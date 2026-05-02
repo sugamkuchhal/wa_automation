@@ -1,6 +1,6 @@
-# WhatsApp Personal Messaging Agent (Android, Safe Automation)
+# WhatsApp Personal Messaging Agent (Android, Safe Automation) — Python Version
 
-This module implements a Google Sheets + Apps Script + Web App architecture for **send-ready** WhatsApp messages with a strict human-in-the-loop flow.
+This project implements a Google Sheets + Python (Flask) + Web dashboard architecture for **send-ready** WhatsApp messages with strict human-in-the-loop control.
 
 ## Compliance-first design
 
@@ -41,23 +41,38 @@ This module implements a Google Sheets + Apps Script + Web App architecture for 
 
 ## Files
 
-- `Code.gs`: Apps Script backend, scheduler, message generation, dashboard data endpoint.
+- `app.py`: Flask backend, queue prep logic, API routes, sheet update actions.
 - `Dashboard.html`: send-ready dashboard UI.
+- `requirements.txt`: Python dependencies.
 
 ## Setup
 
-1. Create Google Sheet with the three tabs above.
-2. Open **Extensions → Apps Script**.
-3. Paste `Code.gs` and `Dashboard.html`.
-4. In `Code.gs`, set `SPREADSHEET_ID`.
-5. Run `createDailyTrigger()` once to install a 9 AM daily trigger.
-6. Deploy as Web App (execute as you, accessible to your Google account).
-7. Open the Web App URL on Android and send via WhatsApp buttons.
+1. Create a Google Sheet with the three tabs above.
+2. Create a Google Cloud service account and download JSON key as `service_account.json`.
+3. Share your Google Sheet with the service-account email.
+4. Set env vars:
+   - `SPREADSHEET_ID`
+   - `GOOGLE_APPLICATION_CREDENTIALS` (default: `service_account.json`)
+   - `TZ` (default: `Asia/Kolkata`)
+5. Install deps: `pip install -r requirements.txt`
+6. Run queue generation once manually:
+   - `python -c "from app import prepare_daily_queue; prepare_daily_queue()"`
+7. Run the app:
+   - `python app.py`
+8. Open `http://localhost:8080` on Android and send via WhatsApp buttons.
+
+## Triggering daily at 9 AM
+
+Use OS scheduler/cron (example):
+
+```bash
+0 9 * * * cd /path/to/repo && /usr/bin/python -c "from app import prepare_daily_queue; prepare_daily_queue()"
+```
 
 ## Android flow
 
-- 9 AM trigger prepares today's queue in `ready_queue` sheet.
-- User opens dashboard from notification/bookmark.
-- For each item, user taps button.
-- WhatsApp opens with prefilled text (and media URL/copy text for group fallback).
+- 9 AM job prepares today's queue in `ready_queue` sheet.
+- User opens dashboard from bookmark/notification shortcut.
+- For each item, user taps send/share.
+- WhatsApp opens with prefilled text.
 - User manually taps **Send**.

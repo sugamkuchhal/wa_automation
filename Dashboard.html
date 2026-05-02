@@ -7,10 +7,10 @@
     .card { background: white; border-radius: 12px; padding: 12px; margin-bottom: 12px; box-shadow: 0 2px 6px rgba(0,0,0,.08); }
     .title { font-weight: 700; margin-bottom: 6px; }
     .meta { color: #666; font-size: 13px; margin-bottom: 8px; }
-    .msg { background: #f1f3f5; border-radius: 8px; padding: 10px; white-space: pre-wrap; }
-    .btn { display:inline-block; margin-top:10px; margin-right:8px; padding:10px 12px; border-radius:8px; text-decoration:none; font-weight:600; }
+    .msg { width:100%; background: #f1f3f5; border-radius: 8px; padding: 10px; white-space: pre-wrap; border:1px solid #e3e6ea; }
+    .btn { display:inline-block; margin-top:10px; margin-right:8px; padding:10px 12px; border-radius:8px; text-decoration:none; font-weight:600; border:0; cursor:pointer; }
     .send { background:#25D366; color:white; }
-    .skip { background:#ddd; color:#222; border:0; }
+    .skip { background:#ddd; color:#222; }
   </style>
 </head>
 <body>
@@ -45,8 +45,15 @@
       }).join('');
     }
 
-    function mark(id, action) {
-      google.script.run.markAction(id, action);
+    async function mark(id, action) {
+      if (window.google && google.script && google.script.run) {
+        google.script.run.markAction(id, action);
+        return;
+      }
+      await fetch('/api/mark', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, action })
+      });
     }
 
     function escapeHtml(v) {
@@ -58,9 +65,16 @@
         .replaceAll("'", '&#039;');
     }
 
-    function saveEdit(id) {
+    async function saveEdit(id) {
       const el = document.getElementById(`msg-${id}`);
-      google.script.run.updateMessageText(id, el.value);
+      if (window.google && google.script && google.script.run) {
+        google.script.run.updateMessageText(id, el.value);
+        return;
+      }
+      await fetch('/api/edit', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, text: el.value })
+      });
     }
 
     function copyText(id) {
@@ -82,7 +96,17 @@
       window.open(`https://wa.me/?text=${encodeURIComponent(mediaUrl ? `${text}\n${mediaUrl}` : text)}`, '_blank');
     }
 
-    google.script.run.withSuccessHandler(render).getTodayQueue();
+    function init() {
+      if (window.google && google.script && google.script.run) {
+        google.script.run.withSuccessHandler(render).getTodayQueue();
+        return;
+      }
+      fetch('/api/today_queue')
+        .then(res => res.json())
+        .then(render);
+    }
+
+    init();
   </script>
 </body>
 </html>
