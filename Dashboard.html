@@ -29,12 +29,17 @@
 
       root.innerHTML = rows.map(r => {
         const icon = emoji[String(r.event_type).toLowerCase()] || '✨';
+        const hasMedia = !!r.media_url;
         return `
           <div class="card">
             <div class="title">${icon} ${escapeHtml(r.name)} – ${escapeHtml(r.event_type)}</div>
             <div class="meta">${escapeHtml(r.chat_type)} • media: ${escapeHtml(r.media_mode)}</div>
-            <div class="msg">${escapeHtml(r.final_message_text)}${r.media_url ? '\n'+escapeHtml(r.media_url) : ''}</div>
+            <textarea id="msg-${escapeHtml(r.id)}" class="msg" rows="4">${escapeHtml(r.final_message_text)}</textarea>
+            ${hasMedia ? `<div class="meta">Media URL: ${escapeHtml(r.media_url)}</div>` : ''}
             <a class="btn send" href="${escapeHtml(r.wa_link)}" target="_blank" onclick="mark('${r.id}','sent')">Send on WhatsApp</a>
+            <button class="btn" onclick="saveEdit('${r.id}')">Save Edit</button>
+            <button class="btn" onclick="copyText('${r.id}')">Copy Text</button>
+            ${hasMedia ? `<button class="btn" onclick="shareMessage('${r.id}', '${escapeHtml(r.media_url)}')">Share (Android)</button>` : ''}
             <button class="btn skip" onclick="mark('${r.id}','skipped')">Skip</button>
           </div>`;
       }).join('');
@@ -51,6 +56,30 @@
         .replaceAll('>', '&gt;')
         .replaceAll('"', '&quot;')
         .replaceAll("'", '&#039;');
+    }
+
+    function saveEdit(id) {
+      const el = document.getElementById(`msg-${id}`);
+      google.script.run.updateMessageText(id, el.value);
+    }
+
+    function copyText(id) {
+      const el = document.getElementById(`msg-${id}`);
+      navigator.clipboard.writeText(el.value);
+    }
+
+    async function shareMessage(id, mediaUrl) {
+      const text = document.getElementById(`msg-${id}`).value;
+      try {
+        if (navigator.share) {
+          await navigator.share({ text: mediaUrl ? `${text}\n${mediaUrl}` : text });
+          mark(id, 'sent');
+          return;
+        }
+      } catch (e) {
+        console.log('Share canceled or failed', e);
+      }
+      window.open(`https://wa.me/?text=${encodeURIComponent(mediaUrl ? `${text}\n${mediaUrl}` : text)}`, '_blank');
     }
 
     google.script.run.withSuccessHandler(render).getTodayQueue();

@@ -28,15 +28,35 @@ function prepareDailyQueue() {
   const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
   const contacts = getSheetRows_(ss, 'contacts_events');
   const templates = getSheetRows_(ss, 'message_templates');
+  const festivals = getSheetRows_(ss, 'festival_calendar');
   const today = Utilities.formatDate(new Date(), TZ, 'yyyy-MM-dd');
+  const todayDate = new Date(today + 'T00:00:00');
+
+  const festivalRows = festivals
+    .filter(f => Number(f.month) === (todayDate.getMonth() + 1) && Number(f.day) === todayDate.getDate())
+    .map(f => ({
+      id: `festival-${String(f.festival).toLowerCase()}-${today}`,
+      name: `${f.festival} Group`,
+      phone: '',
+      chat_type: 'group',
+      group_invite_link: '',
+      event_type: String(f.festival).toLowerCase(),
+      event_date: today,
+      relation: 'community',
+      language: f.default_language || 'en',
+      tone: 'warm',
+      media_mode: f.default_media || 'text',
+      active: 'TRUE'
+    }));
 
   const todays = contacts.filter(r =>
     String(r.event_date || '') === today &&
     String(r.active || '').toUpperCase() === 'TRUE'
-  );
+  ).concat(festivalRows);
 
   const output = todays.map(r => buildQueueRecord_(r, templates, today));
   writeReadyQueue_(ss, output);
+  notifyQueueReady_(output.length, today);
 }
 
 function getTodayQueue() {
@@ -65,6 +85,27 @@ function markAction(id, action) {
   return { ok: false };
 }
 
+function updateMessageText(id, updatedText) {
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  const sh = ss.getSheetByName('ready_queue');
+  const data = sh.getDataRange().getValues();
+  const headers = data[0];
+  const idCol = headers.indexOf('id');
+  const actionCol = headers.indexOf('action_status');
+  const tsCol = headers.indexOf('action_ts');
+  const textCol = headers.indexOf('final_message_text');
+
+  for (let i = 1; i < data.length; i++) {
+    if (String(data[i][idCol]) === String(id)) {
+      sh.getRange(i + 1, textCol + 1).setValue(String(updatedText || ''));
+      sh.getRange(i + 1, actionCol + 1).setValue('edited');
+      sh.getRange(i + 1, tsCol + 1).setValue(new Date());
+      return { ok: true };
+    }
+  }
+  return { ok: false };
+}
+
 function buildQueueRecord_(row, templates, dateStr) {
   const text = renderTemplate_(row, templates);
   const media = buildMedia_(row, text);
@@ -85,6 +126,16 @@ function buildQueueRecord_(row, templates, dateStr) {
     action_status: 'ready',
     action_ts: ''
   };
+}
+
+function notifyQueueReady_(count, dateStr) {
+  const email = Session.getActiveUser().getEmail();
+  if (!email) return;
+  MailApp.sendEmail({
+    to: email,
+    subject: `WhatsApp queue ready: ${count} message(s) for ${dateStr}`,
+    body: `You have ${count} WhatsApp message(s) ready to review and send.`
+  });
 }
 
 function renderTemplate_(row, templates) {
