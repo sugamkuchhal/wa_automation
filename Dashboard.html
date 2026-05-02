@@ -7,10 +7,10 @@
     .card { background: white; border-radius: 12px; padding: 12px; margin-bottom: 12px; box-shadow: 0 2px 6px rgba(0,0,0,.08); }
     .title { font-weight: 700; margin-bottom: 6px; }
     .meta { color: #666; font-size: 13px; margin-bottom: 8px; }
-    .msg { background: #f1f3f5; border-radius: 8px; padding: 10px; white-space: pre-wrap; }
-    .btn { display:inline-block; margin-top:10px; margin-right:8px; padding:10px 12px; border-radius:8px; text-decoration:none; font-weight:600; }
+    .msg { width:100%; background: #f1f3f5; border-radius: 8px; padding: 10px; white-space: pre-wrap; border:1px solid #e3e6ea; }
+    .btn { display:inline-block; margin-top:10px; margin-right:8px; padding:10px 12px; border-radius:8px; text-decoration:none; font-weight:600; border:0; cursor:pointer; }
     .send { background:#25D366; color:white; }
-    .skip { background:#ddd; color:#222; border:0; }
+    .skip { background:#ddd; color:#222; }
   </style>
 </head>
 <body>
@@ -29,19 +29,27 @@
 
       root.innerHTML = rows.map(r => {
         const icon = emoji[String(r.event_type).toLowerCase()] || '✨';
+        const hasMedia = !!r.media_url;
         return `
           <div class="card">
             <div class="title">${icon} ${escapeHtml(r.name)} – ${escapeHtml(r.event_type)}</div>
             <div class="meta">${escapeHtml(r.chat_type)} • media: ${escapeHtml(r.media_mode)}</div>
-            <div class="msg">${escapeHtml(r.final_message_text)}${r.media_url ? '\n'+escapeHtml(r.media_url) : ''}</div>
+            <textarea id="msg-${escapeHtml(r.id)}" class="msg" rows="4">${escapeHtml(r.final_message_text)}</textarea>
+            ${hasMedia ? `<div class="meta">Media URL: ${escapeHtml(r.media_url)}</div>` : ''}
             <a class="btn send" href="${escapeHtml(r.wa_link)}" target="_blank" onclick="mark('${r.id}','sent')">Send on WhatsApp</a>
+            <button class="btn" onclick="saveEdit('${r.id}')">Save Edit</button>
+            <button class="btn" onclick="copyText('${r.id}')">Copy Text</button>
+            ${hasMedia ? `<button class="btn" onclick="shareMessage('${r.id}', '${escapeHtml(r.media_url)}')">Share (Android)</button>` : ''}
             <button class="btn skip" onclick="mark('${r.id}','skipped')">Skip</button>
           </div>`;
       }).join('');
     }
 
-    function mark(id, action) {
-      google.script.run.markAction(id, action);
+    async function mark(id, action) {
+      await fetch('/api/mark', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, action })
+      });
     }
 
     function escapeHtml(v) {
@@ -53,7 +61,40 @@
         .replaceAll("'", '&#039;');
     }
 
-    google.script.run.withSuccessHandler(render).getTodayQueue();
+    async function saveEdit(id) {
+      const el = document.getElementById(`msg-${id}`);
+      await fetch('/api/edit', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, text: el.value })
+      });
+    }
+
+    function copyText(id) {
+      const el = document.getElementById(`msg-${id}`);
+      navigator.clipboard.writeText(el.value);
+    }
+
+    async function shareMessage(id, mediaUrl) {
+      const text = document.getElementById(`msg-${id}`).value;
+      try {
+        if (navigator.share) {
+          await navigator.share({ text: mediaUrl ? `${text}\n${mediaUrl}` : text });
+          mark(id, 'sent');
+          return;
+        }
+      } catch (e) {
+        console.log('Share canceled or failed', e);
+      }
+      window.open(`https://wa.me/?text=${encodeURIComponent(mediaUrl ? `${text}\n${mediaUrl}` : text)}`, '_blank');
+    }
+
+    async function init() {
+      const res = await fetch('/api/today_queue');
+      const rows = await res.json();
+      render(rows);
+    }
+
+    init();
   </script>
 </body>
 </html>
