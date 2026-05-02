@@ -46,6 +46,10 @@
     }
 
     async function mark(id, action) {
+      if (window.google && google.script && google.script.run) {
+        google.script.run.markAction(id, action);
+        return;
+      }
       await fetch('/api/mark', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, action })
@@ -63,6 +67,10 @@
 
     async function saveEdit(id) {
       const el = document.getElementById(`msg-${id}`);
+      if (window.google && google.script && google.script.run) {
+        google.script.run.updateMessageText(id, el.value);
+        return;
+      }
       await fetch('/api/edit', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, text: el.value })
@@ -88,10 +96,14 @@
       window.open(`https://wa.me/?text=${encodeURIComponent(mediaUrl ? `${text}\n${mediaUrl}` : text)}`, '_blank');
     }
 
-    async function init() {
-      const res = await fetch('/api/today_queue');
-      const rows = await res.json();
-      render(rows);
+    function init() {
+      if (window.google && google.script && google.script.run) {
+        google.script.run.withSuccessHandler(render).getTodayQueue();
+        return;
+      }
+      fetch('/api/today_queue')
+        .then(res => res.json())
+        .then(render);
     }
 
     init();

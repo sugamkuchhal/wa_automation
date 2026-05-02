@@ -159,7 +159,7 @@ def mark_action():
     ts_col = headers.index('action_ts')
 
     for i, row in enumerate(values[1:], start=2):
-      if str(row[id_col]) == rid:
+        if str(row[id_col]) == rid:
             sh.update_cell(i, action_col + 1, action)
             sh.update_cell(i, ts_col + 1, datetime.now(ZoneInfo(TZ)).isoformat())
             return jsonify({'ok': True})
