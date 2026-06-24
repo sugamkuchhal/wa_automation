@@ -335,6 +335,8 @@
       window.open(`https://wa.me/?text=${encodeURIComponent(mediaUrl?`${text}\n${mediaUrl}`:text)}`, '_blank');
     }
 
+    const AI_COOLDOWN_MS = 10000;
+
     async function aiGenerate(id, name, eventType, relation, language, tone) {
       const btn = document.getElementById(`ai-${id}`);
       const el  = document.getElementById(`msg-${id}`);
@@ -348,17 +350,33 @@
         const data = await res.json();
         if (data.ok) {
           el.value = data.text;
-          onEdit(id);   // mark dirty, show Save button
+          onEdit(id);
           toast('✨ AI message ready — review before saving');
         } else {
           toast('❌ ' + (data.error || 'AI generation failed'));
+          btn.disabled = false;
+          btn.textContent = '✨ AI Generate';
+          return;
         }
       } catch(e) {
         toast('❌ Network error');
-      } finally {
         btn.disabled = false;
         btn.textContent = '✨ AI Generate';
+        return;
       }
+      // 10s cooldown after successful generation
+      let remaining = AI_COOLDOWN_MS / 1000;
+      btn.textContent = `✨ AI (${remaining}s)`;
+      const timer = setInterval(() => {
+        remaining--;
+        if (remaining <= 0) {
+          clearInterval(timer);
+          btn.disabled = false;
+          btn.textContent = '✨ AI Generate';
+        } else {
+          btn.textContent = `✨ AI (${remaining}s)`;
+        }
+      }, 1000);
     }
 
     async function prepareQueue() {

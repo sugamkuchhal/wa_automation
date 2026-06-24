@@ -303,10 +303,30 @@ def edit_message():
     return jsonify({'ok': True, 'wa_link': new_wa_link})
 
 
+# In-memory daily AI call counter — resets when server restarts or date changes
+_ai_usage = {'date': '', 'count': 0}
+AI_DAILY_LIMIT = int(os.getenv('AI_DAILY_LIMIT', '30'))
+
+
+def _check_ai_rate_limit():
+    today = _today_str()
+    if _ai_usage['date'] != today:
+        _ai_usage['date'] = today
+        _ai_usage['count'] = 0
+    if _ai_usage['count'] >= AI_DAILY_LIMIT:
+        return False, f'Daily AI limit of {AI_DAILY_LIMIT} calls reached. Resets tomorrow.'
+    _ai_usage['count'] += 1
+    return True, None
+
+
 @app.post('/api/ai_generate')
 def ai_generate():
     """Generate a personalised message via Claude. Opt-in only — called from dashboard button."""
     import anthropic
+
+    allowed, err = _check_ai_rate_limit()
+    if not allowed:
+        return jsonify({'ok': False, 'error': err}), 429
 
     payload = request.get_json(force=True)
     name       = str(payload.get('name', 'there'))
