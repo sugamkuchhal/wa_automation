@@ -60,7 +60,13 @@
   </style>
 </head>
 <body>
-  <h2>📨 Send-Ready WhatsApp Messages</h2>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+    <h2 style="margin:0;font-family:Arial,sans-serif">📨 Send-Ready WhatsApp Messages</h2>
+    <button id="prep-btn" onclick="prepareQueue()"
+      style="padding:9px 16px;border-radius:8px;border:0;background:#222;color:#fff;font-weight:600;font-size:14px;cursor:pointer">
+      🔄 Prepare Today's Queue
+    </button>
+  </div>
 
   <!-- Bulk action bar -->
   <div id="bulk-bar">
@@ -349,6 +355,28 @@
       } finally {
         btn.disabled = false;
         btn.textContent = '✨ AI Generate';
+      }
+    }
+
+    async function prepareQueue() {
+      const btn = document.getElementById('prep-btn');
+      btn.disabled = true;
+      btn.textContent = '⏳ Preparing…';
+      try {
+        const res = await fetch('/api/prepare_queue', { method: 'POST' });
+        const data = await res.json();
+        if (data.ok) {
+          toast(`✅ Queue ready — ${data.count} message(s)`);
+          const rows = await fetch('/api/today_queue').then(r => r.json());
+          render(rows);
+        } else {
+          toast('❌ ' + (data.error || 'Preparation failed'));
+        }
+      } catch(e) {
+        toast('❌ Network error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '🔄 Prepare Today\'s Queue';
       }
     }
 

@@ -237,6 +237,16 @@ def today_queue():
     return jsonify([r for r in rows if str(r.get('queue_date')) == today])
 
 
+@app.post('/api/prepare_queue')
+def prepare_queue():
+    """Trigger queue generation on demand from the dashboard."""
+    try:
+        output = prepare_daily_queue()
+        return jsonify({'ok': True, 'count': len(output)})
+    except Exception as e:
+        return jsonify({'ok': False, 'error': str(e)}), 500
+
+
 @app.post('/api/mark')
 def mark_action():
     payload = request.get_json(force=True)
