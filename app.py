@@ -101,16 +101,70 @@ def render_template(row, templates):
     return template.replace('{{name}}', row.get('name', 'there'))
 
 
+# ---------------------------------------------------------------------------
+# Media helpers
+# ---------------------------------------------------------------------------
+
+GIPHY_API_KEY = os.getenv('GIPHY_API_KEY', '')          # optional — public beta key works too
+GDRIVE_IMAGE_FOLDER_ID = os.getenv('GDRIVE_IMAGE_FOLDER_ID', '')  # optional Drive folder
+
+
+def _giphy_url(query):
+    """Search Giphy for a relevant GIF. Falls back to None if unavailable."""
+    import urllib.request, json as _json
+    key = GIPHY_API_KEY or 'dc6zaTOxFJmzC'  # Giphy public beta key
+    q = urllib.parse.quote(query)
+    url = f'https://api.giphy.com/v1/gifs/search?api_key={key}&q={q}&limit=1&rating=g'
+    try:
+        with urllib.request.urlopen(url, timeout=4) as r:
+            data = _json.loads(r.read())
+        return data['data'][0]['images']['original']['url']
+    except Exception:
+        return None
+
+
+def _gdrive_image_url(event_type):
+    """Find first image in the configured Drive folder whose name contains event_type.
+    Returns a direct sharing URL, or None if folder not configured / no match."""
+    if not GDRIVE_IMAGE_FOLDER_ID:
+        return None
+    try:
+        drive = _sheet().client.auth  # reuse existing credentials
+        from googleapiclient.discovery import build as _build
+        svc = _build('drive', 'v3', credentials=drive)
+        q = f"'{GDRIVE_IMAGE_FOLDER_ID}' in parents and mimeType contains 'image/' and name contains '{event_type}' and trashed=false"
+        results = svc.files().list(q=q, fields='files(id,name)', pageSize=1).execute()
+        files = results.get('files', [])
+        if files:
+            fid = files[0]['id']
+            svc.permissions().create(fileId=fid, body={'role': 'reader', 'type': 'anyone'}).execute()
+            return f'https://drive.google.com/uc?export=view&id={fid}'
+    except Exception:
+        pass
+    return None
+
+
 def build_media(row, text):
     mode = row.get('media_mode')
     if mode in ('manual_photo', 'text'):
         return {'media_url': ''}
-    festival = str(row.get('event_type', 'celebration')).replace(' ', '+')
-    name = str(row.get('name', 'friend')).replace(' ', '+')
-    caption = text[:80].replace(' ', '+')
+
+    event_type = str(row.get('event_type', 'celebration'))
+
     if mode == 'gif':
-        return {'media_url': f'https://dummyimage.com/600x600/000/fff.gif&text={festival}+{name}'}
-    return {'media_url': f'https://dummyimage.com/1080x1080/ff6600/ffffff.png&text={festival}+{name}+{caption}'}
+        url = _giphy_url(f'{event_type} celebration')
+        return {'media_url': url or ''}
+
+    if mode == 'image':
+        # 1. Try Google Drive folder first
+        url = _gdrive_image_url(event_type)
+        if url:
+            return {'media_url': url}
+        # 2. Fall back to a free stock image via Unsplash source (no API key)
+        slug = urllib.parse.quote(event_type)
+        return {'media_url': f'https://source.unsplash.com/1080x1080/?{slug},celebration'}
+
+    return {'media_url': ''}
 
 
 def build_wa_link(row, text, media):
