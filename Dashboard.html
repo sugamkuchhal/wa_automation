@@ -300,7 +300,12 @@
         el.classList.remove('dirty');
         document.getElementById(`save-${id}`).style.display = 'none';
         setStatus(id, 'edited');
-        toast('💾 Saved');
+        // Update Send button href so it uses the edited message
+        if (data.wa_link) {
+          const sendBtn = document.querySelector(`#card-${id} .send`);
+          if (sendBtn) sendBtn.href = data.wa_link;
+        }
+        toast('💾 Saved — Send button updated');
       }
     }
 

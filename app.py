@@ -276,13 +276,21 @@ def edit_message():
     text_col   = headers.index('final_message_text') + 1
     action_col = headers.index('action_status') + 1
     ts_col     = headers.index('action_ts') + 1
-    # Batch all three cell updates in a single API call
+    wa_col     = headers.index('wa_link') + 1
+
+    # Rebuild wa_link with the updated text so Send on WhatsApp uses the edited message
+    row_data = dict(zip(headers, values[i - 1]))
+    row_data['final_message_text'] = text
+    media = {'media_url': row_data.get('media_url', '')}
+    new_wa_link = build_wa_link(row_data, text, media)
+
     ws.batch_update([
         {'range': gspread.utils.rowcol_to_a1(i, text_col),   'values': [[text]]},
+        {'range': gspread.utils.rowcol_to_a1(i, wa_col),     'values': [[new_wa_link]]},
         {'range': gspread.utils.rowcol_to_a1(i, action_col), 'values': [['edited']]},
         {'range': gspread.utils.rowcol_to_a1(i, ts_col),     'values': [[datetime.now(ZoneInfo(TZ)).isoformat()]]},
     ])
-    return jsonify({'ok': True})
+    return jsonify({'ok': True, 'wa_link': new_wa_link})
 
 
 @app.post('/api/ai_generate')
