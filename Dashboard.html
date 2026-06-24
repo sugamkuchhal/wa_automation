@@ -274,9 +274,12 @@
       toast('📋 Copied');
     }
 
-    function endSession() {
+    async function endSession() {
       document.getElementById('session').classList.remove('active');
       document.getElementById('session-done').style.display = 'none';
+      // Re-fetch queue so list reflects latest statuses from the session
+      const rows = await fetch('/api/today_queue').then(r => r.json());
+      render(rows);
     }
 
     // ── Individual card actions ───────────────────────────────────────────────
