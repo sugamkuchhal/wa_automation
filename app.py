@@ -1,5 +1,6 @@
 import os
 import smtplib
+import urllib.parse
 from datetime import datetime
 from email.mime.text import MIMEText
 from zoneinfo import ZoneInfo
@@ -9,11 +10,11 @@ from google.oauth2.service_account import Credentials
 
 SPREADSHEET_ID = os.getenv('SPREADSHEET_ID', 'REPLACE_WITH_SPREADSHEET_ID')
 TZ = os.getenv('TZ', 'Asia/Kolkata')
-NOTIFY_EMAIL = os.getenv('NOTIFY_EMAIL', '')        # recipient address
+NOTIFY_EMAIL = os.getenv('NOTIFY_EMAIL', '')
 SMTP_HOST = os.getenv('SMTP_HOST', 'smtp.gmail.com')
 SMTP_PORT = int(os.getenv('SMTP_PORT', '587'))
-SMTP_USER = os.getenv('SMTP_USER', '')              # sender gmail address
-SMTP_PASS = os.getenv('SMTP_PASS', '')              # app password
+SMTP_USER = os.getenv('SMTP_USER', '')
+SMTP_PASS = os.getenv('SMTP_PASS', '')
 
 app = Flask(__name__)
 
@@ -22,25 +23,37 @@ SCOPES = [
     'https://www.googleapis.com/auth/drive.readonly'
 ]
 
+# ---------------------------------------------------------------------------
+# Single shared spreadsheet handle — created once, reused across requests.
+# gspread credentials are long-lived service-account tokens; one client is fine.
+# ---------------------------------------------------------------------------
+_spreadsheet = None
 
-def _client():
-    creds_file = os.getenv('GOOGLE_APPLICATION_CREDENTIALS', 'service_account.json')
-    creds = Credentials.from_service_account_file(creds_file, scopes=SCOPES)
-    return gspread.authorize(creds)
+
+def _sheet():
+    """Return the cached Spreadsheet object, opening it on first call."""
+    global _spreadsheet
+    if _spreadsheet is None:
+        creds_file = os.getenv('GOOGLE_APPLICATION_CREDENTIALS', 'service_account.json')
+        creds = Credentials.from_service_account_file(creds_file, scopes=SCOPES)
+        _spreadsheet = gspread.authorize(creds).open_by_key(SPREADSHEET_ID)
+    return _spreadsheet
 
 
 def _today_str():
     return datetime.now(ZoneInfo(TZ)).strftime('%Y-%m-%d')
 
 
+# ---------------------------------------------------------------------------
+# Sheet helpers
+# ---------------------------------------------------------------------------
+
 def get_sheet_rows(sheet_name):
-    ws = _client().open_by_key(SPREADSHEET_ID).worksheet(sheet_name)
-    records = ws.get_all_records()
-    return records
+    return _sheet().worksheet(sheet_name).get_all_records()
 
 
 def write_ready_queue(rows):
-    sh = _client().open_by_key(SPREADSHEET_ID)
+    sh = _sheet()
     try:
         ws = sh.worksheet('ready_queue')
     except gspread.WorksheetNotFound:
@@ -56,11 +69,34 @@ def write_ready_queue(rows):
         ws.append_rows([[r.get(h, '') for h in headers] for r in rows])
 
 
+def _queue_worksheet():
+    return _sheet().worksheet('ready_queue')
+
+
+def _find_row(values, id_col, rid):
+    """Return 1-based sheet row index for a given id, or None."""
+    for i, row in enumerate(values[1:], start=2):
+        if str(row[id_col]) == rid:
+            return i
+    return None
+
+
+# ---------------------------------------------------------------------------
+# Business logic
+# ---------------------------------------------------------------------------
+
 def render_template(row, templates):
-    exact = next((t for t in templates if t.get('event_type') == row.get('event_type') and t.get('language') == row.get('language') and t.get('tone') == row.get('tone')), None)
-    fallback = next((t for t in templates if t.get('event_type') == row.get('event_type') and t.get('language') == row.get('language')), None) \
-        or next((t for t in templates if t.get('event_type') == row.get('event_type')), None) \
+    exact = next(
+        (t for t in templates if t.get('event_type') == row.get('event_type')
+         and t.get('language') == row.get('language')
+         and t.get('tone') == row.get('tone')), None
+    )
+    fallback = (
+        next((t for t in templates if t.get('event_type') == row.get('event_type')
+              and t.get('language') == row.get('language')), None)
+        or next((t for t in templates if t.get('event_type') == row.get('event_type')), None)
         or {'template_text': 'Hi {{name}}, wishing you a wonderful day!'}
+    )
     template = (exact or fallback).get('template_text', '')
     return template.replace('{{name}}', row.get('name', 'there'))
 
@@ -78,7 +114,6 @@ def build_media(row, text):
 
 
 def build_wa_link(row, text, media):
-    import urllib.parse
     encoded = urllib.parse.quote(text + (f"\n{media['media_url']}" if media.get('media_url') else ''))
     if row.get('chat_type') == 'individual' and row.get('phone'):
         digits = ''.join(ch for ch in str(row.get('phone')) if ch.isdigit())
@@ -91,7 +126,6 @@ def build_wa_link(row, text, media):
 def build_queue_record(row, templates, date_str):
     text = render_template(row, templates)
     media = build_media(row, text)
-    wa_link = build_wa_link(row, text, media)
     return {
         'id': row.get('id'),
         'queue_date': date_str,
@@ -103,7 +137,7 @@ def build_queue_record(row, templates, date_str):
         'media_mode': row.get('media_mode'),
         'media_url': media.get('media_url', ''),
         'final_message_text': text,
-        'wa_link': wa_link,
+        'wa_link': build_wa_link(row, text, media),
         'action_status': 'ready',
         'action_ts': ''
     }
@@ -126,36 +160,41 @@ def notify_queue_ready(count, date_str):
 
 
 def prepare_daily_queue():
+    # Three worksheet reads share the same connection
     contacts = get_sheet_rows('contacts_events')
     templates = get_sheet_rows('message_templates')
     festivals = get_sheet_rows('festival_calendar')
     today = _today_str()
     dt = datetime.strptime(today, '%Y-%m-%d')
 
-    festival_rows = []
-    for f in festivals:
-        if int(f.get('month', 0)) == dt.month and int(f.get('day', 0)) == dt.day:
-            festival_rows.append({
-                'id': f"festival-{str(f.get('festival', '')).lower()}-{today}",
-                'name': f"{f.get('festival', 'Festival')} Group",
-                'phone': '',
-                'chat_type': 'group',
-                'group_invite_link': '',
-                'event_type': str(f.get('festival', '')).lower(),
-                'event_date': today,
-                'relation': 'community',
-                'language': f.get('default_language', 'en'),
-                'tone': 'warm',
-                'media_mode': f.get('default_media', 'text'),
-                'active': 'TRUE'
-            })
+    festival_rows = [
+        {
+            'id': f"festival-{str(f.get('festival', '')).lower()}-{today}",
+            'name': f"{f.get('festival', 'Festival')} Group",
+            'phone': '', 'chat_type': 'group', 'group_invite_link': '',
+            'event_type': str(f.get('festival', '')).lower(),
+            'event_date': today, 'relation': 'community',
+            'language': f.get('default_language', 'en'),
+            'tone': 'warm', 'media_mode': f.get('default_media', 'text'), 'active': 'TRUE'
+        }
+        for f in festivals
+        if int(f.get('month', 0)) == dt.month and int(f.get('day', 0)) == dt.day
+    ]
 
-    todays = [r for r in contacts if str(r.get('event_date', '')) == today and str(r.get('active', '')).upper() == 'TRUE'] + festival_rows
+    todays = [
+        r for r in contacts
+        if str(r.get('event_date', '')) == today and str(r.get('active', '')).upper() == 'TRUE'
+    ] + festival_rows
+
     output = [build_queue_record(r, templates, today) for r in todays]
     write_ready_queue(output)
     notify_queue_ready(len(output), today)
     return output
 
+
+# ---------------------------------------------------------------------------
+# Routes
+# ---------------------------------------------------------------------------
 
 @app.get('/')
 def home():
@@ -175,19 +214,21 @@ def mark_action():
     rid = str(payload.get('id'))
     action = str(payload.get('action'))
 
-    sh = _client().open_by_key(SPREADSHEET_ID).worksheet('ready_queue')
-    values = sh.get_all_values()
+    ws = _queue_worksheet()
+    values = ws.get_all_values()
     headers = values[0]
-    id_col = headers.index('id')
-    action_col = headers.index('action_status')
-    ts_col = headers.index('action_ts')
+    i = _find_row(values, headers.index('id'), rid)
+    if i is None:
+        return jsonify({'ok': False})
 
-    for i, row in enumerate(values[1:], start=2):
-        if str(row[id_col]) == rid:
-            sh.update_cell(i, action_col + 1, action)
-            sh.update_cell(i, ts_col + 1, datetime.now(ZoneInfo(TZ)).isoformat())
-            return jsonify({'ok': True})
-    return jsonify({'ok': False})
+    action_col = headers.index('action_status') + 1
+    ts_col = headers.index('action_ts') + 1
+    # Batch both cell updates in a single API call
+    ws.batch_update([
+        {'range': gspread.utils.rowcol_to_a1(i, action_col), 'values': [[action]]},
+        {'range': gspread.utils.rowcol_to_a1(i, ts_col),     'values': [[datetime.now(ZoneInfo(TZ)).isoformat()]]},
+    ])
+    return jsonify({'ok': True})
 
 
 @app.post('/api/edit')
@@ -196,21 +237,23 @@ def edit_message():
     rid = str(payload.get('id'))
     text = str(payload.get('text', ''))
 
-    sh = _client().open_by_key(SPREADSHEET_ID).worksheet('ready_queue')
-    values = sh.get_all_values()
+    ws = _queue_worksheet()
+    values = ws.get_all_values()
     headers = values[0]
-    id_col = headers.index('id')
-    action_col = headers.index('action_status')
-    ts_col = headers.index('action_ts')
-    text_col = headers.index('final_message_text')
+    i = _find_row(values, headers.index('id'), rid)
+    if i is None:
+        return jsonify({'ok': False})
 
-    for i, row in enumerate(values[1:], start=2):
-        if str(row[id_col]) == rid:
-            sh.update_cell(i, text_col + 1, text)
-            sh.update_cell(i, action_col + 1, 'edited')
-            sh.update_cell(i, ts_col + 1, datetime.now(ZoneInfo(TZ)).isoformat())
-            return jsonify({'ok': True})
-    return jsonify({'ok': False})
+    text_col   = headers.index('final_message_text') + 1
+    action_col = headers.index('action_status') + 1
+    ts_col     = headers.index('action_ts') + 1
+    # Batch all three cell updates in a single API call
+    ws.batch_update([
+        {'range': gspread.utils.rowcol_to_a1(i, text_col),   'values': [[text]]},
+        {'range': gspread.utils.rowcol_to_a1(i, action_col), 'values': [['edited']]},
+        {'range': gspread.utils.rowcol_to_a1(i, ts_col),     'values': [[datetime.now(ZoneInfo(TZ)).isoformat()]]},
+    ])
+    return jsonify({'ok': True})
 
 
 if __name__ == '__main__':
