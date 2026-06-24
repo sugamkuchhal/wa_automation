@@ -23,6 +23,8 @@
     .send { background:#25D366; color:white; }
     .skip { background:#ddd; color:#222; }
     .save { background:#f0a500; color:white; }
+    .ai   { background:#6c47ff; color:white; }
+    .ai:disabled { opacity:.6; cursor:wait; }
     .select-cb { position:absolute; top:14px; right:14px; width:20px; height:20px; cursor:pointer; accent-color:#25D366; }
 
     /* ── Bulk bar ── */
@@ -151,6 +153,8 @@
               onclick="mark('${r.id}','sent')">Send on WhatsApp</a>
             <button class="btn save" id="save-${escapeHtml(r.id)}" style="display:none"
               onclick="saveEdit('${r.id}')">Save Edit</button>
+            <button class="btn ai" id="ai-${escapeHtml(r.id)}"
+              onclick="aiGenerate('${r.id}', ${JSON.stringify(escapeHtml(r.name))}, ${JSON.stringify(escapeHtml(r.event_type))}, ${JSON.stringify(escapeHtml(r.relation||''))}, ${JSON.stringify(escapeHtml(r.language||'en'))}, ${JSON.stringify(escapeHtml(r.tone||'warm'))})">✨ AI Generate</button>
             <button class="btn" onclick="copyText('${r.id}')">Copy Text</button>
             ${hasMedia?`<button class="btn" onclick="shareMessage('${r.id}','${escapeHtml(r.media_url)}')">Share (Android)</button>`:''}
             <button class="btn skip" onclick="mark('${r.id}','skipped')">Skip</button>
@@ -315,6 +319,32 @@
         }
       } catch(e) { console.log('Share canceled or failed', e); }
       window.open(`https://wa.me/?text=${encodeURIComponent(mediaUrl?`${text}\n${mediaUrl}`:text)}`, '_blank');
+    }
+
+    async function aiGenerate(id, name, eventType, relation, language, tone) {
+      const btn = document.getElementById(`ai-${id}`);
+      const el  = document.getElementById(`msg-${id}`);
+      btn.disabled = true;
+      btn.textContent = '⏳ Generating…';
+      try {
+        const res = await fetch('/api/ai_generate', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id, name, event_type: eventType, relation, language, tone, current_text: el.value })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          el.value = data.text;
+          onEdit(id);   // mark dirty, show Save button
+          toast('✨ AI message ready — review before saving');
+        } else {
+          toast('❌ ' + (data.error || 'AI generation failed'));
+        }
+      } catch(e) {
+        toast('❌ Network error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '✨ AI Generate';
+      }
     }
 
     fetch('/api/today_queue').then(r => r.json()).then(render);

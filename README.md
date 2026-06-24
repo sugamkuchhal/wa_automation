@@ -65,6 +65,7 @@ Create a `.env` (or export env vars in shell):
 
 ```bash
 export SPREADSHEET_ID="your_sheet_id"
+export ANTHROPIC_API_KEY="sk-ant-..."   # Optional — only needed for AI Generate button
 export GOOGLE_APPLICATION_CREDENTIALS="/full/path/to/service_account.json"
 export TZ="Asia/Kolkata"
 export PORT="8080"

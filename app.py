@@ -285,5 +285,48 @@ def edit_message():
     return jsonify({'ok': True})
 
 
+@app.post('/api/ai_generate')
+def ai_generate():
+    """Generate a personalised message via Claude. Opt-in only — called from dashboard button."""
+    import anthropic
+
+    payload = request.get_json(force=True)
+    name       = str(payload.get('name', 'there'))
+    event_type = str(payload.get('event_type', 'occasion'))
+    relation   = str(payload.get('relation', ''))
+    language   = str(payload.get('language', 'en'))
+    tone       = str(payload.get('tone', 'warm'))
+    current    = str(payload.get('current_text', ''))
+
+    lang_label = {'en': 'English', 'hi': 'Hindi', 'hinglish': 'Hinglish (mix of Hindi and English)'}.get(language, 'English')
+    tone_label = {'warm': 'warm and heartfelt', 'casual': 'casual and friendly',
+                  'formal': 'formal and respectful', 'fun': 'fun and playful'}.get(tone, 'warm and heartfelt')
+    relation_hint = f" They are my {relation}." if relation else ""
+
+    prompt = (
+        f"Write a short WhatsApp message for {name} on their {event_type}.{relation_hint}\n"
+        f"Language: {lang_label}. Tone: {tone_label}.\n"
+        f"Keep it under 3 sentences, personal, no hashtags, no generic filler.\n"
+        f"Existing message for reference (improve it, don't copy): {current}\n"
+        f"Reply with ONLY the message text, nothing else."
+    )
+
+    api_key = os.getenv('ANTHROPIC_API_KEY', '')
+    if not api_key:
+        return jsonify({'ok': False, 'error': 'ANTHROPIC_API_KEY not set'}), 500
+
+    try:
+        client = anthropic.Anthropic(api_key=api_key)
+        message = client.messages.create(
+            model='claude-haiku-4-5',
+            max_tokens=256,
+            messages=[{'role': 'user', 'content': prompt}]
+        )
+        text = message.content[0].text.strip()
+        return jsonify({'ok': True, 'text': text})
+    except Exception as e:
+        return jsonify({'ok': False, 'error': str(e)}), 500
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.getenv('PORT', '8080')), debug=True)
