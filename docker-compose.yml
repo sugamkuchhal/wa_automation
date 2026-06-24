@@ -1,0 +1,23 @@
+services:
+  wa_automation:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      SPREADSHEET_ID: ${SPREADSHEET_ID}
+      GOOGLE_APPLICATION_CREDENTIALS: /run/secrets/service_account
+      TZ: ${TZ:-Asia/Kolkata}
+      PORT: "8080"
+      # Optional email notification
+      NOTIFY_EMAIL: ${NOTIFY_EMAIL:-}
+      SMTP_HOST: ${SMTP_HOST:-smtp.gmail.com}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+    secrets:
+      - service_account
+    restart: unless-stopped
+
+secrets:
+  service_account:
+    file: ./service_account.json

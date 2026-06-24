@@ -108,6 +108,48 @@ Open:
 
 ---
 
+## Setup (Docker)
+
+The easiest way to run the server — no Python install needed.
+
+### 1) Create a `.env` file
+
+```bash
+SPREADSHEET_ID=your_sheet_id
+TZ=Asia/Kolkata
+
+# Optional email notification
+NOTIFY_EMAIL=you@example.com
+SMTP_USER=sender@gmail.com
+SMTP_PASS=your_app_password
+```
+
+### 2) Place your service account key
+
+Put `service_account.json` in the repo root. Docker Compose mounts it as a secret — it is never baked into the image.
+
+### 3) Build and run
+
+```bash
+docker compose up --build
+```
+
+Open `http://localhost:8080`.
+
+### 4) Run in the background
+
+```bash
+docker compose up -d
+```
+
+### 5) Trigger queue generation inside the container
+
+```bash
+docker compose exec wa_automation python -c "from app import prepare_daily_queue; prepare_daily_queue()"
+```
+
+---
+
 ## Triggering queue creation daily at 9 AM (cron)
 
 ```bash
