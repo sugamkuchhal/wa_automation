@@ -3,37 +3,107 @@
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
+    * { box-sizing: border-box; }
     body { font-family: Arial, sans-serif; margin: 16px; background: #f7f7fb; }
-    .card { background: white; border-radius: 12px; padding: 12px; margin-bottom: 12px; box-shadow: 0 2px 6px rgba(0,0,0,.08); transition: opacity .3s; }
+
+    /* ── List view ── */
+    .card { background: white; border-radius: 12px; padding: 12px; margin-bottom: 12px; box-shadow: 0 2px 6px rgba(0,0,0,.08); transition: opacity .3s; position:relative; }
     .card.done { opacity: .45; }
+    .card.selected { outline: 2px solid #25D366; }
     .title { font-weight: 700; margin-bottom: 6px; }
     .meta { color: #666; font-size: 13px; margin-bottom: 8px; }
     .status-badge { display:inline-block; font-size:11px; font-weight:700; padding:2px 8px; border-radius:99px; margin-left:8px; vertical-align:middle; }
-    .status-sent { background:#d4f5e2; color:#1a7a42; }
+    .status-sent    { background:#d4f5e2; color:#1a7a42; }
     .status-skipped { background:#ececec; color:#666; }
-    .status-edited { background:#fff3cd; color:#856404; }
-    .msg { width:100%; background: #f1f3f5; border-radius: 8px; padding: 10px; white-space: pre-wrap; border:1px solid #e3e6ea; box-sizing:border-box; }
+    .status-edited  { background:#fff3cd; color:#856404; }
+    .status-ready   { background:#e8f0fe; color:#1a56db; }
+    .msg { width:100%; background: #f1f3f5; border-radius: 8px; padding: 10px; white-space: pre-wrap; border:1px solid #e3e6ea; }
     .msg.dirty { border-color:#f0a500; background:#fffbf0; }
     .btn { display:inline-block; margin-top:10px; margin-right:8px; padding:10px 12px; border-radius:8px; text-decoration:none; font-weight:600; border:0; cursor:pointer; font-size:14px; }
     .send { background:#25D366; color:white; }
     .skip { background:#ddd; color:#222; }
     .save { background:#f0a500; color:white; }
-    .toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#333; color:#fff; padding:10px 20px; border-radius:8px; font-size:14px; opacity:0; transition:opacity .3s; pointer-events:none; }
+    .select-cb { position:absolute; top:14px; right:14px; width:20px; height:20px; cursor:pointer; accent-color:#25D366; }
+
+    /* ── Bulk bar ── */
+    #bulk-bar { display:none; position:sticky; top:0; z-index:10; background:#25D366; color:white;
+      padding:12px 16px; border-radius:10px; margin-bottom:12px;
+      display:none; align-items:center; justify-content:space-between; gap:8px; }
+    #bulk-bar.visible { display:flex; }
+    #bulk-bar span { font-weight:700; }
+    #bulk-bar button { background:white; color:#1a7a42; border:0; border-radius:8px;
+      padding:8px 14px; font-weight:700; cursor:pointer; font-size:14px; }
+
+    /* ── Send session overlay ── */
+    #session { display:none; position:fixed; inset:0; background:#f7f7fb; z-index:100; overflow-y:auto; padding:16px; }
+    #session.active { display:block; }
+    #session-progress { font-size:13px; color:#666; margin-bottom:4px; }
+    #session-card { background:white; border-radius:12px; padding:16px; box-shadow:0 2px 6px rgba(0,0,0,.1); }
+    #session-title { font-weight:700; font-size:18px; margin-bottom:6px; }
+    #session-meta  { color:#666; font-size:13px; margin-bottom:10px; }
+    #session-msg   { width:100%; background:#f1f3f5; border-radius:8px; padding:10px; border:1px solid #e3e6ea; font-size:15px; min-height:80px; }
+    #session-actions { margin-top:12px; display:flex; flex-wrap:wrap; gap:8px; }
+    #session-actions a, #session-actions button {
+      flex:1; min-width:120px; padding:14px 10px; border-radius:10px;
+      font-weight:700; font-size:15px; border:0; cursor:pointer; text-align:center; text-decoration:none; }
+    #btn-session-send { background:#25D366; color:white; }
+    #btn-session-skip { background:#ddd; color:#222; }
+    #btn-session-copy { background:#e8f0fe; color:#1a56db; }
+    #session-done { text-align:center; padding:40px 0; }
+    #session-done h2 { font-size:28px; margin-bottom:8px; }
+
+    .toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#333; color:#fff;
+      padding:10px 20px; border-radius:8px; font-size:14px; opacity:0; transition:opacity .3s; pointer-events:none; z-index:200; }
     .toast.show { opacity:1; }
   </style>
 </head>
 <body>
   <h2>📨 Send-Ready WhatsApp Messages</h2>
+
+  <!-- Bulk action bar -->
+  <div id="bulk-bar">
+    <span id="bulk-count">0 selected</span>
+    <div style="display:flex;gap:8px">
+      <button onclick="selectAll()">Select All</button>
+      <button onclick="startSession()" style="background:#1a7a42;color:white">▶ Start Send Session</button>
+      <button onclick="clearSelection()" style="background:#eee;color:#333">✕ Clear</button>
+    </div>
+  </div>
+
   <div id="root">Loading...</div>
+
+  <!-- Send session overlay -->
+  <div id="session">
+    <div id="session-progress"></div>
+    <div id="session-card">
+      <div id="session-title"></div>
+      <div id="session-meta"></div>
+      <textarea id="session-msg" rows="5"></textarea>
+      <div id="session-actions">
+        <a id="btn-session-send" href="#" target="_blank">Send on WhatsApp</a>
+        <button id="btn-session-copy" onclick="sessionCopy()">📋 Copy Text</button>
+        <button id="btn-session-skip" onclick="sessionNext('skipped')">⏭ Skip</button>
+      </div>
+    </div>
+    <div id="session-done" style="display:none">
+      <h2>🎉 All done!</h2>
+      <p id="session-summary"></p>
+      <button class="btn send" onclick="endSession()">Back to Dashboard</button>
+    </div>
+  </div>
+
   <div class="toast" id="toast"></div>
 
   <script>
-    const emoji = { birthday: '🎂', anniversary: '💍', diwali: '🪔', holi: '🎨', christmas: '🎄', 'new year': '🎉' };
+    const emoji = { birthday:'🎂', anniversary:'💍', diwali:'🪔', holi:'🎨', christmas:'🎄', 'new year':'🎉' };
+    let allRows = [];
+    let selected = new Set();         // ids selected for bulk session
+    let sessionQueue = [];            // rows in active session
+    let sessionIdx = 0;
 
     function escapeHtml(v) {
-      return String(v || '')
-        .replaceAll('&', '&amp;').replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;');
+      return String(v||'').replaceAll('&','&amp;').replaceAll('<','&lt;')
+        .replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;');
     }
 
     function toast(msg) {
@@ -53,7 +123,10 @@
       else card.classList.remove('done');
     }
 
+    // ── Render list ──────────────────────────────────────────────────────────
+
     function render(rows) {
+      allRows = rows;
       const root = document.getElementById('root');
       if (!rows.length) { root.innerHTML = '<p>No messages for today.</p>'; return; }
 
@@ -63,7 +136,9 @@
         const status = r.action_status || 'ready';
         const isDone = status === 'sent' || status === 'skipped';
         return `
-          <div class="card${isDone ? ' done' : ''}" id="card-${escapeHtml(r.id)}">
+          <div class="card${isDone?' done':''}" id="card-${escapeHtml(r.id)}">
+            <input type="checkbox" class="select-cb" title="Select for bulk send"
+              onchange="toggleSelect('${escapeHtml(r.id)}', this.checked)" ${isDone?'disabled':''}>
             <div class="title">
               ${icon} ${escapeHtml(r.name)} – ${escapeHtml(r.event_type)}
               <span class="status-badge status-${escapeHtml(status)}">${escapeHtml(status)}</span>
@@ -71,17 +146,130 @@
             <div class="meta">${escapeHtml(r.chat_type)} • media: ${escapeHtml(r.media_mode)}</div>
             <textarea id="msg-${escapeHtml(r.id)}" class="msg" rows="4"
               oninput="onEdit('${escapeHtml(r.id)}')">${escapeHtml(r.final_message_text)}</textarea>
-            ${hasMedia ? `<div class="meta">Media URL: ${escapeHtml(r.media_url)}</div>` : ''}
+            ${hasMedia?`<div class="meta">Media URL: ${escapeHtml(r.media_url)}</div>`:''}
             <a class="btn send" href="${escapeHtml(r.wa_link)}" target="_blank"
               onclick="mark('${r.id}','sent')">Send on WhatsApp</a>
             <button class="btn save" id="save-${escapeHtml(r.id)}" style="display:none"
               onclick="saveEdit('${r.id}')">Save Edit</button>
             <button class="btn" onclick="copyText('${r.id}')">Copy Text</button>
-            ${hasMedia ? `<button class="btn" onclick="shareMessage('${r.id}','${escapeHtml(r.media_url)}')">Share (Android)</button>` : ''}
+            ${hasMedia?`<button class="btn" onclick="shareMessage('${r.id}','${escapeHtml(r.media_url)}')">Share (Android)</button>`:''}
             <button class="btn skip" onclick="mark('${r.id}','skipped')">Skip</button>
           </div>`;
       }).join('');
     }
+
+    // ── Selection ────────────────────────────────────────────────────────────
+
+    function toggleSelect(id, checked) {
+      checked ? selected.add(id) : selected.delete(id);
+      document.getElementById(`card-${id}`).classList.toggle('selected', checked);
+      updateBulkBar();
+    }
+
+    function updateBulkBar() {
+      const bar = document.getElementById('bulk-bar');
+      const n = selected.size;
+      document.getElementById('bulk-count').textContent = `${n} selected`;
+      bar.classList.toggle('visible', n > 0);
+    }
+
+    function selectAll() {
+      allRows.filter(r => r.action_status !== 'sent' && r.action_status !== 'skipped').forEach(r => {
+        selected.add(r.id);
+        const cb = document.querySelector(`#card-${r.id} .select-cb`);
+        if (cb) cb.checked = true;
+        document.getElementById(`card-${r.id}`).classList.add('selected');
+      });
+      updateBulkBar();
+    }
+
+    function clearSelection() {
+      selected.forEach(id => {
+        const cb = document.querySelector(`#card-${id} .select-cb`);
+        if (cb) cb.checked = false;
+        document.getElementById(`card-${id}`)?.classList.remove('selected');
+      });
+      selected.clear();
+      updateBulkBar();
+    }
+
+    // ── Send session ─────────────────────────────────────────────────────────
+
+    function startSession() {
+      if (!selected.size) return;
+      sessionQueue = allRows.filter(r => selected.has(r.id));
+      sessionIdx = 0;
+      clearSelection();
+      document.getElementById('session').classList.add('active');
+      showSessionCard();
+    }
+
+    function showSessionCard() {
+      const doneEl = document.getElementById('session-done');
+      const cardEl = document.getElementById('session-card');
+
+      if (sessionIdx >= sessionQueue.length) {
+        cardEl.style.display = 'none';
+        doneEl.style.display = 'block';
+        const sent = sessionQueue.filter(r => r._sessionStatus === 'sent').length;
+        const skipped = sessionQueue.length - sent;
+        document.getElementById('session-summary').textContent =
+          `${sent} sent, ${skipped} skipped out of ${sessionQueue.length} messages.`;
+        return;
+      }
+
+      doneEl.style.display = 'none';
+      cardEl.style.display = 'block';
+
+      const r = sessionQueue[sessionIdx];
+      const icon = emoji[String(r.event_type).toLowerCase()] || '✨';
+      document.getElementById('session-progress').textContent =
+        `Message ${sessionIdx + 1} of ${sessionQueue.length}`;
+      document.getElementById('session-title').textContent =
+        `${icon} ${r.name} – ${r.event_type}`;
+      document.getElementById('session-meta').textContent =
+        `${r.chat_type} • ${r.media_mode}`;
+      document.getElementById('session-msg').value = r.final_message_text;
+
+      const sendBtn = document.getElementById('btn-session-send');
+      sendBtn.href = r.wa_link || '#';
+      sendBtn.onclick = () => sessionNext('sent');
+    }
+
+    async function sessionNext(action) {
+      const r = sessionQueue[sessionIdx];
+      r._sessionStatus = action;
+      // Persist the latest textarea content if edited
+      const msgEl = document.getElementById('session-msg');
+      const currentText = msgEl.value;
+      if (currentText !== r.final_message_text) {
+        await fetch('/api/edit', {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ id: r.id, text: currentText })
+        });
+      } else {
+        await fetch('/api/mark', {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ id: r.id, action })
+        });
+      }
+      setStatus(r.id, action);
+      sessionIdx++;
+      showSessionCard();
+    }
+
+    function sessionCopy() {
+      const text = document.getElementById('session-msg').value;
+      navigator.clipboard.writeText(text);
+      toast('📋 Copied');
+    }
+
+    function endSession() {
+      document.getElementById('session').classList.remove('active');
+      document.getElementById('session-done').style.display = 'none';
+    }
+
+    // ── Individual card actions ───────────────────────────────────────────────
 
     function onEdit(id) {
       document.getElementById(`msg-${id}`).classList.add('dirty');
@@ -90,17 +278,17 @@
 
     async function mark(id, action) {
       const res = await fetch('/api/mark', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        method:'POST', headers:{'Content-Type':'application/json'},
         body: JSON.stringify({ id, action })
       });
       const data = await res.json();
-      if (data.ok) { setStatus(id, action); toast(action === 'sent' ? '✅ Marked as sent' : '⏭️ Skipped'); }
+      if (data.ok) { setStatus(id, action); toast(action==='sent'?'✅ Marked as sent':'⏭️ Skipped'); }
     }
 
     async function saveEdit(id) {
       const el = document.getElementById(`msg-${id}`);
       const res = await fetch('/api/edit', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        method:'POST', headers:{'Content-Type':'application/json'},
         body: JSON.stringify({ id, text: el.value })
       });
       const data = await res.json();
@@ -125,8 +313,8 @@
           mark(id, 'sent');
           return;
         }
-      } catch (e) { console.log('Share canceled or failed', e); }
-      window.open(`https://wa.me/?text=${encodeURIComponent(mediaUrl ? `${text}\n${mediaUrl}` : text)}`, '_blank');
+      } catch(e) { console.log('Share canceled or failed', e); }
+      window.open(`https://wa.me/?text=${encodeURIComponent(mediaUrl?`${text}\n${mediaUrl}`:text)}`, '_blank');
     }
 
     fetch('/api/today_queue').then(r => r.json()).then(render);
