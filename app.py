@@ -1,5 +1,7 @@
 import os
+import smtplib
 from datetime import datetime
+from email.mime.text import MIMEText
 from zoneinfo import ZoneInfo
 from flask import Flask, jsonify, request, send_from_directory
 import gspread
@@ -7,6 +9,11 @@ from google.oauth2.service_account import Credentials
 
 SPREADSHEET_ID = os.getenv('SPREADSHEET_ID', 'REPLACE_WITH_SPREADSHEET_ID')
 TZ = os.getenv('TZ', 'Asia/Kolkata')
+NOTIFY_EMAIL = os.getenv('NOTIFY_EMAIL', '')        # recipient address
+SMTP_HOST = os.getenv('SMTP_HOST', 'smtp.gmail.com')
+SMTP_PORT = int(os.getenv('SMTP_PORT', '587'))
+SMTP_USER = os.getenv('SMTP_USER', '')              # sender gmail address
+SMTP_PASS = os.getenv('SMTP_PASS', '')              # app password
 
 app = Flask(__name__)
 
@@ -102,6 +109,22 @@ def build_queue_record(row, templates, date_str):
     }
 
 
+def notify_queue_ready(count, date_str):
+    if not all([NOTIFY_EMAIL, SMTP_USER, SMTP_PASS]):
+        return
+    msg = MIMEText(f'You have {count} WhatsApp message(s) ready to review and send.')
+    msg['Subject'] = f'WhatsApp queue ready: {count} message(s) for {date_str}'
+    msg['From'] = SMTP_USER
+    msg['To'] = NOTIFY_EMAIL
+    try:
+        with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as s:
+            s.starttls()
+            s.login(SMTP_USER, SMTP_PASS)
+            s.send_message(msg)
+    except Exception as e:
+        print(f'[notify] email failed: {e}')
+
+
 def prepare_daily_queue():
     contacts = get_sheet_rows('contacts_events')
     templates = get_sheet_rows('message_templates')
@@ -130,6 +153,7 @@ def prepare_daily_queue():
     todays = [r for r in contacts if str(r.get('event_date', '')) == today and str(r.get('active', '')).upper() == 'TRUE'] + festival_rows
     output = [build_queue_record(r, templates, today) for r in todays]
     write_ready_queue(output)
+    notify_queue_ready(len(output), today)
     return output
 
 
