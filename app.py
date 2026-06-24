@@ -159,6 +159,35 @@ def notify_queue_ready(count, date_str):
         print(f'[notify] email failed: {e}')
 
 
+def _matches_today(row, dt):
+    """Return True if a contacts_events row should fire today.
+
+    Recurrence values (case-insensitive):
+      yearly  - match month + day (e.g. birthdays, anniversaries)
+      monthly - match day-of-month only
+      weekly  - match day-of-week (Mon=0, Sun=6) derived from event_date
+      <empty> - exact date match (one-time event)
+    """
+    raw_date = str(row.get('event_date', ''))
+    if not raw_date:
+        return False
+    try:
+        event_dt = datetime.strptime(raw_date, '%Y-%m-%d')
+    except ValueError:
+        return False
+
+    recurrence = str(row.get('recurrence', '')).strip().lower()
+
+    if recurrence == 'yearly':
+        return event_dt.month == dt.month and event_dt.day == dt.day
+    if recurrence == 'monthly':
+        return event_dt.day == dt.day
+    if recurrence == 'weekly':
+        return event_dt.weekday() == dt.weekday()
+    # Default: one-time exact match
+    return raw_date == dt.strftime('%Y-%m-%d')
+
+
 def prepare_daily_queue():
     # Three worksheet reads share the same connection
     contacts = get_sheet_rows('contacts_events')
@@ -183,7 +212,7 @@ def prepare_daily_queue():
 
     todays = [
         r for r in contacts
-        if str(r.get('event_date', '')) == today and str(r.get('active', '')).upper() == 'TRUE'
+        if _matches_today(r, dt) and str(r.get('active', '')).upper() == 'TRUE'
     ] + festival_rows
 
     output = [build_queue_record(r, templates, today) for r in todays]

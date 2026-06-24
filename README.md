@@ -167,7 +167,12 @@ docker compose exec wa_automation python -c "from app import prepare_daily_queue
 - `chat_type` (`individual` | `group`)
 - `group_invite_link`
 - `event_type`
-- `event_date` (`YYYY-MM-DD`)
+- `event_date` (`YYYY-MM-DD`) — the original date of the event
+- `recurrence` (`yearly` | `monthly` | `weekly` | leave blank for one-time)
+  - `yearly` — fires every year on the same month/day (birthdays, anniversaries)
+  - `monthly` — fires every month on the same day-of-month
+  - `weekly` — fires every week on the same weekday as `event_date`
+  - blank — fires once on the exact `event_date`
 - `relation`
 - `language` (`en` | `hi` | `hinglish`)
 - `tone` (`warm` | `casual` | `formal` | `fun`)
