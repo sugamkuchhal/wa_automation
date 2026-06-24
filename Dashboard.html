@@ -4,74 +4,117 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     body { font-family: Arial, sans-serif; margin: 16px; background: #f7f7fb; }
-    .card { background: white; border-radius: 12px; padding: 12px; margin-bottom: 12px; box-shadow: 0 2px 6px rgba(0,0,0,.08); }
+    .card { background: white; border-radius: 12px; padding: 12px; margin-bottom: 12px; box-shadow: 0 2px 6px rgba(0,0,0,.08); transition: opacity .3s; }
+    .card.done { opacity: .45; }
     .title { font-weight: 700; margin-bottom: 6px; }
     .meta { color: #666; font-size: 13px; margin-bottom: 8px; }
-    .msg { width:100%; background: #f1f3f5; border-radius: 8px; padding: 10px; white-space: pre-wrap; border:1px solid #e3e6ea; }
-    .btn { display:inline-block; margin-top:10px; margin-right:8px; padding:10px 12px; border-radius:8px; text-decoration:none; font-weight:600; border:0; cursor:pointer; }
+    .status-badge { display:inline-block; font-size:11px; font-weight:700; padding:2px 8px; border-radius:99px; margin-left:8px; vertical-align:middle; }
+    .status-sent { background:#d4f5e2; color:#1a7a42; }
+    .status-skipped { background:#ececec; color:#666; }
+    .status-edited { background:#fff3cd; color:#856404; }
+    .msg { width:100%; background: #f1f3f5; border-radius: 8px; padding: 10px; white-space: pre-wrap; border:1px solid #e3e6ea; box-sizing:border-box; }
+    .msg.dirty { border-color:#f0a500; background:#fffbf0; }
+    .btn { display:inline-block; margin-top:10px; margin-right:8px; padding:10px 12px; border-radius:8px; text-decoration:none; font-weight:600; border:0; cursor:pointer; font-size:14px; }
     .send { background:#25D366; color:white; }
     .skip { background:#ddd; color:#222; }
+    .save { background:#f0a500; color:white; }
+    .toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#333; color:#fff; padding:10px 20px; border-radius:8px; font-size:14px; opacity:0; transition:opacity .3s; pointer-events:none; }
+    .toast.show { opacity:1; }
   </style>
 </head>
 <body>
   <h2>📨 Send-Ready WhatsApp Messages</h2>
   <div id="root">Loading...</div>
+  <div class="toast" id="toast"></div>
 
   <script>
     const emoji = { birthday: '🎂', anniversary: '💍', diwali: '🪔', holi: '🎨', christmas: '🎄', 'new year': '🎉' };
 
+    function escapeHtml(v) {
+      return String(v || '')
+        .replaceAll('&', '&amp;').replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;');
+    }
+
+    function toast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 2000);
+    }
+
+    function setStatus(id, status) {
+      const card = document.getElementById(`card-${id}`);
+      if (!card) return;
+      const badge = card.querySelector('.status-badge');
+      badge.className = `status-badge status-${status}`;
+      badge.textContent = status;
+      if (status === 'sent' || status === 'skipped') card.classList.add('done');
+      else card.classList.remove('done');
+    }
+
     function render(rows) {
       const root = document.getElementById('root');
-      if (!rows.length) {
-        root.innerHTML = '<p>No messages for today.</p>';
-        return;
-      }
+      if (!rows.length) { root.innerHTML = '<p>No messages for today.</p>'; return; }
 
       root.innerHTML = rows.map(r => {
         const icon = emoji[String(r.event_type).toLowerCase()] || '✨';
         const hasMedia = !!r.media_url;
+        const status = r.action_status || 'ready';
+        const isDone = status === 'sent' || status === 'skipped';
         return `
-          <div class="card">
-            <div class="title">${icon} ${escapeHtml(r.name)} – ${escapeHtml(r.event_type)}</div>
+          <div class="card${isDone ? ' done' : ''}" id="card-${escapeHtml(r.id)}">
+            <div class="title">
+              ${icon} ${escapeHtml(r.name)} – ${escapeHtml(r.event_type)}
+              <span class="status-badge status-${escapeHtml(status)}">${escapeHtml(status)}</span>
+            </div>
             <div class="meta">${escapeHtml(r.chat_type)} • media: ${escapeHtml(r.media_mode)}</div>
-            <textarea id="msg-${escapeHtml(r.id)}" class="msg" rows="4">${escapeHtml(r.final_message_text)}</textarea>
+            <textarea id="msg-${escapeHtml(r.id)}" class="msg" rows="4"
+              oninput="onEdit('${escapeHtml(r.id)}')">${escapeHtml(r.final_message_text)}</textarea>
             ${hasMedia ? `<div class="meta">Media URL: ${escapeHtml(r.media_url)}</div>` : ''}
-            <a class="btn send" href="${escapeHtml(r.wa_link)}" target="_blank" onclick="mark('${r.id}','sent')">Send on WhatsApp</a>
-            <button class="btn" onclick="saveEdit('${r.id}')">Save Edit</button>
+            <a class="btn send" href="${escapeHtml(r.wa_link)}" target="_blank"
+              onclick="mark('${r.id}','sent')">Send on WhatsApp</a>
+            <button class="btn save" id="save-${escapeHtml(r.id)}" style="display:none"
+              onclick="saveEdit('${r.id}')">Save Edit</button>
             <button class="btn" onclick="copyText('${r.id}')">Copy Text</button>
-            ${hasMedia ? `<button class="btn" onclick="shareMessage('${r.id}', '${escapeHtml(r.media_url)}')">Share (Android)</button>` : ''}
+            ${hasMedia ? `<button class="btn" onclick="shareMessage('${r.id}','${escapeHtml(r.media_url)}')">Share (Android)</button>` : ''}
             <button class="btn skip" onclick="mark('${r.id}','skipped')">Skip</button>
           </div>`;
       }).join('');
     }
 
-    function escapeHtml(v) {
-      return String(v || '')
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#039;');
+    function onEdit(id) {
+      document.getElementById(`msg-${id}`).classList.add('dirty');
+      document.getElementById(`save-${id}`).style.display = 'inline-block';
     }
 
     async function mark(id, action) {
-      await fetch('/api/mark', {
+      const res = await fetch('/api/mark', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, action })
       });
+      const data = await res.json();
+      if (data.ok) { setStatus(id, action); toast(action === 'sent' ? '✅ Marked as sent' : '⏭️ Skipped'); }
     }
 
     async function saveEdit(id) {
       const el = document.getElementById(`msg-${id}`);
-      await fetch('/api/edit', {
+      const res = await fetch('/api/edit', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, text: el.value })
       });
+      const data = await res.json();
+      if (data.ok) {
+        el.classList.remove('dirty');
+        document.getElementById(`save-${id}`).style.display = 'none';
+        setStatus(id, 'edited');
+        toast('💾 Saved');
+      }
     }
 
     function copyText(id) {
-      const el = document.getElementById(`msg-${id}`);
-      navigator.clipboard.writeText(el.value);
+      navigator.clipboard.writeText(document.getElementById(`msg-${id}`).value);
+      toast('📋 Copied');
     }
 
     async function shareMessage(id, mediaUrl) {
@@ -82,15 +125,11 @@
           mark(id, 'sent');
           return;
         }
-      } catch (e) {
-        console.log('Share canceled or failed', e);
-      }
+      } catch (e) { console.log('Share canceled or failed', e); }
       window.open(`https://wa.me/?text=${encodeURIComponent(mediaUrl ? `${text}\n${mediaUrl}` : text)}`, '_blank');
     }
 
-    fetch('/api/today_queue')
-      .then(res => res.json())
-      .then(render);
+    fetch('/api/today_queue').then(r => r.json()).then(render);
   </script>
 </body>
 </html>
