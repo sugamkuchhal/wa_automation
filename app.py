@@ -346,5 +346,30 @@ def ai_generate():
         return jsonify({'ok': False, 'error': str(e)}), 500
 
 
+def _startup_check():
+    """Verify sheet connectivity before accepting traffic. Exits with a clear message on failure."""
+    import sys
+    print('[startup] checking Google Sheets connection…')
+    try:
+        sh = _sheet()
+        titles = [ws.title for ws in sh.worksheets()]
+        required = {'contacts_events', 'festival_calendar', 'message_templates'}
+        missing = required - set(titles)
+        if missing:
+            print(f'[startup] ERROR: missing sheet tab(s): {", ".join(sorted(missing))}')
+            print('[startup] Create the tabs and restart. See README for schema.')
+            sys.exit(1)
+        print(f'[startup] OK — connected to "{sh.title}", tabs: {titles}')
+    except FileNotFoundError:
+        creds_file = os.getenv('GOOGLE_APPLICATION_CREDENTIALS', 'service_account.json')
+        print(f'[startup] ERROR: credentials file not found: {creds_file}')
+        print('[startup] Set GOOGLE_APPLICATION_CREDENTIALS or place service_account.json in repo root.')
+        sys.exit(1)
+    except Exception as e:
+        print(f'[startup] ERROR: could not connect to Google Sheets: {e}')
+        sys.exit(1)
+
+
 if __name__ == '__main__':
+    _startup_check()
     app.run(host='0.0.0.0', port=int(os.getenv('PORT', '8080')), debug=True)
