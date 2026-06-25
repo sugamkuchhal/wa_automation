@@ -243,11 +243,12 @@ def build_wa_link(row, text, media):
 
 
 def build_queue_record(row, templates, date_str, id_suffix='', chat_type_override=None):
-    text = render_template(row, templates)
-    media = build_media(row, text)
+    # Resolve chat_type BEFORE render_template so tone override applies correctly
     chat_type = chat_type_override or row.get('chat_type')
-    # Build a modified row for wa_link generation with the correct chat_type
-    link_row = {**row, 'chat_type': chat_type}
+    resolved_row = {**row, 'chat_type': chat_type}
+    text = render_template(resolved_row, templates)
+    media = build_media(resolved_row, text)
+    link_row = resolved_row
     return {
         'id': str(row.get('id', '')) + id_suffix,
         'queue_date': date_str,
