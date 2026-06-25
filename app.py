@@ -294,21 +294,17 @@ def prepare_daily_queue():
     today     = _today_str()
     dt        = datetime.strptime(today, '%Y-%m-%d')
 
-    # Load event reference sheet — maps event_name to event_type and category
+    # Load event reference sheet — maps event_name to event_category
     try:
         event_ref = get_sheet_rows('event_ref')
     except Exception:
         event_ref = []
-    # Build lookup: event_name → {event_type, category}
+    # Build lookup: event_name → event_category
     EVENT_REF = {
-        str(e.get('event_name', '')).lower().strip(): {
-            'event_type': str(e.get('event_type', e.get('event_name', ''))).lower().strip(),
-            'category':   str(e.get('category', 'personal')).lower().strip(),
-        }
+        str(e.get('event_name', '')).lower().strip():
+            str(e.get('event_category', 'historical')).lower().strip()
         for e in event_ref
     }
-    PERSONAL_EVENTS  = {k for k, v in EVENT_REF.items() if v['category'] == 'personal'}
-    FESTIVAL_EVENTS  = {k for k, v in EVENT_REF.items() if v['category'] in ('fixed_festival', 'variable_festival')}
 
     def _festival_matches(f, dt):
         """Match festival to today using year+month+day (variable) or month+day (fixed)."""
@@ -345,8 +341,7 @@ def prepare_daily_queue():
         if str(r.get('is_active', r.get('active', ''))).upper() != 'TRUE':
             continue
         event_name = str(r.get('event_name', r.get('event_type', ''))).lower().strip()
-        ref = EVENT_REF.get(event_name, {})
-        category = ref.get('category', 'personal')
+        category = EVENT_REF.get(event_name, 'historical')
 
         if category in ('fixed_festival', 'variable_festival'):
             if event_name in todays_festivals:
@@ -358,12 +353,9 @@ def prepare_daily_queue():
 
     output = []
     for r in todays:
-        # Resolve event_name → event_type for template matching
+        # event_name IS the event_type for template matching — inject directly
         event_name = str(r.get('event_name', r.get('event_type', ''))).lower().strip()
-        ref = EVENT_REF.get(event_name, {})
-        resolved_event_type = ref.get('event_type', event_name)
-        # Inject resolved event_type so build_queue_record uses it for template matching
-        r = {**r, 'event_type': resolved_event_type}
+        r = {**r, 'event_type': event_name}
         if str(r.get('chat_type', '')).lower() == 'individual':
             # Always add the individual card
             output.append(build_queue_record(r, templates, today))

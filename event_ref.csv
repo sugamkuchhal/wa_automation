@@ -1,24 +1,24 @@
-event_name,event_type,category
-birthday,birthday,personal
-anniversary,anniversary,personal
-lohri,lohri,fixed_festival
-makar sankranti,makar sankranti,fixed_festival
-pongal,pongal,fixed_festival
-republic day,republic day,fixed_festival
-christmas,christmas,fixed_festival
-new year,new year,fixed_festival
-independence day,independence day,fixed_festival
-gandhi jayanti,gandhi jayanti,fixed_festival
-baisakhi,baisakhi,fixed_festival
-onam,onam,fixed_festival
-maha shivratri,maha shivratri,variable_festival
-holi,holi,variable_festival
-eid ul-fitr,eid ul-fitr,variable_festival
-eid ul-adha,eid ul-adha,variable_festival
-janmashtami,janmashtami,variable_festival
-raksha bandhan,raksha bandhan,variable_festival
-ganesh chaturthi,ganesh chaturthi,variable_festival
-navratri,navratri,variable_festival
-dussehra,dussehra,variable_festival
-diwali,diwali,variable_festival
-guru nanak jayanti,guru nanak jayanti,variable_festival
+event_name,event_category
+birthday,historical
+anniversary,historical
+lohri,fixed_festival
+makar sankranti,fixed_festival
+pongal,fixed_festival
+republic day,fixed_festival
+christmas,fixed_festival
+new year,fixed_festival
+independence day,fixed_festival
+gandhi jayanti,fixed_festival
+baisakhi,fixed_festival
+onam,fixed_festival
+maha shivratri,variable_festival
+holi,variable_festival
+eid ul-fitr,variable_festival
+eid ul-adha,variable_festival
+janmashtami,variable_festival
+raksha bandhan,variable_festival
+ganesh chaturthi,variable_festival
+navratri,variable_festival
+dussehra,variable_festival
+diwali,variable_festival
+guru nanak jayanti,variable_festival
