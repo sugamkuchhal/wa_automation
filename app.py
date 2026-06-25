@@ -288,17 +288,11 @@ def _matches_today(row, dt):
 
 def prepare_daily_queue():
     # Read all sheets via single connection
-    contacts  = get_sheet_rows('contacts_events')
+    people    = get_sheet_rows('people_and_groups')
     templates = get_sheet_rows('message_templates')
     festivals = get_sheet_rows('festival_calendar')
     today     = _today_str()
     dt        = datetime.strptime(today, '%Y-%m-%d')
-
-    # Load group_events if the sheet exists
-    try:
-        groups = get_sheet_rows('group_events')
-    except Exception:
-        groups = []
 
     def _festival_matches(f, dt):
         """Match festival to today using year+month+day (variable) or month+day (fixed)."""
@@ -324,51 +318,25 @@ def prepare_daily_queue():
         if _festival_matches(f, dt)
     }
 
-    # Personal event types (birthday, anniversary etc.) — always month+day
-    # Festival event types — fire only when festival_calendar says so today
-    # A contact row with event_type matching a today festival always fires
-    # A contact row with a personal event_type fires on month+day match
+    # All known festival names for type detection
     FESTIVAL_EVENT_TYPES = {str(f.get('festival', '')).lower() for f in festivals}
 
-    contact_rows = [
-        r for r in contacts
-        if str(r.get('active', '')).upper() == 'TRUE' and (
-            str(r.get('event_type', '')).lower().strip() in todays_festivals
-            or (
-                str(r.get('event_type', '')).lower().strip() not in FESTIVAL_EVENT_TYPES
-                and _matches_today(r, dt)
-            )
-        )
-    ]
-
-    # Group events: use same recurrence logic as contacts_events
-    # Also auto-match groups whose event_type is a festival happening today
-    group_rows = []
-    for g in groups:
-        if str(g.get('active', '')).upper() != 'TRUE':
+    # Single loop over all people_and_groups rows
+    # Personal events (birthday, anniversary): fire on month+day match
+    # Festival events: fire when festival_calendar says that festival is today
+    todays = []
+    for r in people:
+        if str(r.get('active', '')).upper() != 'TRUE':
             continue
-        event_type = str(g.get('event_type', '')).lower().strip()
-        # Groups fire only when their event_type matches a festival today
-        if event_type in todays_festivals:
-            # chat_type defaults to 'group' but can be 'individual' if phone is set
-            chat_type = str(g.get('chat_type', 'group')).strip().lower() or 'group'
-            phone     = ''.join(ch for ch in str(g.get('phone', '')) if ch.isdigit())
-            group_rows.append({
-                'id':                str(g.get('id', f"group-{event_type}-{today}")),
-                'name':              str(g.get('name', g.get('group_name', 'Group'))),
-                'phone':             phone,
-                'chat_type':         chat_type,
-                'group_invite_link': str(g.get('group_invite_link', '')),
-                'event_type':        event_type,
-                'event_date':        today,
-                'relation':          str(g.get('relation', 'group')),
-                'language':          str(g.get('language', 'en')),
-                'tone':              str(g.get('tone', 'warm')),
-                'media_mode':        str(g.get('media_mode', 'text')),
-                'active':            'TRUE',
-            })
-
-    todays = contact_rows + group_rows
+        event_type = str(r.get('event_type', '')).lower().strip()
+        if event_type in FESTIVAL_EVENT_TYPES:
+            # Festival row — fire only when festival_calendar confirms today
+            if event_type in todays_festivals:
+                todays.append(r)
+        else:
+            # Personal event — fire on month+day match
+            if _matches_today(r, dt):
+                todays.append(r)
 
     output = []
     for r in todays:
@@ -596,7 +564,7 @@ def ai_generate():
 def _validate_phone_numbers(sh):
     """Warn about contacts with malformed phone numbers (non-digits, too short, leading +)."""
     try:
-        rows = sh.worksheet('contacts_events').get_all_records()
+        rows = sh.worksheet('people_and_groups').get_all_records()
     except Exception:
         return  # sheet missing — _startup_check will catch it
     bad = []
@@ -628,8 +596,8 @@ def _startup_check():
     try:
         sh = _sheet()
         titles = [ws.title for ws in sh.worksheets()]
-        required = {'contacts_events', 'festival_calendar', 'message_templates'}
-        optional = {'group_events', 'ready_queue', 'send_history', '_meta'}
+        required = {'people_and_groups', 'festival_calendar', 'message_templates'}
+        optional = {'ready_queue', 'send_history', '_meta'}
         present_optional = optional & set(titles)
         if present_optional:
             print(f'[startup] optional tabs found: {sorted(present_optional)}')

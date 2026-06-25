@@ -11,7 +11,7 @@ Runs as a Python/Flask server. It prepares send-ready messages — you manually 
 ### Data model in Google Sheets
 The system expects these tabs:
 
-- `contacts_events`
+- `people_and_groups`
 - `festival_calendar`
 - `message_templates`
 - (auto-created) `ready_queue`
