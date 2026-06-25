@@ -223,21 +223,24 @@ def build_wa_link(row, text, media):
     return ''
 
 
-def build_queue_record(row, templates, date_str):
+def build_queue_record(row, templates, date_str, id_suffix='', chat_type_override=None):
     text = render_template(row, templates)
     media = build_media(row, text)
+    chat_type = chat_type_override or row.get('chat_type')
+    # Build a modified row for wa_link generation with the correct chat_type
+    link_row = {**row, 'chat_type': chat_type}
     return {
-        'id': row.get('id'),
+        'id': str(row.get('id', '')) + id_suffix,
         'queue_date': date_str,
         'name': row.get('name'),
-        'chat_type': row.get('chat_type'),
+        'chat_type': chat_type,
         'event_type': row.get('event_type'),
         'phone': row.get('phone', ''),
         'group_invite_link': row.get('group_invite_link', ''),
         'media_mode': row.get('media_mode'),
         'media_url': media.get('media_url', ''),
         'final_message_text': text,
-        'wa_link': build_wa_link(row, text, media),
+        'wa_link': build_wa_link(link_row, text, media),
         'action_status': 'ready',
         'action_ts': ''
     }
@@ -367,7 +370,20 @@ def prepare_daily_queue():
 
     todays = contact_rows + group_rows
 
-    output = [build_queue_record(r, templates, today) for r in todays]
+    output = []
+    for r in todays:
+        if str(r.get('chat_type', '')).lower() == 'individual':
+            # Always add the individual card
+            output.append(build_queue_record(r, templates, today))
+            # If also has a group link, add a second card for the group
+            if str(r.get('group_invite_link', '')).strip():
+                output.append(build_queue_record(
+                    r, templates, today,
+                    id_suffix='-group',
+                    chat_type_override='group'
+                ))
+        else:
+            output.append(build_queue_record(r, templates, today))
     write_ready_queue(output)
     notify_queue_ready(len(output), today)
     return output
