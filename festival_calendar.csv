@@ -1,41 +1,41 @@
-festival,year,month,day,default_language,default_media
-Christmas,,12,25,en,text
-New Year,,1,1,en,text
-Lohri,2026,1,13,hinglish,text
-Makar Sankranti,2026,1,14,hi,text
-Pongal,2026,1,14,hi,text
-Republic Day,2026,1,26,hinglish,text
-Maha Shivratri,2026,2,26,hi,text
-Holi,2026,3,14,hinglish,text
-Baisakhi,2026,4,14,hinglish,text
-Eid ul-Fitr,2026,4,1,hinglish,text
-Eid ul-Adha,2026,6,7,hinglish,text
-Janmashtami,2026,8,15,hi,text
-Raksha Bandhan,2026,8,9,hinglish,text
-Ganesh Chaturthi,2026,8,24,hi,text
-Independence Day,2026,8,15,hinglish,text
-Onam,2026,9,2,en,text
-Navratri,2026,9,25,hi,text
-Gandhi Jayanti,2026,10,2,en,text
-Dussehra,2026,10,6,hi,text
-Diwali,2026,10,20,hi,text
-Guru Nanak Jayanti,2026,11,3,hinglish,text
-Lohri,2027,1,13,hinglish,text
-Makar Sankranti,2027,1,14,hi,text
-Pongal,2027,1,14,hi,text
-Republic Day,2027,1,26,hinglish,text
-Maha Shivratri,2027,2,17,hi,text
-Holi,2027,3,4,hinglish,text
-Eid ul-Fitr,2027,3,21,hinglish,text
-Baisakhi,2027,4,14,hinglish,text
-Eid ul-Adha,2027,5,27,hinglish,text
-Raksha Bandhan,2027,7,29,hinglish,text
-Independence Day,2027,8,15,hinglish,text
-Janmashtami,2027,8,4,hi,text
-Ganesh Chaturthi,2027,8,13,hi,text
-Onam,2027,8,22,en,text
-Gandhi Jayanti,2027,10,2,en,text
-Navratri,2027,10,13,hi,text
-Dussehra,2027,10,24,hi,text
-Guru Nanak Jayanti,2027,11,23,hinglish,text
-Diwali,2027,11,8,hi,text
+festival,year,month,day
+Christmas,,12,25
+New Year,,1,1
+Lohri,2026,1,13
+Makar Sankranti,2026,1,14
+Pongal,2026,1,14
+Republic Day,2026,1,26
+Maha Shivratri,2026,2,26
+Holi,2026,3,14
+Baisakhi,2026,4,14
+Eid ul-Fitr,2026,4,1
+Eid ul-Adha,2026,6,7
+Janmashtami,2026,8,15
+Raksha Bandhan,2026,8,9
+Ganesh Chaturthi,2026,8,24
+Independence Day,2026,8,15
+Onam,2026,9,2
+Navratri,2026,9,25
+Gandhi Jayanti,2026,10,2
+Dussehra,2026,10,6
+Diwali,2026,10,20
+Guru Nanak Jayanti,2026,11,3
+Lohri,2027,1,13
+Makar Sankranti,2027,1,14
+Pongal,2027,1,14
+Republic Day,2027,1,26
+Maha Shivratri,2027,2,17
+Holi,2027,3,4
+Eid ul-Fitr,2027,3,21
+Baisakhi,2027,4,14
+Eid ul-Adha,2027,5,27
+Raksha Bandhan,2027,7,29
+Independence Day,2027,8,15
+Janmashtami,2027,8,4
+Ganesh Chaturthi,2027,8,13
+Onam,2027,8,22
+Gandhi Jayanti,2027,10,2
+Navratri,2027,10,13
+Dussehra,2027,10,24
+Guru Nanak Jayanti,2027,11,23
+Diwali,2027,11,8

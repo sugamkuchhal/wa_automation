@@ -186,12 +186,12 @@ docker compose exec wa_automation python -c "from app import prepare_daily_queue
 - `active` (`TRUE` | `FALSE`)
 
 ### `festival_calendar`
-- `festival`
-- `year` — optional. If filled, festival only fires that specific year (for moveable feasts like Diwali, Holi). If blank or 0, fires every year on that month/day (for fixed festivals like Christmas, New Year).
-- `month`
-- `day`
-- `default_language`
-- `default_media`
+- `festival` — name e.g. Diwali, Christmas
+- `year` — optional. If filled, fires only that year (moveable festivals: Diwali, Holi, Eid). If blank or 0, fires every year on month/day (fixed festivals: Christmas, New Year, Republic Day).
+- `month` — integer 1–12
+- `day` — integer 1–31
+
+This sheet is a **date lookup only**. Language, tone and media are set per row in `contacts_events` and `group_events`.
 
 ### `message_templates`
 - `event_type`
