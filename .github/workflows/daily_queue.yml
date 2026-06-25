@@ -48,7 +48,7 @@ jobs:
           server_port: 587
           username: ${{ secrets.NOTIFY_EMAIL }}
           password: ${{ secrets.GMAIL_APP_PASSWORD }}
-          to: ${{ secrets.NOTIFY_EMAIL }}
+          to: sugam.kuchhal.iimc@gmail.com
           from: WA Automated Wishes <sugamkuchhal@gmail.com>
           subject: "📨 WhatsApp queue ready for today"
           body: |
