@@ -262,39 +262,28 @@ def notify_queue_ready(count, date_str):
         print(f'[notify] email failed: {e}')
 
 
-def _matches_today(row, dt):
-    """Return True if a contacts_events row should fire today.
+def _parse_date(raw):
+    """Parse a date string in any common format. Returns datetime or None."""
+    for fmt in ('%Y-%m-%d', '%d-%b-%Y', '%d/%m/%Y', '%m/%d/%Y', '%d-%m-%Y'):
+        try:
+            return datetime.strptime(str(raw).strip(), fmt)
+        except ValueError:
+            continue
+    return None
 
-    Recurrence values (case-insensitive):
-      yearly  - match month + day (e.g. birthdays, anniversaries)
-      monthly - match day-of-month only
-      weekly  - match day-of-week (Mon=0, Sun=6) derived from event_date
-      <empty> - exact date match (one-time event)
+
+def _matches_today(row, dt):
+    """contacts_events rows always match on month+day (birthdays, anniversaries).
+    The year in event_date is the historical year — it is never used for matching.
     """
     raw_date = str(row.get('event_date', '')).strip()
     if not raw_date:
         return False
-    event_dt = None
-    for fmt in ('%Y-%m-%d', '%d-%b-%Y', '%d/%m/%Y', '%m/%d/%Y', '%d-%m-%Y'):
-        try:
-            event_dt = datetime.strptime(raw_date, fmt)
-            break
-        except ValueError:
-            continue
+    event_dt = _parse_date(raw_date)
     if event_dt is None:
         print(f'[queue] unrecognised date format: {raw_date!r}')
         return False
-
-    recurrence = str(row.get('recurrence', '')).strip().lower()
-
-    if recurrence == 'yearly':
-        return event_dt.month == dt.month and event_dt.day == dt.day
-    if recurrence == 'monthly':
-        return event_dt.day == dt.day
-    if recurrence == 'weekly':
-        return event_dt.weekday() == dt.weekday()
-    # Default: one-time exact match
-    return raw_date == dt.strftime('%Y-%m-%d')
+    return event_dt.month == dt.month and event_dt.day == dt.day
 
 
 def prepare_daily_queue():
@@ -348,8 +337,8 @@ def prepare_daily_queue():
         if str(g.get('active', '')).upper() != 'TRUE':
             continue
         event_type = str(g.get('event_type', '')).lower().strip()
-        # Check recurrence match OR festival date match
-        if _matches_today(g, dt) or event_type in todays_festivals:
+        # Groups fire only when their event_type matches a festival today
+        if event_type in todays_festivals:
             # chat_type defaults to 'group' but can be 'individual' if phone is set
             chat_type = str(g.get('chat_type', 'group')).strip().lower() or 'group'
             phone     = ''.join(ch for ch in str(g.get('phone', '')) if ch.isdigit())
