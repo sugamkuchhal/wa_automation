@@ -355,9 +355,11 @@ def home():
 
 @app.get('/api/today_queue')
 def today_queue():
-    today = _today_str()
     rows = get_sheet_rows('ready_queue')
-    return jsonify([r for r in rows if str(r.get('queue_date')) == today])
+    # Return all unsent/unresolved rows regardless of date
+    # so missed days accumulate until actioned
+    pending = [r for r in rows if str(r.get('action_status', '')).lower() in ('ready', 'edited', '')]
+    return jsonify(pending)
 
 
 @app.get('/api/history')

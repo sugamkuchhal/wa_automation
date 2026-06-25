@@ -206,7 +206,10 @@ async function loadQueue() {
   try {
     const rows = await gasGet({ action: 'queue' });
     allRows = Array.isArray(rows) ? rows : [];
-    document.getElementById('q-date').textContent = today();
+    const todayStr2 = today();
+    const pending = allRows.length;
+    const missed = allRows.filter(r => r.queue_date !== todayStr2).length;
+    document.getElementById('q-date').textContent = pending + ' pending' + (missed > 0 ? ' · ' + missed + ' from previous days' : '') + ' · ' + todayStr2;
     render(allRows);
   } catch(e) {
     document.getElementById('offline-bar').classList.add('on');
@@ -216,16 +219,18 @@ async function loadQueue() {
 
 function render(rows) {
   const root = document.getElementById('root');
-  if (!rows.length) { root.innerHTML = '<p style="color:#777;font-size:13px;padding:10px 0">No messages for today.</p>'; return; }
-  root.innerHTML = rows.map(r => {
+  if (!rows.length) { root.innerHTML = '<p style="color:#777;font-size:13px;padding:10px 0">No pending messages.</p>'; return; }
+  const todayStr = today();
+  const sorted = [...rows].sort((a,b) => String(a.queue_date).localeCompare(String(b.queue_date)));
+  root.innerHTML = sorted.map(r => {
     const icon = EMOJI[String(r.event_type||'').toLowerCase()] || '✨';
     const status = r.action_status || 'ready';
     const done = status === 'sent' || status === 'skipped';
     const hasMedia = !!r.media_url;
     return `<div class="card${done?' done':''}" id="card-${esc(r.id)}">
       <input type="checkbox" class="cb" ${done?'disabled':''} onchange="toggleSel('${esc(r.id)}',this.checked)">
-      <div class="ctitle">${icon} ${esc(r.name)} — ${esc(r.event_type)} <span class="badge b-${esc(status)}">${esc(status)}</span></div>
-      <div class="cmeta">${esc(r.chat_type)} · ${esc(r.media_mode)}</div>
+      <div class="ctitle">${icon} ${esc(r.name)} — ${esc(r.event_type)} <span class="badge b-${esc(status)}">${esc(status)}</span>${r.queue_date !== todayStr ? ` <span class="badge" style="background:#fce8e8;color:#c0392b">missed · ${esc(r.queue_date)}</span>` : ''}</div>
+      <div class="cmeta">${esc(r.chat_type)} · ${esc(r.media_mode)} · ${esc(r.queue_date)}</div>
       <textarea class="msg" id="msg-${esc(r.id)}" rows="4" oninput="onEdit('${esc(r.id)}')">${esc(r.final_message_text)}</textarea>
       ${hasMedia?`<div style="font-size:11px;color:#888;margin-top:4px">Media: ${esc(r.media_url)}</div>`:''}
       <div class="btns">
