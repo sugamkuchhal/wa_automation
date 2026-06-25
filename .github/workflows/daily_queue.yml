@@ -3,7 +3,7 @@ name: Daily Queue Generator
 on:
   schedule:
     - cron: '30 3 * * *'   # 9:00 AM IST (UTC+5:30)
-  workflow_dispatch:         # allows manual trigger from GitHub UI
+  workflow_dispatch:
 
 jobs:
   generate-queue:
@@ -27,34 +27,64 @@ jobs:
         run: echo '${{ secrets.GOOGLE_CREDENTIALS_JSON }}' > service_account.json
 
       - name: Generate today's queue
+        id: queue
         env:
           SPREADSHEET_ID: ${{ secrets.SPREADSHEET_ID }}
           GOOGLE_APPLICATION_CREDENTIALS: service_account.json
           TZ: Asia/Kolkata
         run: |
-          python - << 'EOF'
+          python - << 'PYEOF'
+          import os
           from app import prepare_daily_queue
+          from datetime import datetime
+          from zoneinfo import ZoneInfo
+
           results = prepare_daily_queue()
+          today = datetime.now(ZoneInfo('Asia/Kolkata')).strftime('%d %B %Y')
+
+          if not results:
+              summary = "No messages today."
+              subject = "📨 WA Wishes — nothing today"
+              lines = []
+          else:
+              lines = []
+              for r in results:
+                  event = r['event_type'].title()
+                  lines.append(f"• {r['name']} — {event}")
+              summary = '\n'.join(lines)
+              count = len(results)
+              subject = f"📨 WA Wishes — {count} message(s) for {today}"
+
+          # Write to GitHub env for next steps
+          with open(os.environ['GITHUB_ENV'], 'a') as f:
+              f.write(f"QUEUE_COUNT={len(results)}\n")
+              f.write(f"QUEUE_SUBJECT={subject}\n")
+              # Encode newlines for env var
+              f.write(f"QUEUE_SUMMARY={summary.replace(chr(10), ' | ')}\n")
+              f.write(f"QUEUE_DATE={today}\n")
+
           print(f"Queue ready: {len(results)} message(s)")
-          for r in results:
-              print(f"  - {r['name']} ({r['event_type']})")
-          EOF
+          for line in lines:
+              print(line)
+          PYEOF
 
       - name: Send email notification
-        if: success()
+        if: success() && env.QUEUE_COUNT != '0'
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
           server_port: 587
-          username: ${{ secrets.NOTIFY_EMAIL }}
+          username: sugamkuchhal@gmail.com
           password: ${{ secrets.GMAIL_APP_PASSWORD }}
           to: sugam.kuchhal.iimc@gmail.com
           from: WA Automated Wishes <sugamkuchhal@gmail.com>
-          subject: "📨 WhatsApp queue ready for today"
+          subject: ${{ env.QUEUE_SUBJECT }}
           body: |
-            Your WhatsApp messages are ready to review and send.
+            Good morning! Here's your WhatsApp queue for ${{ env.QUEUE_DATE }}:
 
-            Open the dashboard:
+            ${{ env.QUEUE_SUMMARY }}
+
+            Open dashboard to review and send:
             https://sugamkuchhal.github.io/wa_automation/
 
             — WA Automated Wishes
