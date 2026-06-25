@@ -117,10 +117,12 @@ def _find_row(values, id_col, rid):
 
 def render_template(row, templates):
     """Match message_templates using event_type (already resolved from event_name),
-    language, and tone. Falls back progressively to broader matches."""
+    language, and tone. Falls back progressively to broader matches.
+    Groups always use formal tone — direct override regardless of sheet data."""
     event_type = str(row.get('event_type', '')).strip()
     language   = row.get('language')
-    tone       = row.get('tone')
+    # Group messages always use formal tone — hard override
+    tone = 'formal' if str(row.get('chat_type', '')).lower() == 'group' else row.get('tone')
 
     exact = next(
         (t for t in templates
