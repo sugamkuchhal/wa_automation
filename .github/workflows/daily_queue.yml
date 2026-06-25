@@ -1,0 +1,64 @@
+name: Daily Queue Generator
+
+on:
+  schedule:
+    - cron: '30 3 * * *'   # 9:00 AM IST (UTC+5:30)
+  workflow_dispatch:         # allows manual trigger from GitHub UI
+
+jobs:
+  generate-queue:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Write service account credentials
+        run: echo '${{ secrets.GOOGLE_CREDENTIALS_JSON }}' > service_account.json
+
+      - name: Generate today's queue
+        env:
+          SPREADSHEET_ID: ${{ secrets.SPREADSHEET_ID }}
+          GOOGLE_APPLICATION_CREDENTIALS: service_account.json
+          TZ: Asia/Kolkata
+        run: |
+          python - << 'EOF'
+          from app import prepare_daily_queue
+          results = prepare_daily_queue()
+          print(f"Queue ready: {len(results)} message(s)")
+          for r in results:
+              print(f"  - {r['name']} ({r['event_type']})")
+          EOF
+
+      - name: Send email notification
+        if: success()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.NOTIFY_EMAIL }}
+          password: ${{ secrets.GMAIL_APP_PASSWORD }}
+          to: ${{ secrets.NOTIFY_EMAIL }}
+          from: WA Automated Wishes <sugamkuchhal@gmail.com>
+          subject: "📨 WhatsApp queue ready for today"
+          body: |
+            Your WhatsApp messages are ready to review and send.
+
+            Open the dashboard:
+            https://sugamkuchhal.github.io/wa_automation/
+
+            — WA Automated Wishes
+
+      - name: Clean up credentials
+        if: always()
+        run: rm -f service_account.json
