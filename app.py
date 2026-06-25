@@ -422,19 +422,57 @@ def edit_message():
     return jsonify({'ok': True, 'wa_link': new_wa_link})
 
 
-# In-memory daily AI call counter — resets when server restarts or date changes
-_ai_usage = {'date': '', 'count': 0}
 AI_DAILY_LIMIT = int(os.getenv('AI_DAILY_LIMIT', '30'))
+_AI_META_KEY = 'ai_usage'   # row key in the meta sheet
+
+
+def _meta_ws():
+    """Return (or create) the meta sheet — a simple key/value store."""
+    return _get_or_create_ws('_meta', rows=100, cols=3)
+
+
+def _read_ai_usage():
+    """Read today's AI call count from the _meta sheet. Returns 0 if not set."""
+    today = _today_str()
+    try:
+        ws = _meta_ws()
+        rows = ws.get_all_values()
+        for row in rows[1:]:
+            if len(row) >= 3 and row[0] == _AI_META_KEY and row[1] == today:
+                return int(row[2])
+    except Exception:
+        pass
+    return 0
+
+
+def _write_ai_usage(count):
+    """Persist today's AI call count to the _meta sheet."""
+    today = _today_str()
+    try:
+        ws = _meta_ws()
+        values = ws.get_all_values()
+        # Ensure header exists
+        if not values or values[0] != ['key', 'date', 'value']:
+            ws.clear()
+            ws.append_row(['key', 'date', 'value'])
+            values = [['key', 'date', 'value']]
+        # Find existing row for this key+date
+        for i, row in enumerate(values[1:], start=2):
+            if len(row) >= 2 and row[0] == _AI_META_KEY and row[1] == today:
+                ws.update_cell(i, 3, str(count))
+                return
+        # Not found — append new row
+        ws.append_row([_AI_META_KEY, today, str(count)])
+    except Exception as e:
+        print(f'[meta] failed to persist AI usage: {e}')
 
 
 def _check_ai_rate_limit():
     today = _today_str()
-    if _ai_usage['date'] != today:
-        _ai_usage['date'] = today
-        _ai_usage['count'] = 0
-    if _ai_usage['count'] >= AI_DAILY_LIMIT:
+    count = _read_ai_usage()
+    if count >= AI_DAILY_LIMIT:
         return False, f'Daily AI limit of {AI_DAILY_LIMIT} calls reached. Resets tomorrow.'
-    _ai_usage['count'] += 1
+    _write_ai_usage(count + 1)
     return True, None
 
 
