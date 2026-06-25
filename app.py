@@ -319,48 +319,19 @@ def prepare_daily_queue():
                 return False
         return True  # blank or 0 = fixed annual, month+day match is enough
 
-    festival_rows = []
-    for f in festivals:
-        if not _festival_matches(f, dt):
-            continue
-        fname = str(f.get('festival', 'Festival'))
-        event_type = fname.lower()
-        base = {
-            'event_type': event_type,
-            'event_date': today,
-            'relation': 'community',
+    festival_rows = [
+        {
+            'id': f"festival-{str(f.get('festival', '')).lower()}-{today}",
+            'name': f"{f.get('festival', 'Festival')} Group",
+            'phone': '', 'chat_type': 'group', 'group_invite_link': '',
+            'event_type': str(f.get('festival', '')).lower(),
+            'event_date': today, 'relation': 'community',
             'language': f.get('default_language', 'en'),
-            'tone': 'warm',
-            'media_mode': f.get('default_media', 'text'),
-            'active': 'TRUE',
+            'tone': 'warm', 'media_mode': f.get('default_media', 'text'), 'active': 'TRUE'
         }
-        # One row per group link (supports multiple groups per festival)
-        group_links = [
-            g.strip()
-            for g in str(f.get('group_invite_links', f.get('group_invite_link', ''))).split(',')
-            if g.strip()
-        ]
-        if group_links:
-            for idx, link in enumerate(group_links):
-                suffix = f"-g{idx+1}" if len(group_links) > 1 else "-group"
-                festival_rows.append({
-                    **base,
-                    'id': f"festival-{event_type}-{today}{suffix}",
-                    'name': f"{fname} Group",
-                    'phone': '',
-                    'chat_type': 'group',
-                    'group_invite_link': link,
-                })
-        else:
-            # No group link — still queue it so user can copy/share manually
-            festival_rows.append({
-                **base,
-                'id': f"festival-{event_type}-{today}-group",
-                'name': f"{fname} Group",
-                'phone': '',
-                'chat_type': 'group',
-                'group_invite_link': '',
-            })
+        for f in festivals
+        if _festival_matches(f, dt)
+    ]
 
     todays = [
         r for r in contacts
