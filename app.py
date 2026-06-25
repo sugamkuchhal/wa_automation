@@ -139,8 +139,10 @@ def render_template(row, templates):
         or {'template_text': 'Hi {{name}}, wishing you a wonderful day!'}
     )
     template = (exact or fallback).get('template_text', '')
-    # Group messages: strip {{name}} placeholder — no personalisation for groups
-    if str(row.get('chat_type', '')).lower() == 'group':
+    # Pure group rows (chat_type=group in the original sheet): no personalisation
+    # Individual rows generating a group card: keep name (originated from individual)
+    original_chat_type = str(row.get('original_chat_type', row.get('chat_type', ''))).lower()
+    if original_chat_type == 'group':
         return template.replace('{{name}}', '').replace('  ', ' ').strip()
     return template.replace('{{name}}', str(row.get('name', 'there')))
 
@@ -399,12 +401,13 @@ def prepare_daily_queue():
         event_name = str(r.get('event_name', r.get('event_type', ''))).lower().strip()
         r = {**r, 'event_type': event_name}
         if str(r.get('chat_type', '')).lower() == 'individual':
-            # Always add the individual card
+            # Card 1: personal — original chat_type, sheet tone, name personalised
             output.append(build_queue_record(r, templates, today))
-            # If also has a group link, add a second card for the group
+            # Card 2: group — forced formal tone, but name kept (originated from individual)
             if str(r.get('group_invite_link', '')).strip():
+                r_group = {**r, 'original_chat_type': 'individual'}
                 output.append(build_queue_record(
-                    r, templates, today,
+                    r_group, templates, today,
                     id_suffix='-group',
                     chat_type_override='group'
                 ))
