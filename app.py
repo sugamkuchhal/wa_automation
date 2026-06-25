@@ -268,12 +268,18 @@ def _matches_today(row, dt):
       weekly  - match day-of-week (Mon=0, Sun=6) derived from event_date
       <empty> - exact date match (one-time event)
     """
-    raw_date = str(row.get('event_date', ''))
+    raw_date = str(row.get('event_date', '')).strip()
     if not raw_date:
         return False
-    try:
-        event_dt = datetime.strptime(raw_date, '%Y-%m-%d')
-    except ValueError:
+    event_dt = None
+    for fmt in ('%Y-%m-%d', '%d-%b-%Y', '%d/%m/%Y', '%m/%d/%Y', '%d-%m-%Y'):
+        try:
+            event_dt = datetime.strptime(raw_date, fmt)
+            break
+        except ValueError:
+            continue
+    if event_dt is None:
+        print(f'[queue] unrecognised date format: {raw_date!r}')
         return False
 
     recurrence = str(row.get('recurrence', '')).strip().lower()
