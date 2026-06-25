@@ -285,10 +285,14 @@ def notify_queue_ready(count, date_str):
 
 
 def _parse_date(raw):
-    """Parse a date string in any common format. Returns datetime or None."""
+    """Parse a date string in any common format. Returns datetime or None.
+    If the year is unknown (stored as '????'), substitute '0001' so that
+    month+day matching still works — the year is never used for comparison.
+    """
+    normalised = str(raw).strip().replace('????', '0001')
     for fmt in ('%Y-%m-%d', '%d-%b-%Y', '%d/%m/%Y', '%m/%d/%Y', '%d-%m-%Y'):
         try:
-            return datetime.strptime(str(raw).strip(), fmt)
+            return datetime.strptime(normalised, fmt)
         except ValueError:
             continue
     return None
