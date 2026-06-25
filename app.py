@@ -307,21 +307,43 @@ def prepare_daily_queue():
     }
 
     def _festival_matches(f, dt):
-        """Match festival to today using year+month+day (variable) or month+day (fixed)."""
+        """Match festival row to today based on its event_category.
+
+        fixed_festival:    match month+day only — year is always ignored
+        variable_festival: year is compulsory — skip row if year blank/0,
+                           then match year+month+day exactly
+        """
+        festival_name = str(f.get('festival', '')).lower().strip()
+        category = EVENT_REF.get(festival_name, 'historical')
+
         try:
             month = int(f.get('month', 0))
             day   = int(f.get('day', 0))
         except (ValueError, TypeError):
             return False
-        if month != dt.month or day != dt.day:
+        if not month or not day:
             return False
+
         year_val = str(f.get('year', '')).strip()
-        if year_val and year_val != '0':
-            try:
-                return int(year_val) == dt.year
-            except ValueError:
+        year_is_set = bool(year_val) and year_val != '0'
+
+        if category == 'fixed_festival':
+            # Always match on month+day — year is irrelevant even if filled
+            return month == dt.month and day == dt.day
+
+        if category == 'variable_festival':
+            # Year is compulsory — skip this row if not set
+            if not year_is_set:
+                print(f'[queue] WARNING: variable festival "{festival_name}" has no year set — skipping')
                 return False
-        return True  # blank or 0 = fixed annual, month+day match is enough
+            try:
+                return int(year_val) == dt.year and month == dt.month and day == dt.day
+            except ValueError:
+                print(f'[queue] WARNING: invalid year "{year_val}" for festival "{festival_name}" — skipping')
+                return False
+
+        # Unknown category in festival_calendar — treat as fixed
+        return month == dt.month and day == dt.day
 
     # Build today's festival event_types from festival_calendar
     todays_festivals = {
