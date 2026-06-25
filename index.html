@@ -36,6 +36,8 @@
     /* cards */
     .card { background: white; border-radius: 12px; padding: 12px; margin-bottom: 12px; box-shadow: 0 1px 5px rgba(0,0,0,.08); position: relative; transition: opacity .3s; }
     .card.done { opacity: .45; }
+    .card.skipped { opacity: .7; }
+    .card.skipped .btn-unskip { opacity: 1 !important; pointer-events: auto !important; font-weight: 700; }
     .card.sel { outline: 2px solid #25D366; }
     .ctitle { font-weight: 700; font-size: 14px; margin-bottom: 3px; color: #111; }
     .cmeta { font-size: 12px; color: #777; margin-bottom: 7px; }
@@ -237,14 +239,14 @@ function render(rows) {
     }
 
     const actionBtns = isSkipped
-      ? `<button class="btn" style="background:#f0a500;color:white" onclick="unskip('${esc(r.id)}')">↩ Unskip</button>`
+      ? `<button class="btn btn-unskip" style="background:#f0a500;color:white;opacity:1" onclick="unskip('${esc(r.id)}')">↩ Unskip</button>`
       : `<a class="btn wa" id="wa-${esc(r.id)}" href="${esc(r.wa_link)}" target="_blank" onclick="mark('${esc(r.id)}','sent')">Send on WhatsApp</a>
         <button class="btn sv" id="sv-${esc(r.id)}" style="display:none" onclick="saveEdit('${esc(r.id)}')">Save Edit</button>
         <button class="btn ai" id="ai-${esc(r.id)}" onclick="aiGen('${esc(r.id)}','${esc(r.name)}','${esc(r.event_type)}','${esc(r.relation||'')}','${esc(r.language||'en')}','${esc(r.tone||'warm')}')">✨ AI</button>
         <button class="btn cp" onclick="copyText('${esc(r.id)}')">Copy</button>
         <button class="btn sk" onclick="mark('${esc(r.id)}','skipped')">Skip</button>`;
 
-    return `<div class="card${isSkipped||isSent?' done':''}" id="card-${esc(r.id)}">
+    return `<div class="card${isSent?' done':isSkipped?' skipped':''}" id="card-${esc(r.id)}">
       <input type="checkbox" class="cb" ${isSkipped||isSent?'disabled':''} onchange="toggleSel('${esc(r.id)}',this.checked)">
       <div class="ctitle">${icon} ${esc(r.name)} — ${esc(r.event_type)}
         <span class="badge b-${esc(status)}">${esc(status)}</span>
@@ -264,10 +266,15 @@ function setStatus(id, status) {
   const badge = card.querySelector('.badge');
   badge.className = 'badge b-' + status;
   badge.textContent = status;
-  if (status === 'sent' || status === 'skipped') {
+  if (status === 'sent') {
     card.classList.add('done');
+    card.classList.remove('skipped');
+  } else if (status === 'skipped') {
+    card.classList.add('skipped');
+    card.classList.remove('done');
   } else {
     card.classList.remove('done');
+    card.classList.remove('skipped');
   }
 }
 
@@ -294,7 +301,7 @@ function disableCard(id, status) {
   const btnsEl = document.getElementById('btns-' + id);
   if (status === 'skipped') {
     if (ta) ta.disabled = true;
-    if (btnsEl) btnsEl.innerHTML = `<button class="btn" style="background:#f0a500;color:white" onclick="unskip('${id}')">↩ Unskip</button>`;
+    if (btnsEl) btnsEl.innerHTML = `<button class="btn btn-unskip" style="background:#f0a500;color:white;opacity:1" onclick="unskip('${id}')">↩ Unskip</button>`;
   } else {
     // sent — disable everything
     card.querySelectorAll('button, a.btn').forEach(el => {
