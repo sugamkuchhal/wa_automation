@@ -324,10 +324,21 @@ def prepare_daily_queue():
         if _festival_matches(f, dt)
     }
 
-    # Individual contacts matching today
+    # Personal event types (birthday, anniversary etc.) — always month+day
+    # Festival event types — fire only when festival_calendar says so today
+    # A contact row with event_type matching a today festival always fires
+    # A contact row with a personal event_type fires on month+day match
+    FESTIVAL_EVENT_TYPES = {str(f.get('festival', '')).lower() for f in festivals}
+
     contact_rows = [
         r for r in contacts
-        if _matches_today(r, dt) and str(r.get('active', '')).upper() == 'TRUE'
+        if str(r.get('active', '')).upper() == 'TRUE' and (
+            str(r.get('event_type', '')).lower().strip() in todays_festivals
+            or (
+                str(r.get('event_type', '')).lower().strip() not in FESTIVAL_EVENT_TYPES
+                and _matches_today(r, dt)
+            )
+        )
     ]
 
     # Group events: use same recurrence logic as contacts_events
