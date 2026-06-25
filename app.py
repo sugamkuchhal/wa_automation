@@ -441,6 +441,34 @@ def ai_generate():
         return jsonify({'ok': False, 'error': str(e)}), 500
 
 
+def _validate_phone_numbers(sh):
+    """Warn about contacts with malformed phone numbers (non-digits, too short, leading +)."""
+    try:
+        rows = sh.worksheet('contacts_events').get_all_records()
+    except Exception:
+        return  # sheet missing — _startup_check will catch it
+    bad = []
+    for r in rows:
+        if str(r.get('chat_type', '')).strip().lower() != 'individual':
+            continue
+        if str(r.get('active', '')).upper() != 'TRUE':
+            continue
+        phone = str(r.get('phone', '')).strip()
+        digits = ''.join(ch for ch in phone if ch.isdigit())
+        if not phone:
+            bad.append((r.get('id'), 'phone is blank'))
+        elif phone != digits:
+            bad.append((r.get('id'), f'phone "{phone}" has non-digit characters — use digits only e.g. 919876543210'))
+        elif len(digits) < 7:
+            bad.append((r.get('id'), f'phone "{phone}" looks too short ({len(digits)} digits)'))
+    if bad:
+        print(f'[startup] WARNING: {len(bad)} contact(s) with phone issues — wa.me links will be broken:')
+        for cid, msg in bad:
+            print(f'[startup]   id={cid}: {msg}')
+    else:
+        print(f'[startup] phone check OK — {len([r for r in rows if str(r.get("active","")).upper()=="TRUE" and str(r.get("chat_type","")).lower()=="individual"])} individual contacts validated')
+
+
 def _startup_check():
     """Verify sheet connectivity before accepting traffic. Exits with a clear message on failure."""
     import sys
@@ -455,6 +483,7 @@ def _startup_check():
             print('[startup] Create the tabs and restart. See README for schema.')
             sys.exit(1)
         print(f'[startup] OK — connected to "{sh.title}", tabs: {titles}')
+        _validate_phone_numbers(sh)
     except FileNotFoundError:
         creds_file = os.getenv('GOOGLE_APPLICATION_CREDENTIALS', 'service_account.json')
         print(f'[startup] ERROR: credentials file not found: {creds_file}')
