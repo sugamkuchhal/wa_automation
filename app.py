@@ -332,10 +332,10 @@ def prepare_daily_queue():
 
     # Single loop over all people_and_groups rows
     # Category from event_ref determines firing rule:
-    #   personal         → fire on month+day match every year
+    #   historical       → fire on month+day match every year (birthday, anniversary)
     #   fixed_festival   → fire when festival_calendar confirms today (month+day match)
     #   variable_festival→ fire when festival_calendar confirms today (exact year date)
-    #   unknown          → treat as personal (safe default)
+    #   unknown          → treat as historical (safe default)
     todays = []
     for r in people:
         if str(r.get('is_active', r.get('active', ''))).upper() != 'TRUE':
@@ -347,7 +347,7 @@ def prepare_daily_queue():
             if event_name in todays_festivals:
                 todays.append(r)
         else:
-            # personal or unknown — fire on month+day
+            # historical or unknown — fire on month+day
             if _matches_today(r, dt):
                 todays.append(r)
 
