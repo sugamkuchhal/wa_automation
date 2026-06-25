@@ -352,7 +352,7 @@ def prepare_daily_queue():
             phone     = ''.join(ch for ch in str(g.get('phone', '')) if ch.isdigit())
             group_rows.append({
                 'id':                str(g.get('id', f"group-{event_type}-{today}")),
-                'name':              str(g.get('group_name', 'Group')),
+                'name':              str(g.get('name', g.get('group_name', 'Group'))),
                 'phone':             phone,
                 'chat_type':         chat_type,
                 'group_invite_link': str(g.get('group_invite_link', '')),
