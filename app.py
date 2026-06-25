@@ -52,21 +52,46 @@ def get_sheet_rows(sheet_name):
     return _sheet().worksheet(sheet_name).get_all_records()
 
 
-def write_ready_queue(rows):
+QUEUE_HEADERS = [
+    'id', 'queue_date', 'name', 'chat_type', 'event_type', 'phone', 'group_invite_link',
+    'media_mode', 'media_url', 'final_message_text', 'wa_link', 'action_status', 'action_ts'
+]
+
+
+def _get_or_create_ws(name, rows=5000, cols=20):
     sh = _sheet()
     try:
-        ws = sh.worksheet('ready_queue')
+        return sh.worksheet(name)
     except gspread.WorksheetNotFound:
-        ws = sh.add_worksheet(title='ready_queue', rows=1000, cols=20)
+        return sh.add_worksheet(title=name, rows=rows, cols=cols)
 
-    headers = [
-        'id', 'queue_date', 'name', 'chat_type', 'event_type', 'phone', 'group_invite_link',
-        'media_mode', 'media_url', 'final_message_text', 'wa_link', 'action_status', 'action_ts'
-    ]
+
+def _archive_to_history():
+    """Copy all rows currently in ready_queue into send_history before clearing."""
+    try:
+        rq = _sheet().worksheet('ready_queue')
+    except gspread.WorksheetNotFound:
+        return  # nothing to archive yet
+    values = rq.get_all_values()
+    if len(values) < 2:
+        return  # header only or empty
+    data_rows = values[1:]  # skip header
+
+    hist = _get_or_create_ws('send_history', rows=50000, cols=20)
+    # Write header on first use
+    if hist.row_count < 1 or not hist.get('A1'):
+        hist.append_row(QUEUE_HEADERS)
+    hist.append_rows(data_rows)
+    print(f'[history] archived {len(data_rows)} row(s) to send_history')
+
+
+def write_ready_queue(rows):
+    _archive_to_history()   # persist yesterday's results before wiping
+    ws = _get_or_create_ws('ready_queue')
     ws.clear()
-    ws.append_row(headers)
+    ws.append_row(QUEUE_HEADERS)
     if rows:
-        ws.append_rows([[r.get(h, '') for h in headers] for r in rows])
+        ws.append_rows([[r.get(h, '') for h in QUEUE_HEADERS] for r in rows])
 
 
 def _queue_worksheet():
