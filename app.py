@@ -306,12 +306,12 @@ def prepare_daily_queue():
         if month != dt.month or day != dt.day:
             return False
         year_val = str(f.get('year', '')).strip()
-        if year_val:
+        if year_val and year_val != '0':
             try:
                 return int(year_val) == dt.year
             except ValueError:
                 return False
-        return True  # no year = fixed annual, month+day match is enough
+        return True  # blank or 0 = fixed annual, month+day match is enough
 
     festival_rows = [
         {
