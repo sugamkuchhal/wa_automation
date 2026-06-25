@@ -295,12 +295,18 @@ def _matches_today(row, dt):
 
 
 def prepare_daily_queue():
-    # Three worksheet reads share the same connection
-    contacts = get_sheet_rows('contacts_events')
+    # Read all sheets via single connection
+    contacts  = get_sheet_rows('contacts_events')
     templates = get_sheet_rows('message_templates')
     festivals = get_sheet_rows('festival_calendar')
-    today = _today_str()
-    dt = datetime.strptime(today, '%Y-%m-%d')
+    today     = _today_str()
+    dt        = datetime.strptime(today, '%Y-%m-%d')
+
+    # Load group_events if the sheet exists
+    try:
+        groups = get_sheet_rows('group_events')
+    except Exception:
+        groups = []
 
     def _festival_matches(f, dt):
         """Match festival to today using year+month+day (variable) or month+day (fixed)."""
@@ -319,24 +325,44 @@ def prepare_daily_queue():
                 return False
         return True  # blank or 0 = fixed annual, month+day match is enough
 
-    festival_rows = [
-        {
-            'id': f"festival-{str(f.get('festival', '')).lower()}-{today}",
-            'name': f"{f.get('festival', 'Festival')} Group",
-            'phone': '', 'chat_type': 'group', 'group_invite_link': '',
-            'event_type': str(f.get('festival', '')).lower(),
-            'event_date': today, 'relation': 'community',
-            'language': f.get('default_language', 'en'),
-            'tone': 'warm', 'media_mode': f.get('default_media', 'text'), 'active': 'TRUE'
-        }
+    # Build today's festival event_types from festival_calendar
+    todays_festivals = {
+        str(f.get('festival', '')).lower()
         for f in festivals
         if _festival_matches(f, dt)
-    ]
+    }
 
-    todays = [
+    # Individual contacts matching today
+    contact_rows = [
         r for r in contacts
         if _matches_today(r, dt) and str(r.get('active', '')).upper() == 'TRUE'
-    ] + festival_rows
+    ]
+
+    # Group events: use same recurrence logic as contacts_events
+    # Also auto-match groups whose event_type is a festival happening today
+    group_rows = []
+    for g in groups:
+        if str(g.get('active', '')).upper() != 'TRUE':
+            continue
+        event_type = str(g.get('event_type', '')).lower().strip()
+        # Check recurrence match OR festival date match
+        if _matches_today(g, dt) or event_type in todays_festivals:
+            group_rows.append({
+                'id':               str(g.get('id', f"group-{event_type}-{today}")),
+                'name':             str(g.get('group_name', 'Group')),
+                'phone':            '',
+                'chat_type':        'group',
+                'group_invite_link': str(g.get('group_invite_link', '')),
+                'event_type':       event_type,
+                'event_date':       today,
+                'relation':         'group',
+                'language':         str(g.get('language', 'en')),
+                'tone':             str(g.get('tone', 'warm')),
+                'media_mode':       str(g.get('media_mode', 'text')),
+                'active':           'TRUE',
+            })
+
+    todays = contact_rows + group_rows
 
     output = [build_queue_record(r, templates, today) for r in todays]
     write_ready_queue(output)
@@ -584,6 +610,10 @@ def _startup_check():
         sh = _sheet()
         titles = [ws.title for ws in sh.worksheets()]
         required = {'contacts_events', 'festival_calendar', 'message_templates'}
+        optional = {'group_events', 'ready_queue', 'send_history', '_meta'}
+        present_optional = optional & set(titles)
+        if present_optional:
+            print(f'[startup] optional tabs found: {sorted(present_optional)}')
         missing = required - set(titles)
         if missing:
             print(f'[startup] ERROR: missing sheet tab(s): {", ".join(sorted(missing))}')
