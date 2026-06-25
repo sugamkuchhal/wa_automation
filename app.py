@@ -296,6 +296,23 @@ def prepare_daily_queue():
     today = _today_str()
     dt = datetime.strptime(today, '%Y-%m-%d')
 
+    def _festival_matches(f, dt):
+        """Match festival to today using year+month+day (variable) or month+day (fixed)."""
+        try:
+            month = int(f.get('month', 0))
+            day   = int(f.get('day', 0))
+        except (ValueError, TypeError):
+            return False
+        if month != dt.month or day != dt.day:
+            return False
+        year_val = str(f.get('year', '')).strip()
+        if year_val:
+            try:
+                return int(year_val) == dt.year
+            except ValueError:
+                return False
+        return True  # no year = fixed annual, month+day match is enough
+
     festival_rows = [
         {
             'id': f"festival-{str(f.get('festival', '')).lower()}-{today}",
@@ -307,7 +324,7 @@ def prepare_daily_queue():
             'tone': 'warm', 'media_mode': f.get('default_media', 'text'), 'active': 'TRUE'
         }
         for f in festivals
-        if int(f.get('month', 0)) == dt.month and int(f.get('day', 0)) == dt.day
+        if _festival_matches(f, dt)
     ]
 
     todays = [
