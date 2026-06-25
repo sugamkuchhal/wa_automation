@@ -187,9 +187,9 @@ docker compose exec wa_automation python -c "from app import prepare_daily_queue
 
 ### `festival_calendar`
 - `festival`
+- `year` — optional. If filled, festival only fires that specific year (for moveable feasts like Diwali, Holi). If blank or 0, fires every year on that month/day (for fixed festivals like Christmas, New Year).
 - `month`
 - `day`
-- `year` — optional. If filled, festival only fires that specific year (for moveable feasts like Diwali, Holi). If blank, fires every year on that month/day (for fixed festivals like Christmas, New Year).
 - `default_language`
 - `default_media`
 
