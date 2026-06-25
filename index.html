@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>WA Automated Wishes</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #f7f7fb; padding: 14px; }
+
+    h1 { font-size: 18px; font-weight: 700; color: #111; margin-bottom: 14px; }
+
+    /* tabs */
+    .tabs { display: flex; gap: 6px; margin-bottom: 14px; }
+    .tab { padding: 8px 18px; border-radius: 8px; border: 0; font-size: 14px; font-weight: 600; cursor: pointer; background: #e0e0e0; color: #444; }
+    .tab.on { background: #222; color: white; }
+
+    .pane { display: none; }
+    .pane.on { display: block; }
+
+    /* queue header */
+    .qhead { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+    .qhead span { font-size: 13px; color: #666; }
+    #prep-btn { padding: 8px 14px; border-radius: 8px; border: 0; background: #222; color: white; font-weight: 600; font-size: 13px; cursor: pointer; }
+
+    /* offline bar */
+    #offline-bar { display: none; background: #fee2e2; color: #991b1b; padding: 9px 14px; border-radius: 9px; margin-bottom: 12px; font-size: 13px; font-weight: 600; text-align: center; }
+    #offline-bar.on { display: block; }
+
+    /* bulk bar */
+    #bulk-bar { display: none; position: sticky; top: 0; z-index: 10; background: #25D366; color: white; padding: 10px 14px; border-radius: 10px; margin-bottom: 12px; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+    #bulk-bar.on { display: flex; }
+    #bulk-bar span { font-weight: 700; font-size: 13px; }
+    #bulk-bar button { background: white; color: #1a7a42; border: 0; border-radius: 7px; padding: 6px 12px; font-weight: 700; cursor: pointer; font-size: 13px; }
+
+    /* cards */
+    .card { background: white; border-radius: 12px; padding: 12px; margin-bottom: 12px; box-shadow: 0 1px 5px rgba(0,0,0,.08); position: relative; transition: opacity .3s; }
+    .card.done { opacity: .45; }
+    .card.sel { outline: 2px solid #25D366; }
+    .ctitle { font-weight: 700; font-size: 14px; margin-bottom: 3px; color: #111; }
+    .cmeta { font-size: 12px; color: #777; margin-bottom: 7px; }
+    .badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 99px; margin-left: 6px; vertical-align: middle; }
+    .b-ready   { background: #e8f0fe; color: #1a56db; }
+    .b-edited  { background: #fff3cd; color: #856404; }
+    .b-sent    { background: #d4f5e2; color: #1a7a42; }
+    .b-skipped { background: #ececec; color: #666; }
+    .msg { width: 100%; background: #f1f3f5; border-radius: 8px; padding: 9px; border: 1px solid #e3e6ea; font-size: 13px; line-height: 1.5; resize: vertical; }
+    .msg.dirty { border-color: #f0a500; background: #fffbf0; }
+    .btns { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .btn { padding: 8px 11px; border-radius: 7px; border: 0; font-size: 12px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block; }
+    .wa  { background: #25D366; color: white; }
+    .ai  { background: #6c47ff; color: white; }
+    .ai:disabled { opacity: .6; cursor: wait; }
+    .sv  { background: #f0a500; color: white; }
+    .sk  { background: #ddd; color: #333; }
+    .cp  { background: #e8f0fe; color: #1a56db; }
+    .cb  { position: absolute; top: 13px; right: 13px; width: 18px; height: 18px; accent-color: #25D366; cursor: pointer; }
+
+    /* session overlay */
+    #session { display: none; position: fixed; inset: 0; background: #f7f7fb; z-index: 100; overflow-y: auto; padding: 16px; }
+    #session.on { display: block; }
+    #sess-prog { font-size: 12px; color: #888; margin-bottom: 6px; }
+    #sess-card { background: white; border-radius: 12px; padding: 14px; box-shadow: 0 1px 5px rgba(0,0,0,.1); }
+    #sess-title { font-size: 16px; font-weight: 700; margin-bottom: 3px; color: #111; }
+    #sess-meta  { font-size: 12px; color: #777; margin-bottom: 9px; }
+    #sess-msg   { width: 100%; background: #f1f3f5; border-radius: 8px; padding: 9px; border: 1px solid #e3e6ea; font-size: 14px; min-height: 80px; }
+    #sess-btns  { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    #sess-btns a, #sess-btns button { flex: 1; min-width: 100px; padding: 13px 8px; border-radius: 9px; font-weight: 700; font-size: 14px; border: 0; cursor: pointer; text-align: center; text-decoration: none; }
+    #btn-ss { background: #25D366; color: white; }
+    #btn-sk { background: #ddd; color: #333; }
+    #btn-cp { background: #e8f0fe; color: #1a56db; }
+    #sess-done { text-align: center; padding: 40px 0; display: none; }
+    #sess-done h2 { font-size: 24px; margin-bottom: 8px; }
+
+    /* history */
+    .hfilter { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+    .hfilter select, .hfilter input { padding: 7px 10px; border-radius: 7px; border: 1px solid #ddd; font-size: 13px; background: white; }
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 8px; margin-bottom: 14px; }
+    .stat { background: white; border-radius: 10px; padding: 10px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,.07); }
+    .stat-n { font-size: 24px; font-weight: 700; color: #111; }
+    .stat-l { font-size: 11px; color: #777; margin-top: 2px; }
+    .htbl { width: 100%; border-collapse: collapse; font-size: 12px; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,.07); }
+    .htbl th { text-align: left; padding: 8px 10px; background: #f1f3f5; color: #555; font-size: 11px; border-bottom: 1px solid #e3e6ea; }
+    .htbl td { padding: 7px 10px; border-bottom: 1px solid #f5f5f5; color: #222; vertical-align: top; }
+    .htbl tr:last-child td { border-bottom: none; }
+
+    /* toast */
+    .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 9px 18px; border-radius: 8px; font-size: 13px; opacity: 0; transition: opacity .3s; pointer-events: none; z-index: 200; white-space: nowrap; }
+    .toast.on { opacity: 1; }
+  </style>
+</head>
+<body>
+
+<h1>📨 WA Automated Wishes</h1>
+
+<div class="tabs">
+  <button class="tab on" onclick="showTab('queue',this)">Today's Queue</button>
+  <button class="tab" onclick="showTab('history',this)">Send History</button>
+</div>
+
+<!-- ── Queue pane ── -->
+<div class="pane on" id="pane-queue">
+  <div id="offline-bar">⚠️ Cannot reach server. <button onclick="loadQueue()" style="margin-left:8px;padding:3px 10px;border-radius:6px;border:0;background:#991b1b;color:white;font-size:12px;font-weight:700;cursor:pointer">Retry</button></div>
+  <div class="qhead">
+    <span id="q-date"></span>
+  </div>
+  <div id="bulk-bar">
+    <span id="bulk-count">0 selected</span>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      <button onclick="selectAll()">Select All</button>
+      <button onclick="startSession()" style="background:#1a7a42;color:white">▶ Start Session</button>
+      <button onclick="clearSel()" style="background:#eee;color:#333">✕ Clear</button>
+    </div>
+  </div>
+  <div id="root">Loading…</div>
+</div>
+
+<!-- ── History pane ── -->
+<div class="pane" id="pane-history">
+  <div class="hfilter">
+    <select id="hist-days" onchange="loadHistory()">
+      <option value="7">Last 7 days</option>
+      <option value="30" selected>Last 30 days</option>
+      <option value="90">Last 90 days</option>
+      <option value="0">All time</option>
+    </select>
+    <input type="text" id="hist-q" placeholder="Search name or event…" oninput="renderHistory()" style="flex:1;min-width:140px">
+  </div>
+  <div class="stats" id="hist-stats"></div>
+  <div id="hist-body">Loading…</div>
+</div>
+
+<!-- ── Send session overlay ── -->
+<div id="session">
+  <div id="sess-prog"></div>
+  <div id="sess-card">
+    <div id="sess-title"></div>
+    <div id="sess-meta"></div>
+    <textarea id="sess-msg" rows="5"></textarea>
+    <div id="sess-btns">
+      <a id="btn-ss" href="#" target="_blank">Send on WhatsApp</a>
+      <button id="btn-cp" onclick="sessCopy()">📋 Copy</button>
+      <button id="btn-sk" onclick="sessNext('skipped')">⏭ Skip</button>
+    </div>
+  </div>
+  <div id="sess-done">
+    <h2>🎉 All done!</h2>
+    <p id="sess-summary" style="color:#777;font-size:13px;margin-bottom:14px"></p>
+    <button class="btn wa" onclick="endSession()">Back to Dashboard</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzGcZiIqLzhrX2PjylcH7Aw8CB08fN_cA5OwHe9GqwvjpA4JaMYHKxgPx37Webb3qGR/exec';
+const EMOJI = { birthday:'🎂', anniversary:'💍', diwali:'🪔', holi:'🎨', christmas:'🎄', 'new year':'🎉' };
+const AI_COOLDOWN = 10000;
+
+let allRows = [], selected = new Set(), sessQueue = [], sessIdx = 0, histRows = [];
+
+// ── Utilities ────────────────────────────────────────────────────────────────
+
+function esc(v) {
+  return String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+}
+
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('on');
+  setTimeout(() => el.classList.remove('on'), 2200);
+}
+
+function today() {
+  return new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
+}
+
+async function gasGet(params) {
+  const url = GAS_URL + '?' + new URLSearchParams(params);
+  const res = await fetch(url);
+  return res.json();
+}
+
+async function gasPost(data) {
+  const res = await fetch(GAS_URL, {
+    method: 'POST',
+    body: JSON.stringify(data)
+  });
+  return res.json();
+}
+
+// ── Tabs ─────────────────────────────────────────────────────────────────────
+
+function showTab(name, btn) {
+  document.querySelectorAll('.pane').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('on'));
+  document.getElementById('pane-' + name).classList.add('on');
+  btn.classList.add('on');
+  if (name === 'history') loadHistory();
+}
+
+// ── Queue ────────────────────────────────────────────────────────────────────
+
+async function loadQueue() {
+  document.getElementById('offline-bar').classList.remove('on');
+  try {
+    const rows = await gasGet({ action: 'queue' });
+    allRows = Array.isArray(rows) ? rows : [];
+    document.getElementById('q-date').textContent = today();
+    render(allRows);
+  } catch(e) {
+    document.getElementById('offline-bar').classList.add('on');
+    document.getElementById('root').innerHTML = '';
+  }
+}
+
+function render(rows) {
+  const root = document.getElementById('root');
+  if (!rows.length) { root.innerHTML = '<p style="color:#777;font-size:13px;padding:10px 0">No messages for today.</p>'; return; }
+  root.innerHTML = rows.map(r => {
+    const icon = EMOJI[String(r.event_type||'').toLowerCase()] || '✨';
+    const status = r.action_status || 'ready';
+    const done = status === 'sent' || status === 'skipped';
+    const hasMedia = !!r.media_url;
+    return `<div class="card${done?' done':''}" id="card-${esc(r.id)}">
+      <input type="checkbox" class="cb" ${done?'disabled':''} onchange="toggleSel('${esc(r.id)}',this.checked)">
+      <div class="ctitle">${icon} ${esc(r.name)} — ${esc(r.event_type)} <span class="badge b-${esc(status)}">${esc(status)}</span></div>
+      <div class="cmeta">${esc(r.chat_type)} · ${esc(r.media_mode)}</div>
+      <textarea class="msg" id="msg-${esc(r.id)}" rows="4" oninput="onEdit('${esc(r.id)}')">${esc(r.final_message_text)}</textarea>
+      ${hasMedia?`<div style="font-size:11px;color:#888;margin-top:4px">Media: ${esc(r.media_url)}</div>`:''}
+      <div class="btns">
+        <a class="btn wa" id="wa-${esc(r.id)}" href="${esc(r.wa_link)}" target="_blank" onclick="mark('${esc(r.id)}','sent')">Send on WhatsApp</a>
+        <button class="btn sv" id="sv-${esc(r.id)}" style="display:none" onclick="saveEdit('${esc(r.id)}')">Save Edit</button>
+        <button class="btn ai" id="ai-${esc(r.id)}" onclick="aiGen('${esc(r.id)}','${esc(r.name)}','${esc(r.event_type)}','${esc(r.relation||'')}','${esc(r.language||'en')}','${esc(r.tone||'warm')}')">✨ AI</button>
+        <button class="btn cp" onclick="copyText('${esc(r.id)}')">Copy</button>
+        <button class="btn sk" onclick="mark('${esc(r.id)}','skipped')">Skip</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function setStatus(id, status) {
+  const card = document.getElementById('card-' + id);
+  if (!card) return;
+  const badge = card.querySelector('.badge');
+  badge.className = 'badge b-' + status;
+  badge.textContent = status;
+  if (status === 'sent' || status === 'skipped') card.classList.add('done');
+  else card.classList.remove('done');
+}
+
+function onEdit(id) {
+  document.getElementById('msg-' + id).classList.add('dirty');
+  document.getElementById('sv-' + id).style.display = 'inline-block';
+}
+
+async function mark(id, status) {
+  const data = await gasPost({ action: 'mark', id, status });
+  if (data.ok) { setStatus(id, status); toast(status === 'sent' ? '✅ Sent' : '⏭ Skipped'); }
+}
+
+async function saveEdit(id) {
+  const text = document.getElementById('msg-' + id).value;
+  const data = await gasPost({ action: 'edit', id, text });
+  if (data.ok) {
+    document.getElementById('msg-' + id).classList.remove('dirty');
+    document.getElementById('sv-' + id).style.display = 'none';
+    setStatus(id, 'edited');
+    if (data.wa_link) document.getElementById('wa-' + id).href = data.wa_link;
+    toast('💾 Saved');
+  }
+}
+
+function copyText(id) {
+  navigator.clipboard.writeText(document.getElementById('msg-' + id).value);
+  toast('📋 Copied');
+}
+
+// ── AI Generate ───────────────────────────────────────────────────────────────
+
+async function aiGen(id, name, eventType, relation, language, tone) {
+  const btn = document.getElementById('ai-' + id);
+  const el  = document.getElementById('msg-' + id);
+  btn.disabled = true; btn.textContent = '⏳';
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5',
+        max_tokens: 256,
+        messages: [{ role: 'user', content:
+          `Write a short WhatsApp message for ${name} on their ${eventType}.${relation?' They are my '+relation+'.':''}\nLanguage: ${{en:'English',hi:'Hindi',hinglish:'Hinglish'}[language]||'English'}. Tone: ${{warm:'warm and heartfelt',casual:'casual and friendly',formal:'formal and respectful',fun:'fun and playful'}[tone]||'warm'}.\nKeep it under 3 sentences, personal, no hashtags.\nExisting message (improve it): ${el.value}\nReply with ONLY the message text.`
+        }]
+      })
+    });
+    const d = await res.json();
+    if (d.content && d.content[0]) {
+      el.value = d.content[0].text.trim();
+      onEdit(id);
+      toast('✨ AI message ready — review before saving');
+    } else {
+      toast('❌ AI failed — API key may be needed');
+    }
+  } catch(e) { toast('❌ AI error'); }
+  let s = AI_COOLDOWN / 1000;
+  btn.textContent = `✨ AI (${s}s)`;
+  const t = setInterval(() => {
+    s--;
+    if (s <= 0) { clearInterval(t); btn.disabled = false; btn.textContent = '✨ AI'; }
+    else btn.textContent = `✨ AI (${s}s)`;
+  }, 1000);
+}
+
+// ── Selection ─────────────────────────────────────────────────────────────────
+
+function toggleSel(id, checked) {
+  checked ? selected.add(id) : selected.delete(id);
+  document.getElementById('card-' + id).classList.toggle('sel', checked);
+  updateBulkBar();
+}
+
+function updateBulkBar() {
+  const n = selected.size;
+  document.getElementById('bulk-count').textContent = n + ' selected';
+  document.getElementById('bulk-bar').classList.toggle('on', n > 0);
+}
+
+function selectAll() {
+  allRows.filter(r => r.action_status !== 'sent' && r.action_status !== 'skipped').forEach(r => {
+    selected.add(r.id);
+    const cb = document.querySelector('#card-' + r.id + ' .cb');
+    if (cb) cb.checked = true;
+    document.getElementById('card-' + r.id).classList.add('sel');
+  });
+  updateBulkBar();
+}
+
+function clearSel() {
+  selected.forEach(id => {
+    const cb = document.querySelector('#card-' + id + ' .cb');
+    if (cb) cb.checked = false;
+    document.getElementById('card-' + id)?.classList.remove('sel');
+  });
+  selected.clear(); updateBulkBar();
+}
+
+// ── Send session ──────────────────────────────────────────────────────────────
+
+function startSession() {
+  if (!selected.size) return;
+  sessQueue = allRows.filter(r => selected.has(r.id));
+  sessIdx = 0; clearSel();
+  document.getElementById('session').classList.add('on');
+  showSessCard();
+}
+
+function showSessCard() {
+  const doneEl = document.getElementById('sess-done');
+  const cardEl = document.getElementById('sess-card');
+  if (sessIdx >= sessQueue.length) {
+    cardEl.style.display = 'none'; doneEl.style.display = 'block';
+    const sent = sessQueue.filter(r => r._s === 'sent').length;
+    document.getElementById('sess-summary').textContent =
+      sent + ' sent, ' + (sessQueue.length - sent) + ' skipped out of ' + sessQueue.length + ' messages.';
+    return;
+  }
+  doneEl.style.display = 'none'; cardEl.style.display = 'block';
+  const r = sessQueue[sessIdx];
+  const icon = EMOJI[String(r.event_type||'').toLowerCase()] || '✨';
+  document.getElementById('sess-prog').textContent = 'Message ' + (sessIdx+1) + ' of ' + sessQueue.length;
+  document.getElementById('sess-title').textContent = icon + ' ' + r.name + ' — ' + r.event_type;
+  document.getElementById('sess-meta').textContent = r.chat_type + ' · ' + r.media_mode;
+  document.getElementById('sess-msg').value = r.final_message_text;
+  const sb = document.getElementById('btn-ss');
+  sb.href = r.wa_link || '#';
+  sb.onclick = () => sessNext('sent');
+}
+
+async function sessNext(action) {
+  const r = sessQueue[sessIdx];
+  r._s = action;
+  const text = document.getElementById('sess-msg').value;
+  if (text !== r.final_message_text) {
+    const d = await gasPost({ action: 'edit', id: r.id, text });
+    if (d.ok && d.wa_link) { r.wa_link = d.wa_link; r.final_message_text = text; document.getElementById('btn-ss').href = d.wa_link; }
+  } else {
+    await gasPost({ action: 'mark', id: r.id, status: action });
+  }
+  setStatus(r.id, action);
+  sessIdx++; showSessCard();
+}
+
+function sessCopy() {
+  navigator.clipboard.writeText(document.getElementById('sess-msg').value);
+  toast('📋 Copied');
+}
+
+async function endSession() {
+  document.getElementById('session').classList.remove('on');
+  document.getElementById('sess-done').style.display = 'none';
+  await loadQueue();
+}
+
+// ── History ───────────────────────────────────────────────────────────────────
+
+async function loadHistory() {
+  const days = document.getElementById('hist-days').value;
+  document.getElementById('hist-body').innerHTML = 'Loading…';
+  try {
+    histRows = await gasGet({ action: 'history', days });
+    if (!Array.isArray(histRows)) histRows = [];
+    renderHistory();
+  } catch(e) { document.getElementById('hist-body').innerHTML = '❌ Could not load history.'; }
+}
+
+function renderHistory() {
+  const q = (document.getElementById('hist-q').value || '').toLowerCase();
+  const rows = q ? histRows.filter(r => String(r.name||'').toLowerCase().includes(q) || String(r.event_type||'').toLowerCase().includes(q)) : histRows;
+  const sent = rows.filter(r => r.action_status === 'sent').length;
+  const skipped = rows.filter(r => r.action_status === 'skipped').length;
+  const edited = rows.filter(r => r.action_status === 'edited').length;
+  const days = new Set(rows.map(r => r.queue_date)).size;
+  document.getElementById('hist-stats').innerHTML = `
+    <div class="stat"><div class="stat-n">${rows.length}</div><div class="stat-l">Total</div></div>
+    <div class="stat"><div class="stat-n" style="color:#1a7a42">${sent}</div><div class="stat-l">Sent</div></div>
+    <div class="stat"><div class="stat-n" style="color:#856404">${edited}</div><div class="stat-l">Edited</div></div>
+    <div class="stat"><div class="stat-n" style="color:#666">${skipped}</div><div class="stat-l">Skipped</div></div>
+    <div class="stat"><div class="stat-n">${days}</div><div class="stat-l">Days</div></div>`;
+  if (!rows.length) { document.getElementById('hist-body').innerHTML = '<p style="color:#777;font-size:13px">No records found.</p>'; return; }
+  const sorted = [...rows].sort((a,b) => String(b.queue_date).localeCompare(String(a.queue_date)));
+  const colors = { sent:'#1a7a42', skipped:'#666', edited:'#856404', ready:'#1a56db' };
+  document.getElementById('hist-body').innerHTML = `
+    <table class="htbl">
+      <thead><tr><th>Date</th><th>Name</th><th>Event</th><th>Status</th><th>Time</th></tr></thead>
+      <tbody>${sorted.map(r => `<tr>
+        <td>${esc(r.queue_date)}</td>
+        <td>${esc(r.name)}</td>
+        <td>${esc(r.event_type)}</td>
+        <td style="color:${colors[r.action_status]||'#333'};font-weight:600">${esc(r.action_status)}</td>
+        <td style="color:#999;font-size:11px">${r.action_ts ? String(r.action_ts).replace('T',' ').substring(0,16) : '—'}</td>
+      </tr>`).join('')}</tbody>
+    </table>`;
+}
+
+// ── Boot ──────────────────────────────────────────────────────────────────────
+loadQueue();
+</script>
+</body>
+</html>
