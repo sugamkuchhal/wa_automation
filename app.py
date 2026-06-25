@@ -347,19 +347,22 @@ def prepare_daily_queue():
         event_type = str(g.get('event_type', '')).lower().strip()
         # Check recurrence match OR festival date match
         if _matches_today(g, dt) or event_type in todays_festivals:
+            # chat_type defaults to 'group' but can be 'individual' if phone is set
+            chat_type = str(g.get('chat_type', 'group')).strip().lower() or 'group'
+            phone     = ''.join(ch for ch in str(g.get('phone', '')) if ch.isdigit())
             group_rows.append({
-                'id':               str(g.get('id', f"group-{event_type}-{today}")),
-                'name':             str(g.get('group_name', 'Group')),
-                'phone':            '',
-                'chat_type':        'group',
+                'id':                str(g.get('id', f"group-{event_type}-{today}")),
+                'name':              str(g.get('group_name', 'Group')),
+                'phone':             phone,
+                'chat_type':         chat_type,
                 'group_invite_link': str(g.get('group_invite_link', '')),
-                'event_type':       event_type,
-                'event_date':       today,
-                'relation':         'group',
-                'language':         str(g.get('language', 'en')),
-                'tone':             str(g.get('tone', 'warm')),
-                'media_mode':       str(g.get('media_mode', 'text')),
-                'active':           'TRUE',
+                'event_type':        event_type,
+                'event_date':        today,
+                'relation':          'group',
+                'language':          str(g.get('language', 'en')),
+                'tone':              str(g.get('tone', 'warm')),
+                'media_mode':        str(g.get('media_mode', 'text')),
+                'active':            'TRUE',
             })
 
     todays = contact_rows + group_rows
