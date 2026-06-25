@@ -358,7 +358,7 @@ def prepare_daily_queue():
                 'group_invite_link': str(g.get('group_invite_link', '')),
                 'event_type':        event_type,
                 'event_date':        today,
-                'relation':          'group',
+                'relation':          str(g.get('relation', 'group')),
                 'language':          str(g.get('language', 'en')),
                 'tone':              str(g.get('tone', 'warm')),
                 'media_mode':        str(g.get('media_mode', 'text')),
