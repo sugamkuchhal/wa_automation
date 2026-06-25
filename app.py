@@ -112,14 +112,14 @@ def _find_row(values, id_col, rid):
 
 def render_template(row, templates):
     exact = next(
-        (t for t in templates if t.get('event_type') == row.get('event_type')
+        (t for t in templates if t.get('event_type') == row.get('event_name', row.get('event_type'))
          and t.get('language') == row.get('language')
          and t.get('tone') == row.get('tone')), None
     )
     fallback = (
-        next((t for t in templates if t.get('event_type') == row.get('event_type')
+        next((t for t in templates if t.get('event_type') == row.get('event_name', row.get('event_type'))
               and t.get('language') == row.get('language')), None)
-        or next((t for t in templates if t.get('event_type') == row.get('event_type')), None)
+        or next((t for t in templates if t.get('event_type') == row.get('event_name', row.get('event_type'))), None)
         or {'template_text': 'Hi {{name}}, wishing you a wonderful day!'}
     )
     template = (exact or fallback).get('template_text', '')
@@ -195,7 +195,7 @@ def build_media(row, text):
     if mode in ('manual_photo', 'text'):
         return {'media_url': ''}
 
-    event_type = str(row.get('event_type', 'celebration'))
+    event_type = str(row.get('event_name', row.get('event_type', 'celebration')))
 
     if mode == 'gif':
         url = _giphy_url(f'{event_type} celebration')
@@ -234,7 +234,7 @@ def build_queue_record(row, templates, date_str, id_suffix='', chat_type_overrid
         'queue_date': date_str,
         'name': row.get('name'),
         'chat_type': chat_type,
-        'event_type': row.get('event_type'),
+        'event_type': row.get('event_name', row.get('event_type')),
         'phone': row.get('phone', ''),
         'group_invite_link': row.get('group_invite_link', ''),
         'media_mode': row.get('media_mode'),
@@ -328,7 +328,7 @@ def prepare_daily_queue():
     for r in people:
         if str(r.get('is_active', r.get('active', ''))).upper() != 'TRUE':
             continue
-        event_type = str(r.get('event_type', '')).lower().strip()
+        event_type = str(r.get('event_name', r.get('event_type', ''))).lower().strip()
         if event_type in FESTIVAL_EVENT_TYPES:
             # Festival row — fire only when festival_calendar confirms today
             if event_type in todays_festivals:
