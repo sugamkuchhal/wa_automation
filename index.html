@@ -225,21 +225,35 @@ function render(rows) {
   root.innerHTML = sorted.map(r => {
     const icon = EMOJI[String(r.event_type||'').toLowerCase()] || '✨';
     const status = r.action_status || 'ready';
-    const done = status === 'sent' || status === 'skipped';
+    const isSkipped = status === 'skipped';
+    const isSent = status === 'sent';
+    const isMissed = r.queue_date !== todayStr;
     const hasMedia = !!r.media_url;
-    return `<div class="card${done?' done':''}" id="card-${esc(r.id)}">
-      <input type="checkbox" class="cb" ${done?'disabled':''} onchange="toggleSel('${esc(r.id)}',this.checked)">
-      <div class="ctitle">${icon} ${esc(r.name)} — ${esc(r.event_type)} <span class="badge b-${esc(status)}">${esc(status)}</span>${r.queue_date !== todayStr ? ` <span class="badge" style="background:#fce8e8;color:#c0392b">missed · ${esc(r.queue_date)}</span>` : ''}</div>
-      <div class="cmeta">${esc(r.chat_type)} · ${esc(r.media_mode)} · ${esc(r.queue_date)}</div>
-      <textarea class="msg" id="msg-${esc(r.id)}" rows="4" oninput="onEdit('${esc(r.id)}')">${esc(r.final_message_text)}</textarea>
-      ${hasMedia?`<div style="font-size:11px;color:#888;margin-top:4px">Media: ${esc(r.media_url)}</div>`:''}
-      <div class="btns">
-        <a class="btn wa" id="wa-${esc(r.id)}" href="${esc(r.wa_link)}" target="_blank" onclick="mark('${esc(r.id)}','sent')">Send on WhatsApp</a>
+
+    // Auto-prepend Belated for missed messages not yet edited
+    let msgText = r.final_message_text || '';
+    if (isMissed && status === 'ready' && !msgText.toLowerCase().startsWith('belated') && !msgText.toLowerCase().startsWith('sorry')) {
+      msgText = 'Belated ' + msgText;
+    }
+
+    const actionBtns = isSkipped
+      ? `<button class="btn" style="background:#f0a500;color:white" onclick="unskip('${esc(r.id)}')">↩ Unskip</button>`
+      : `<a class="btn wa" id="wa-${esc(r.id)}" href="${esc(r.wa_link)}" target="_blank" onclick="mark('${esc(r.id)}','sent')">Send on WhatsApp</a>
         <button class="btn sv" id="sv-${esc(r.id)}" style="display:none" onclick="saveEdit('${esc(r.id)}')">Save Edit</button>
         <button class="btn ai" id="ai-${esc(r.id)}" onclick="aiGen('${esc(r.id)}','${esc(r.name)}','${esc(r.event_type)}','${esc(r.relation||'')}','${esc(r.language||'en')}','${esc(r.tone||'warm')}')">✨ AI</button>
         <button class="btn cp" onclick="copyText('${esc(r.id)}')">Copy</button>
-        <button class="btn sk" onclick="mark('${esc(r.id)}','skipped')">Skip</button>
+        <button class="btn sk" onclick="mark('${esc(r.id)}','skipped')">Skip</button>`;
+
+    return `<div class="card${isSkipped||isSent?' done':''}" id="card-${esc(r.id)}">
+      <input type="checkbox" class="cb" ${isSkipped||isSent?'disabled':''} onchange="toggleSel('${esc(r.id)}',this.checked)">
+      <div class="ctitle">${icon} ${esc(r.name)} — ${esc(r.event_type)}
+        <span class="badge b-${esc(status)}">${esc(status)}</span>
+        ${isMissed ? `<span class="badge" style="background:#fce8e8;color:#c0392b">⚠ belated · ${esc(r.queue_date)}</span>` : ''}
       </div>
+      <div class="cmeta">${esc(r.chat_type)} · ${esc(r.media_mode)} · ${esc(r.queue_date)}</div>
+      <textarea class="msg" id="msg-${esc(r.id)}" rows="4" ${isSkipped?'disabled':''} oninput="onEdit('${esc(r.id)}')">${esc(msgText)}</textarea>
+      ${hasMedia?`<div style="font-size:11px;color:#888;margin-top:4px">Media: ${esc(r.media_url)}</div>`:''}
+      <div class="btns" id="btns-${esc(r.id)}">${actionBtns}</div>
     </div>`;
   }).join('');
 }
@@ -250,8 +264,11 @@ function setStatus(id, status) {
   const badge = card.querySelector('.badge');
   badge.className = 'badge b-' + status;
   badge.textContent = status;
-  if (status === 'sent' || status === 'skipped') card.classList.add('done');
-  else card.classList.remove('done');
+  if (status === 'sent' || status === 'skipped') {
+    card.classList.add('done');
+  } else {
+    card.classList.remove('done');
+  }
 }
 
 function onEdit(id) {
@@ -261,7 +278,40 @@ function onEdit(id) {
 
 async function mark(id, status) {
   const data = await gasPost({ action: 'mark', id, status });
-  if (data.ok) { setStatus(id, status); toast(status === 'sent' ? '✅ Sent' : '⏭ Skipped'); }
+  if (data.ok) {
+    setStatus(id, status);
+    toast(status === 'sent' ? '✅ Sent' : '⏭ Skipped');
+    if (status === 'sent' || status === 'skipped') disableCard(id, status);
+  }
+}
+
+function disableCard(id, status) {
+  const card = document.getElementById('card-' + id);
+  if (!card) return;
+  const cb = card.querySelector('.cb');
+  if (cb) { cb.disabled = true; cb.checked = false; }
+  const ta = document.getElementById('msg-' + id);
+  const btnsEl = document.getElementById('btns-' + id);
+  if (status === 'skipped') {
+    if (ta) ta.disabled = true;
+    if (btnsEl) btnsEl.innerHTML = `<button class="btn" style="background:#f0a500;color:white" onclick="unskip('${id}')">↩ Unskip</button>`;
+  } else {
+    // sent — disable everything
+    card.querySelectorAll('button, a.btn').forEach(el => {
+      el.disabled = true;
+      el.style.opacity = '0.4';
+      el.style.pointerEvents = 'none';
+    });
+  }
+}
+
+async function unskip(id) {
+  const data = await gasPost({ action: 'mark', id, status: 'ready' });
+  if (data.ok) {
+    // Reload queue to get fresh state
+    await loadQueue();
+    toast('↩ Unskipped');
+  }
 }
 
 async function saveEdit(id) {
