@@ -249,14 +249,20 @@
     async function sessionNext(action) {
       const r = sessionQueue[sessionIdx];
       r._sessionStatus = action;
-      // Persist the latest textarea content if edited
       const msgEl = document.getElementById('session-msg');
       const currentText = msgEl.value;
       if (currentText !== r.final_message_text) {
-        await fetch('/api/edit', {
+        // Text was edited — save it and update the Send href with the new wa_link
+        const res = await fetch('/api/edit', {
           method:'POST', headers:{'Content-Type':'application/json'},
           body: JSON.stringify({ id: r.id, text: currentText })
         });
+        const data = await res.json();
+        if (data.ok && data.wa_link) {
+          r.wa_link = data.wa_link;
+          r.final_message_text = currentText;
+          document.getElementById('btn-session-send').href = data.wa_link;
+        }
       } else {
         await fetch('/api/mark', {
           method:'POST', headers:{'Content-Type':'application/json'},
