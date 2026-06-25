@@ -57,6 +57,8 @@
     .toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#333; color:#fff;
       padding:10px 20px; border-radius:8px; font-size:14px; opacity:0; transition:opacity .3s; pointer-events:none; z-index:200; }
     .toast.show { opacity:1; }
+    #offline-bar { display:none; position:sticky; top:0; z-index:20; background:var(--color-background-danger,#fee2e2); color:var(--color-text-danger,#991b1b); padding:9px 16px; border-radius:10px; margin-bottom:12px; font-size:13px; font-weight:600; text-align:center; }
+    #offline-bar.visible { display:block; }
   </style>
 </head>
 <body>
@@ -78,6 +80,7 @@
     </div>
   </div>
 
+  <div id="offline-bar">⚠️ Cannot reach server — check that Flask is running and you're on the same Wi-Fi. <button onclick="retryFetch()" style="margin-left:10px;padding:3px 10px;border-radius:6px;border:0;background:#991b1b;color:white;font-size:12px;font-weight:600;cursor:pointer">Retry</button></div>
   <div id="root">Loading...</div>
 
   <!-- Send session overlay -->
@@ -393,21 +396,60 @@
         const res = await fetch('/api/prepare_queue', { method: 'POST' });
         const data = await res.json();
         if (data.ok) {
+          setOffline(false);
           toast(`✅ Queue ready — ${data.count} message(s)`);
-          const rows = await fetch('/api/today_queue').then(r => r.json());
+          const rows = await fetchWithTimeout('/api/today_queue').then(r => r.json());
           render(rows);
         } else {
           toast('❌ ' + (data.error || 'Preparation failed'));
         }
       } catch(e) {
-        toast('❌ Network error');
+        setOffline(true);
+        toast('❌ Network error — server unreachable');
       } finally {
         btn.disabled = false;
         btn.textContent = '🔄 Prepare Today\'s Queue';
       }
     }
 
-    fetch('/api/today_queue').then(r => r.json()).then(render);
+    const FETCH_TIMEOUT_MS = 8000;
+
+    async function fetchWithTimeout(url, opts = {}) {
+      const ctrl = new AbortController();
+      const tid = setTimeout(() => ctrl.abort(), FETCH_TIMEOUT_MS);
+      try {
+        const res = await fetch(url, { ...opts, signal: ctrl.signal });
+        clearTimeout(tid);
+        return res;
+      } catch(e) {
+        clearTimeout(tid);
+        throw e;
+      }
+    }
+
+    function setOffline(isOffline) {
+      document.getElementById('offline-bar').classList.toggle('visible', isOffline);
+    }
+
+    async function retryFetch() {
+      setOffline(false);
+      document.getElementById('root').innerHTML = 'Loading...';
+      await loadQueue();
+    }
+
+    async function loadQueue() {
+      try {
+        const res = await fetchWithTimeout('/api/today_queue');
+        const rows = await res.json();
+        setOffline(false);
+        render(rows);
+      } catch(e) {
+        setOffline(true);
+        document.getElementById('root').innerHTML = '';
+      }
+    }
+
+    loadQueue();
   </script>
 </body>
 </html>
