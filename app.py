@@ -78,9 +78,14 @@ def _archive_to_history():
     data_rows = values[1:]  # skip header
 
     hist = _get_or_create_ws('send_history', rows=50000, cols=20)
-    # Write header on first use
-    if hist.row_count < 1 or not hist.get('A1'):
-        hist.append_row(QUEUE_HEADERS)
+    # Write header on first use — check by reading A1 value explicitly
+    existing = hist.get_all_values()
+    if not existing or existing[0] != QUEUE_HEADERS:
+        if not existing:
+            hist.append_row(QUEUE_HEADERS)
+        # If header row exists but is wrong, prepend correct header
+        elif existing[0] != QUEUE_HEADERS:
+            hist.insert_row(QUEUE_HEADERS, 1)
     hist.append_rows(data_rows)
     print(f'[history] archived {len(data_rows)} row(s) to send_history')
 
@@ -111,19 +116,31 @@ def _find_row(values, id_col, rid):
 # ---------------------------------------------------------------------------
 
 def render_template(row, templates):
+    """Match message_templates using event_type (already resolved from event_name),
+    language, and tone. Falls back progressively to broader matches."""
+    event_type = str(row.get('event_type', '')).strip()
+    language   = row.get('language')
+    tone       = row.get('tone')
+
     exact = next(
-        (t for t in templates if t.get('event_type') == row.get('event_name', row.get('event_type'))
-         and t.get('language') == row.get('language')
-         and t.get('tone') == row.get('tone')), None
+        (t for t in templates
+         if t.get('event_type') == event_type
+         and t.get('language') == language
+         and t.get('tone') == tone), None
     )
     fallback = (
-        next((t for t in templates if t.get('event_type') == row.get('event_name', row.get('event_type'))
-              and t.get('language') == row.get('language')), None)
-        or next((t for t in templates if t.get('event_type') == row.get('event_name', row.get('event_type'))), None)
+        next((t for t in templates
+              if t.get('event_type') == event_type
+              and t.get('language') == language), None)
+        or next((t for t in templates
+                 if t.get('event_type') == event_type), None)
         or {'template_text': 'Hi {{name}}, wishing you a wonderful day!'}
     )
     template = (exact or fallback).get('template_text', '')
-    return template.replace('{{name}}', row.get('name', 'there'))
+    # Group messages: strip {{name}} placeholder — no personalisation for groups
+    if str(row.get('chat_type', '')).lower() == 'group':
+        return template.replace('{{name}}', '').replace('  ', ' ').strip()
+    return template.replace('{{name}}', str(row.get('name', 'there')))
 
 
 # ---------------------------------------------------------------------------
