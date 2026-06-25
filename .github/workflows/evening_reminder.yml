@@ -1,0 +1,86 @@
+name: Evening Reminder
+
+on:
+  schedule:
+    - cron: '30 13 * * *'  # 7:00 PM IST (UTC+5:30)
+  workflow_dispatch:
+
+jobs:
+  check-pending:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Check pending messages via Apps Script
+        id: check
+        run: |
+          python3 - << 'PYEOF'
+          import urllib.request, json, os
+          from datetime import datetime, timezone, timedelta
+
+          GAS_URL = 'https://script.google.com/macros/s/AKfycbzGcZiIqLzhrX2PjylcH7Aw8CB08fN_cA5OwHe9GqwvjpA4JaMYHKxgPx37Webb3qGR/exec?action=queue'
+
+          try:
+              with urllib.request.urlopen(GAS_URL, timeout=15) as r:
+                  rows = json.loads(r.read())
+          except Exception as e:
+              print(f"Could not reach Apps Script: {e}")
+              rows = []
+
+          pending = [r for r in rows if str(r.get('action_status','')).lower() in ('ready','edited','')]
+          IST = timezone(timedelta(hours=5, minutes=30))
+          today = datetime.now(IST).strftime('%d %B %Y')
+
+          if not pending:
+              print("All done — no pending messages. No reminder needed.")
+              with open(os.environ['GITHUB_ENV'], 'a') as f:
+                  f.write("PENDING_COUNT=0\n")
+          else:
+              lines = [f"• {r['name']} — {r['event_type'].title()}" for r in pending]
+              summary = '\n'.join(lines)
+              count = len(pending)
+              subject = f"⏰ WA Wishes reminder — {count} message(s) still pending"
+              tg_msg = f"⏰ *WA Wishes reminder*\n\nYou still have {count} message(s) unsent:\n\n" + summary + f"\n\n👉 https://sugamkuchhal.github.io/wa_automation/"
+              print(f"Still pending: {count} message(s)")
+              for line in lines:
+                  print(line)
+              with open(os.environ['GITHUB_ENV'], 'a') as f:
+                  f.write(f"PENDING_COUNT={count}\n")
+                  f.write(f"PENDING_SUBJECT={subject}\n")
+                  f.write(f"PENDING_SUMMARY={summary.replace(chr(10), ' | ')}\n")
+                  f.write(f"PENDING_DATE={today}\n")
+                  f.write(f"PENDING_TG_MSG={tg_msg.replace(chr(10), chr(92)+'n')}\n")
+          PYEOF
+
+      - name: Send Telegram reminder
+        if: success() && env.PENDING_COUNT != '0'
+        run: |
+          if [ -n "${{ secrets.TELEGRAM_BOT_TOKEN }}" ] && [ "${{ secrets.TELEGRAM_BOT_TOKEN }}" != "placeholder" ]; then
+            curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+              -d chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" \
+              -d parse_mode="Markdown" \
+              --data-urlencode "text=${{ env.PENDING_TG_MSG }}"
+          else
+            echo "Telegram not configured yet — skipping"
+          fi
+
+      - name: Send email reminder
+        if: success() && env.PENDING_COUNT != '0'
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: sugamkuchhal@gmail.com
+          password: ${{ secrets.GMAIL_APP_PASSWORD }}
+          to: sugam.kuchhal.iimc@gmail.com
+          from: WA Automated Wishes <sugamkuchhal@gmail.com>
+          subject: ${{ env.PENDING_SUBJECT }}
+          body: |
+            Friendly reminder — you still have unsent messages for ${{ env.PENDING_DATE }}:
+
+            ${{ env.PENDING_SUMMARY }}
+
+            Open dashboard:
+            https://sugamkuchhal.github.io/wa_automation/
+
+            — WA Automated Wishes

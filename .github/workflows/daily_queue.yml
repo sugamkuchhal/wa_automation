@@ -45,28 +45,38 @@ jobs:
           if not results:
               summary = "No messages today."
               subject = "📨 WA Wishes — nothing today"
+              tg_msg = f"📨 WA Wishes — no messages for {today}"
               lines = []
           else:
-              lines = []
-              for r in results:
-                  event = r['event_type'].title()
-                  lines.append(f"• {r['name']} — {event}")
+              lines = [f"• {r['name']} — {r['event_type'].title()}" for r in results]
               summary = '\n'.join(lines)
               count = len(results)
               subject = f"📨 WA Wishes — {count} message(s) for {today}"
+              tg_msg = f"📨 *WA Wishes — {today}*\n\n" + summary + f"\n\n👉 https://sugamkuchhal.github.io/wa_automation/"
 
-          # Write to GitHub env for next steps
           with open(os.environ['GITHUB_ENV'], 'a') as f:
               f.write(f"QUEUE_COUNT={len(results)}\n")
               f.write(f"QUEUE_SUBJECT={subject}\n")
-              # Encode newlines for env var
               f.write(f"QUEUE_SUMMARY={summary.replace(chr(10), ' | ')}\n")
               f.write(f"QUEUE_DATE={today}\n")
+              f.write(f"QUEUE_TG_MSG={tg_msg.replace(chr(10), '\\n')}\n")
 
           print(f"Queue ready: {len(results)} message(s)")
           for line in lines:
               print(line)
           PYEOF
+
+      - name: Send Telegram notification
+        if: success() && env.QUEUE_COUNT != '0'
+        run: |
+          if [ -n "${{ secrets.TELEGRAM_BOT_TOKEN }}" ] && [ "${{ secrets.TELEGRAM_BOT_TOKEN }}" != "placeholder" ]; then
+            curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+              -d chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" \
+              -d parse_mode="Markdown" \
+              --data-urlencode "text=${{ env.QUEUE_TG_MSG }}"
+          else
+            echo "Telegram not configured yet — skipping"
+          fi
 
       - name: Send email notification
         if: success() && env.QUEUE_COUNT != '0'
