@@ -294,6 +294,22 @@ def prepare_daily_queue():
     today     = _today_str()
     dt        = datetime.strptime(today, '%Y-%m-%d')
 
+    # Load event reference sheet — maps event_name to event_type and category
+    try:
+        event_ref = get_sheet_rows('event_ref')
+    except Exception:
+        event_ref = []
+    # Build lookup: event_name → {event_type, category}
+    EVENT_REF = {
+        str(e.get('event_name', '')).lower().strip(): {
+            'event_type': str(e.get('event_type', e.get('event_name', ''))).lower().strip(),
+            'category':   str(e.get('category', 'personal')).lower().strip(),
+        }
+        for e in event_ref
+    }
+    PERSONAL_EVENTS  = {k for k, v in EVENT_REF.items() if v['category'] == 'personal'}
+    FESTIVAL_EVENTS  = {k for k, v in EVENT_REF.items() if v['category'] in ('fixed_festival', 'variable_festival')}
+
     def _festival_matches(f, dt):
         """Match festival to today using year+month+day (variable) or month+day (fixed)."""
         try:
@@ -318,28 +334,36 @@ def prepare_daily_queue():
         if _festival_matches(f, dt)
     }
 
-    # All known festival names for type detection
-    FESTIVAL_EVENT_TYPES = {str(f.get('festival', '')).lower() for f in festivals}
-
     # Single loop over all people_and_groups rows
-    # Personal events (birthday, anniversary): fire on month+day match
-    # Festival events: fire when festival_calendar says that festival is today
+    # Category from event_ref determines firing rule:
+    #   personal         → fire on month+day match every year
+    #   fixed_festival   → fire when festival_calendar confirms today (month+day match)
+    #   variable_festival→ fire when festival_calendar confirms today (exact year date)
+    #   unknown          → treat as personal (safe default)
     todays = []
     for r in people:
         if str(r.get('is_active', r.get('active', ''))).upper() != 'TRUE':
             continue
-        event_type = str(r.get('event_name', r.get('event_type', ''))).lower().strip()
-        if event_type in FESTIVAL_EVENT_TYPES:
-            # Festival row — fire only when festival_calendar confirms today
-            if event_type in todays_festivals:
+        event_name = str(r.get('event_name', r.get('event_type', ''))).lower().strip()
+        ref = EVENT_REF.get(event_name, {})
+        category = ref.get('category', 'personal')
+
+        if category in ('fixed_festival', 'variable_festival'):
+            if event_name in todays_festivals:
                 todays.append(r)
         else:
-            # Personal event — fire on month+day match
+            # personal or unknown — fire on month+day
             if _matches_today(r, dt):
                 todays.append(r)
 
     output = []
     for r in todays:
+        # Resolve event_name → event_type for template matching
+        event_name = str(r.get('event_name', r.get('event_type', ''))).lower().strip()
+        ref = EVENT_REF.get(event_name, {})
+        resolved_event_type = ref.get('event_type', event_name)
+        # Inject resolved event_type so build_queue_record uses it for template matching
+        r = {**r, 'event_type': resolved_event_type}
         if str(r.get('chat_type', '')).lower() == 'individual':
             # Always add the individual card
             output.append(build_queue_record(r, templates, today))
@@ -596,7 +620,7 @@ def _startup_check():
     try:
         sh = _sheet()
         titles = [ws.title for ws in sh.worksheets()]
-        required = {'people_and_groups', 'festival_calendar', 'message_templates'}
+        required = {'people_and_groups', 'festival_calendar', 'message_templates', 'event_ref'}
         optional = {'ready_queue', 'send_history', '_meta'}
         present_optional = optional & set(titles)
         if present_optional:
