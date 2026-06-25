@@ -107,6 +107,7 @@ def render_template(row, templates):
 
 GIPHY_API_KEY = os.getenv('GIPHY_API_KEY', '')          # optional — public beta key works too
 GDRIVE_IMAGE_FOLDER_ID = os.getenv('GDRIVE_IMAGE_FOLDER_ID', '')  # optional Drive folder
+UNSPLASH_ACCESS_KEY = os.getenv('UNSPLASH_ACCESS_KEY', '')        # optional — free key at unsplash.com/developers
 
 
 def _giphy_url(query):
@@ -144,6 +145,26 @@ def _gdrive_image_url(event_type):
     return None
 
 
+def _unsplash_url(event_type):
+    """Fetch a random Unsplash image via the official API. Requires UNSPLASH_ACCESS_KEY.
+    Returns None if key not set or request fails."""
+    if not UNSPLASH_ACCESS_KEY:
+        return None
+    import urllib.request, json as _json
+    q = urllib.parse.quote(f'{event_type} celebration')
+    url = (
+        f'https://api.unsplash.com/photos/random'
+        f'?query={q}&orientation=squarish&content_filter=high'
+        f'&client_id={UNSPLASH_ACCESS_KEY}'
+    )
+    try:
+        with urllib.request.urlopen(url, timeout=4) as r:
+            data = _json.loads(r.read())
+        return data['urls']['regular']   # ~1080px wide, no auth needed to display
+    except Exception:
+        return None
+
+
 def build_media(row, text):
     mode = row.get('media_mode')
     if mode in ('manual_photo', 'text'):
@@ -160,9 +181,9 @@ def build_media(row, text):
         url = _gdrive_image_url(event_type)
         if url:
             return {'media_url': url}
-        # 2. Fall back to a free stock image via Unsplash source (no API key)
-        slug = urllib.parse.quote(event_type)
-        return {'media_url': f'https://source.unsplash.com/1080x1080/?{slug},celebration'}
+        # 2. Fall back to Unsplash API (free key) or blank if not configured
+        url = _unsplash_url(event_type)
+        return {'media_url': url or ''}
 
     return {'media_url': ''}
 

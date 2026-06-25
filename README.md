@@ -73,6 +73,7 @@ export PORT="8080"
 # Optional — real media sources
 export GIPHY_API_KEY="your_giphy_key"          # GIF search; falls back to Giphy public beta key
 export GDRIVE_IMAGE_FOLDER_ID="folder_id"      # Drive folder for event images (share with service account)
+export UNSPLASH_ACCESS_KEY="your_key"          # Free at unsplash.com/developers; used for image fallback
 export AI_DAILY_LIMIT="30"                     # Max AI Generate calls per day (default: 30)
 # Optional — email notification when queue is ready
 export NOTIFY_EMAIL="you@example.com"
