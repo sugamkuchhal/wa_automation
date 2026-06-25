@@ -337,6 +337,25 @@ def today_queue():
     return jsonify([r for r in rows if str(r.get('queue_date')) == today])
 
 
+@app.get('/api/history')
+def get_history():
+    """Return all rows from send_history, optionally filtered by ?days=N (default 30)."""
+    try:
+        days = int(request.args.get('days', 30))
+    except ValueError:
+        days = 30
+    try:
+        ws = _sheet().worksheet('send_history')
+        rows = ws.get_all_records()
+    except gspread.WorksheetNotFound:
+        return jsonify([])
+    if days > 0:
+        from datetime import timedelta
+        cutoff = (datetime.now(ZoneInfo(TZ)) - timedelta(days=days)).strftime('%Y-%m-%d')
+        rows = [r for r in rows if str(r.get('queue_date', '')) >= cutoff]
+    return jsonify(rows)
+
+
 @app.post('/api/prepare_queue')
 def prepare_queue():
     """Trigger queue generation on demand from the dashboard."""
