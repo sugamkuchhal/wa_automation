@@ -11,7 +11,8 @@ Runs as a Python/Flask server. It prepares send-ready messages — you manually 
 ### Data model in Google Sheets
 The system expects these tabs:
 
-- `people_and_groups`
+- `people_and_groups` — columns in order:
+  `id | chat_type | event_type | event_date | group_invite_link | phone | name | relation | language | tone | media_mode | is_active`
 - `festival_calendar`
 - `message_templates`
 - (auto-created) `ready_queue`

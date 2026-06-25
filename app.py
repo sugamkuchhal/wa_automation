@@ -326,7 +326,7 @@ def prepare_daily_queue():
     # Festival events: fire when festival_calendar says that festival is today
     todays = []
     for r in people:
-        if str(r.get('active', '')).upper() != 'TRUE':
+        if str(r.get('is_active', r.get('active', ''))).upper() != 'TRUE':
             continue
         event_type = str(r.get('event_type', '')).lower().strip()
         if event_type in FESTIVAL_EVENT_TYPES:
@@ -571,7 +571,7 @@ def _validate_phone_numbers(sh):
     for r in rows:
         if str(r.get('chat_type', '')).strip().lower() != 'individual':
             continue
-        if str(r.get('active', '')).upper() != 'TRUE':
+        if str(r.get('is_active', r.get('active', ''))).upper() != 'TRUE':
             continue
         phone = str(r.get('phone', '')).strip()
         digits = ''.join(ch for ch in phone if ch.isdigit())
