@@ -323,14 +323,14 @@ def prepare_daily_queue():
     today     = _today_str()
     dt        = datetime.strptime(today, '%Y-%m-%d')
 
-    # Load event reference sheet — maps event_name to event_category
+    # Load event reference sheet — maps event_type to event_category
     try:
         event_ref = get_sheet_rows('event_ref')
     except Exception:
         event_ref = []
-    # Build lookup: event_name → event_category
+    # Build lookup: event_type → event_category
     EVENT_REF = {
-        str(e.get('event_name', '')).lower().strip():
+        str(e.get('event_type', '')).lower().strip():
             str(e.get('event_category', 'historical')).lower().strip()
         for e in event_ref
     }
