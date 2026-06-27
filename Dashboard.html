@@ -513,8 +513,18 @@
       const days = document.getElementById('hist-days').value;
       document.getElementById('hist-body').innerHTML = 'Loading…';
       try {
-        const res = await fetchWithTimeout(`/api/history?days=${days}`);
-        histRows = await res.json();
+        // Fetch both send_history and today's ready_queue in parallel
+        const [histRes, queueRes] = await Promise.all([
+          fetchWithTimeout(`/api/history?days=${days}`),
+          fetchWithTimeout('/api/today_queue_all')
+        ]);
+        const histData  = await histRes.json();
+        const queueData = await queueRes.json();
+        // Merge: today's sent rows from ready_queue + send_history, dedupe by id
+        const todaySent = queueData.filter(r => String(r.action_status).toLowerCase() === 'sent');
+        const histIds   = new Set(histData.map(r => r.id));
+        const merged    = [...histData, ...todaySent.filter(r => !histIds.has(r.id))];
+        histRows = merged;
         renderHistory();
       } catch(e) {
         document.getElementById('hist-body').innerHTML = '❌ Could not load history.';

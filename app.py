@@ -449,6 +449,13 @@ def today_queue():
     return jsonify(pending)
 
 
+@app.get('/api/today_queue_all')
+def today_queue_all():
+    """Return all rows from ready_queue including sent — used by History tab to show today's sent messages."""
+    rows = get_sheet_rows('ready_queue')
+    return jsonify(rows)
+
+
 @app.get('/api/history')
 def get_history():
     """Return all rows from send_history, optionally filtered by ?days=N (default 30)."""
