@@ -139,6 +139,13 @@ def render_template(row, templates):
         or {'template_text': 'Hi {{name}}, wishing you a wonderful day!'}
     )
     template = (exact or fallback).get('template_text', '')
+    # cascade_birthday: address parent ({{cascade_name}}) and reference kid ({{name}})
+    if event_type == 'cascade_birthday':
+        cascade_name = str(row.get('cascade_name', '') or 'there')
+        kid_name     = str(row.get('name', 'them'))
+        return (template
+                .replace('{{cascade_name}}', cascade_name)
+                .replace('{{name}}', kid_name))
     # Pure group rows (chat_type=group in the original sheet): no personalisation
     # Individual rows generating a group card: keep name (originated from individual)
     original_chat_type = str(row.get('original_chat_type', row.get('chat_type', ''))).lower()
