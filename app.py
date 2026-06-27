@@ -244,7 +244,7 @@ def build_media(row, text):
 def build_wa_link(row, text, media):
     encoded = urllib.parse.quote(text + (f"\n{media['media_url']}" if media.get('media_url') else ''))
     chat_type = str(row.get('chat_type', '')).lower()
-    if chat_type in ('individual', 'cascade_birthday') and row.get('phone'):
+    if chat_type == 'individual' and row.get('phone'):
         digits = ''.join(ch for ch in str(row.get('phone')) if ch.isdigit())
         return f'https://wa.me/{digits}?text={encoded}'
     if chat_type == 'group' and row.get('group_invite_link'):
@@ -657,7 +657,7 @@ def _validate_phone_numbers(sh):
         return  # sheet missing — _startup_check will catch it
     bad = []
     for r in rows:
-        if str(r.get('chat_type', '')).strip().lower() not in ('individual', 'cascade_birthday'):
+        if str(r.get('chat_type', '')).strip().lower() != 'individual':
             continue
         if str(r.get('is_active', r.get('active', ''))).upper() != 'TRUE':
             continue
@@ -675,8 +675,8 @@ def _validate_phone_numbers(sh):
             print(f'[startup]   id={cid}: {msg}')
     else:
         validated = len([r for r in rows if str(r.get('is_active', r.get('active', ''))).upper() == 'TRUE'
-                         and str(r.get('chat_type', '')).lower() in ('individual', 'cascade_birthday')])
-        print(f'[startup] phone check OK — {validated} individual/cascade contacts validated')
+                         and str(r.get('chat_type', '')).lower() == 'individual'])
+        print(f'[startup] phone check OK — {validated} individual contacts validated')
 
 
 def _startup_check():
