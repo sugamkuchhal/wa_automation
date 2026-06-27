@@ -118,11 +118,46 @@ def _find_row(values, id_col, rid):
 def render_template(row, templates):
     """Match message_templates using event_type (already resolved from event_name),
     language, and tone. Falls back progressively to broader matches.
-    Groups always use formal tone — direct override regardless of sheet data."""
+    Groups always use formal tone — direct override regardless of sheet data.
+    cascade_birthday rows match templates by chat_type first, then fall back to
+    birthday templates; both {{name}} (kid) and {{cascade_name}} (parent) are replaced."""
     event_type = str(row.get('event_type', '')).strip()
     language   = row.get('language')
+    chat_type  = str(row.get('chat_type', '')).lower()
     # Group messages always use formal tone — hard override
-    tone = 'formal' if str(row.get('chat_type', '')).lower() == 'group' else row.get('tone')
+    tone = 'formal' if chat_type == 'group' else row.get('tone')
+
+    # cascade_birthday: try cascade_birthday-specific templates first, then fall back to birthday
+    if chat_type == 'cascade_birthday':
+        exact = next(
+            (t for t in templates
+             if t.get('chat_type', '').lower() == 'cascade_birthday'
+             and t.get('event_type') == event_type
+             and t.get('language') == language
+             and t.get('tone') == tone), None
+        )
+        fallback = (
+            next((t for t in templates
+                  if t.get('chat_type', '').lower() == 'cascade_birthday'
+                  and t.get('event_type') == event_type
+                  and t.get('language') == language), None)
+            or next((t for t in templates
+                     if t.get('chat_type', '').lower() == 'cascade_birthday'
+                     and t.get('event_type') == event_type), None)
+            or next((t for t in templates
+                     if t.get('event_type') == event_type
+                     and t.get('language') == language
+                     and t.get('tone') == tone), None)
+            or next((t for t in templates
+                     if t.get('event_type') == event_type), None)
+            or {'template_text': 'Hi {{cascade_name}}, wishing {{name}} a wonderful birthday!'}
+        )
+        template = (exact or fallback).get('template_text', '')
+        cascade_name = str(row.get('cascade_name', '') or 'there')
+        kid_name     = str(row.get('name', 'them'))
+        return (template
+                .replace('{{cascade_name}}', cascade_name)
+                .replace('{{name}}', kid_name))
 
     exact = next(
         (t for t in templates
@@ -251,10 +286,16 @@ def build_queue_record(row, templates, date_str, id_suffix='', chat_type_overrid
     text = render_template(resolved_row, templates)
     media = build_media(resolved_row, text)
     link_row = resolved_row
+    # For cascade_birthday: display name in queue is "Kid (via Parent)" for clarity
+    if str(chat_type).lower() == 'cascade_birthday':
+        cascade_name = row.get('cascade_name', '')
+        display_name = f"{row.get('name')} (via {cascade_name})" if cascade_name else row.get('name')
+    else:
+        display_name = row.get('name')
     return {
         'id': str(row.get('id', '')) + id_suffix,
         'queue_date': date_str,
-        'name': row.get('name'),
+        'name': display_name,
         'chat_type': chat_type,
         'event_type': row.get('event_name', row.get('event_type')),
         'phone': row.get('phone', ''),
