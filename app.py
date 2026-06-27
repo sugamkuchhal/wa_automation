@@ -445,7 +445,7 @@ def today_queue():
     rows = get_sheet_rows('ready_queue')
     # Return all unsent/unresolved rows regardless of date
     # so missed days accumulate until actioned
-    pending = [r for r in rows if str(r.get('action_status', '')).lower() in ('ready', 'edited', '')]
+    pending = [r for r in rows if str(r.get('action_status', '')).lower() in ('ready', 'edited', 'skipped', '')]
     return jsonify(pending)
 
 
