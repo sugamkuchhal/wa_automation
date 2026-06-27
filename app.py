@@ -243,10 +243,11 @@ def build_media(row, text):
 
 def build_wa_link(row, text, media):
     encoded = urllib.parse.quote(text + (f"\n{media['media_url']}" if media.get('media_url') else ''))
-    if row.get('chat_type') == 'individual' and row.get('phone'):
+    chat_type = str(row.get('chat_type', '')).lower()
+    if chat_type in ('individual', 'cascade_birthday') and row.get('phone'):
         digits = ''.join(ch for ch in str(row.get('phone')) if ch.isdigit())
         return f'https://wa.me/{digits}?text={encoded}'
-    if row.get('chat_type') == 'group' and row.get('group_invite_link'):
+    if chat_type == 'group' and row.get('group_invite_link'):
         return row.get('group_invite_link')
     return ''
 
@@ -304,6 +305,7 @@ def _parse_date(raw):
 def _matches_today(row, dt):
     """contacts_events rows always match on month+day (birthdays, anniversaries).
     The year in event_date is the historical year — it is never used for matching.
+    Dates with month=1, day=1 and year=1900 are placeholders (unknown date) — always skipped.
     """
     raw_date = str(row.get('event_date', '')).strip()
     if not raw_date:
@@ -311,6 +313,10 @@ def _matches_today(row, dt):
     event_dt = _parse_date(raw_date)
     if event_dt is None:
         print(f'[queue] unrecognised date format: {raw_date!r}')
+        return False
+    # 1900-01-01 is a sentinel for "date unknown" — skip with a warning
+    if event_dt.year == 1900 and event_dt.month == 1 and event_dt.day == 1:
+        print(f'[queue] skipping "{row.get("id", "?")}" — event_date is a placeholder (1900-01-01), fill in the real date')
         return False
     return event_dt.month == dt.month and event_dt.day == dt.day
 
@@ -391,7 +397,7 @@ def prepare_daily_queue():
     for r in people:
         if str(r.get('is_active', r.get('active', ''))).upper() != 'TRUE':
             continue
-        event_name = str(r.get('event_name', r.get('event_type', ''))).lower().strip()
+        event_name = str(r.get('event_type', '')).lower().strip()
         category = EVENT_REF.get(event_name, 'historical')
 
         if category in ('fixed_festival', 'variable_festival'):
@@ -404,8 +410,8 @@ def prepare_daily_queue():
 
     output = []
     for r in todays:
-        # event_name IS the event_type for template matching — inject directly
-        event_name = str(r.get('event_name', r.get('event_type', ''))).lower().strip()
+        # event_type drives template matching — normalise to lowercase
+        event_name = str(r.get('event_type', '')).lower().strip()
         r = {**r, 'event_type': event_name}
         if str(r.get('chat_type', '')).lower() == 'individual':
             # Card 1: personal — original chat_type, sheet tone, name personalised
@@ -599,13 +605,27 @@ def ai_generate():
     tone       = str(payload.get('tone', 'warm'))
     current    = str(payload.get('current_text', ''))
 
+    # cascade_birthday: name is stored as "Kid (via Parent)" — split for a sensible prompt
+    if event_type == 'cascade_birthday':
+        import re as _re
+        m = _re.match(r'^(.+?)\s*\(via\s*(.+?)\)$', name)
+        if m:
+            kid_name, parent_name = m.group(1).strip(), m.group(2).strip()
+        else:
+            kid_name, parent_name = name, 'the parent'
+        prompt_name = f"{parent_name} (wishing their child {kid_name})"
+        event_type_label = 'birthday'
+    else:
+        prompt_name = name
+        event_type_label = event_type
+
     lang_label = {'en': 'English', 'hi': 'Hindi', 'hinglish': 'Hinglish (mix of Hindi and English)'}.get(language, 'English')
     tone_label = {'warm': 'warm and heartfelt', 'casual': 'casual and friendly',
                   'formal': 'formal and respectful', 'fun': 'fun and playful'}.get(tone, 'warm and heartfelt')
     relation_hint = f" They are my {relation}." if relation else ""
 
     prompt = (
-        f"Write a short WhatsApp message for {name} on their {event_type}.{relation_hint}\n"
+        f"Write a short WhatsApp message for {prompt_name} on their {event_type_label}.{relation_hint}\n"
         f"Language: {lang_label}. Tone: {tone_label}.\n"
         f"Keep it under 3 sentences, personal, no hashtags, no generic filler.\n"
         f"Existing message for reference (improve it, don't copy): {current}\n"
@@ -637,7 +657,7 @@ def _validate_phone_numbers(sh):
         return  # sheet missing — _startup_check will catch it
     bad = []
     for r in rows:
-        if str(r.get('chat_type', '')).strip().lower() != 'individual':
+        if str(r.get('chat_type', '')).strip().lower() not in ('individual', 'cascade_birthday'):
             continue
         if str(r.get('is_active', r.get('active', ''))).upper() != 'TRUE':
             continue
@@ -654,7 +674,9 @@ def _validate_phone_numbers(sh):
         for cid, msg in bad:
             print(f'[startup]   id={cid}: {msg}')
     else:
-        print(f'[startup] phone check OK — {len([r for r in rows if str(r.get("active","")).upper()=="TRUE" and str(r.get("chat_type","")).lower()=="individual"])} individual contacts validated')
+        validated = len([r for r in rows if str(r.get('is_active', r.get('active', ''))).upper() == 'TRUE'
+                         and str(r.get('chat_type', '')).lower() in ('individual', 'cascade_birthday')])
+        print(f'[startup] phone check OK — {validated} individual/cascade contacts validated')
 
 
 def _startup_check():
