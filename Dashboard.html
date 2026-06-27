@@ -205,7 +205,7 @@
               oninput="onEdit('${escapeHtml(r.id)}')">${escapeHtml(r.final_message_text)}</textarea>
             ${hasMedia?`<div class="meta">Media URL: ${escapeHtml(r.media_url)}</div>`:''}
             <a class="btn send" href="${escapeHtml(r.wa_link)}" target="_blank"
-              onclick="mark('${r.id}','sent')">Send on WhatsApp</a>
+              onclick="copyText('${r.id}'); mark('${r.id}','sent')">Send on WhatsApp</a>
             <button class="btn save" id="save-${escapeHtml(r.id)}" style="display:none"
               onclick="saveEdit('${r.id}')">Save Edit</button>
             <button class="btn ai" id="ai-${escapeHtml(r.id)}"
@@ -292,7 +292,7 @@
 
       const sendBtn = document.getElementById('btn-session-send');
       sendBtn.href = r.wa_link || '#';
-      sendBtn.onclick = () => sessionNext('sent');
+      sendBtn.onclick = () => { sessionCopy(); sessionNext('sent'); };
     }
 
     async function sessionNext(action) {
