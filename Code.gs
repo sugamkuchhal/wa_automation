@@ -385,8 +385,8 @@ function _writeReadyQueue(records) {
 
 function _archiveToHistory() {
   try {
-    const rq = _ss().getSheetByName('ready_queue');
-    if (!rq) return;
+    let rq;
+    try { rq = _ws('ready_queue'); } catch(e) { return; }
     const values = rq.getDataRange().getValues();
     if (values.length < 2) return;
     const dataRows = values.slice(1);
@@ -610,6 +610,25 @@ function _sendTelegram(text) {
 // ============================================================================
 
 function morningRun() {
+  try {
+    _morningRunInner();
+  } catch(e) {
+    Logger.log('morningRun FAILED: ' + e.message);
+    try {
+      MailApp.sendEmail({
+        to: NOTIFY_TO,
+        subject: '❌ WA Wishes — morning run failed',
+        body: 'The morning queue generation failed on ' +
+          Utilities.formatDate(new Date(), TZ, 'dd MMMM yyyy') +
+          '\n\nError: ' + e.message +
+          '\n\nOpen Apps Script to investigate:\nhttps://script.google.com',
+        name: 'WA Automated Wishes'
+      });
+    } catch(mailErr) {}
+  }
+}
+
+function _morningRunInner() {
   const results = prepareDailyQueue();
   const today   = Utilities.formatDate(new Date(), TZ, 'dd MMMM yyyy');
 
@@ -669,25 +688,21 @@ function runChecks() {
   const missing = required.filter(n => !titles.includes(n));
   const warnings = [];
 
-  // Phone validation
+  // Phone validation + duplicate id check — single read
   try {
     const people = _sheetToObjects('people_and_groups');
+    const ids = [];
     people.forEach(r => {
       const active = String(r.is_active || r.active || '').toUpperCase();
+      ids.push(String(r.id || ''));
       if (active !== 'TRUE') return;
       if (String(r.chat_type || '').toLowerCase() !== 'individual') return;
       const phone = String(r.phone || '').trim();
       const digits = phone.replace(/\D/g, '');
-      if (!phone)          warnings.push('id=' + r.id + ': phone is blank');
+      if (!phone)            warnings.push('id=' + r.id + ': phone is blank');
       else if (phone !== digits) warnings.push('id=' + r.id + ': phone "' + phone + '" has non-digit characters');
       else if (digits.length < 7) warnings.push('id=' + r.id + ': phone too short');
     });
-  } catch(e) {}
-
-  // Duplicate id check
-  try {
-    const people = _sheetToObjects('people_and_groups');
-    const ids = people.map(r => String(r.id || ''));
     const dupes = ids.filter((id, i) => ids.indexOf(id) !== i);
     if (dupes.length) warnings.push('Duplicate ids found: ' + [...new Set(dupes)].join(', '));
   } catch(e) {}

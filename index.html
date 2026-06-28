@@ -106,6 +106,7 @@
   <div id="offline-bar">⚠️ Cannot reach server. <button onclick="loadQueue()" style="margin-left:8px;padding:3px 10px;border-radius:6px;border:0;background:#991b1b;color:white;font-size:12px;font-weight:700;cursor:pointer">Retry</button></div>
   <div class="qhead">
     <span id="q-date"></span>
+    <button id="prep-btn" onclick="prepareQueue()" style="padding:8px 14px;border-radius:8px;border:0;background:#222;color:#fff;font-weight:600;font-size:13px;cursor:pointer">🔄 Prepare Queue</button>
   </div>
   <div id="bulk-bar">
     <span id="bulk-count">0 selected</span>
@@ -214,15 +215,26 @@ function showTab(name, btn) {
   document.querySelectorAll('.tab').forEach(b => b.classList.remove('on'));
   document.getElementById('pane-' + name).classList.add('on');
   btn.classList.add('on');
-  refreshAll();
-}
-
-function refreshAll() {
-  loadQueue();
-  loadHistory();
+  if (name === 'queue')   loadQueue();
+  if (name === 'history') loadHistory();
 }
 
 // ── Queue ────────────────────────────────────────────────────────────────────
+
+async function prepareQueue() {
+  const btn = document.getElementById('prep-btn');
+  btn.disabled = true; btn.textContent = '⏳ Preparing…';
+  try {
+    const data = await gasPost({ action: 'prepare' });
+    if (data.ok) {
+      toast('✅ Queue ready — ' + data.count + ' message(s)');
+      await loadQueue();
+    } else {
+      toast('❌ ' + (data.error || 'Preparation failed'));
+    }
+  } catch(e) { toast('❌ Could not reach server'); }
+  btn.disabled = false; btn.textContent = '🔄 Prepare Queue';
+}
 
 async function loadQueue() {
   document.getElementById('offline-bar').classList.remove('on');
@@ -255,9 +267,20 @@ function render(rows) {
     const hasMedia = !!r.media_url;
 
     // Auto-prepend Belated for missed messages not yet edited
+    // Also auto-save so wa_link reflects the belated text
     let msgText = r.final_message_text || '';
-    if (isMissed && status === 'ready' && !msgText.toLowerCase().startsWith('belated') && !msgText.toLowerCase().startsWith('sorry')) {
+    const needsBelated = isMissed && status === 'ready' &&
+      !msgText.toLowerCase().startsWith('belated') &&
+      !msgText.toLowerCase().startsWith('sorry');
+    if (needsBelated) {
       msgText = 'Belated ' + msgText;
+      // Auto-save in background so wa_link is updated
+      gasPost({ action: 'edit', id: r.id, text: msgText }).then(d => {
+        if (d.ok && d.wa_link) {
+          const wa = document.getElementById('wa-' + r.id);
+          if (wa) wa.href = d.wa_link;
+        }
+      });
     }
 
     const actionBtns = isSkipped
