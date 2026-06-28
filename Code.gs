@@ -165,20 +165,22 @@ function prepareDailyQueue() {
     const row = Object.assign({}, r, { event_type: eventName });
     const chatType = String(row.chat_type || '').toLowerCase();
 
-    if (chatType === 'personalized') {
-      // Card 1: personal wish to individual
+    const eventType2 = String(row.event_type || '').toLowerCase().trim();
+
+    if (eventType2 === 'cascade_birthday') {
+      // cascade_birthday: goes to parent phone, uses cascade_name + name
+      // No group card generated regardless of group_invite_link
       output.push(_buildRecord(row, templates, today));
-      // Card 2: group card if group_invite_link also present
+    } else if (chatType === 'personalized') {
+      // Card 1: personal wish
+      output.push(_buildRecord(row, templates, today));
+      // Card 2: broadcast card if group_invite_link also present
       if (String(row.group_invite_link || '').trim()) {
         const rowGroup = Object.assign({}, row, { original_chat_type: 'personalized' });
         output.push(_buildRecord(rowGroup, templates, today, '-broadcast', 'broadcast'));
       }
-    } else if (chatType === 'cascade_birthday') {
-      // cascade_birthday: message goes to parent's phone, references child by name
-      // No group card generated
-      output.push(_buildRecord(row, templates, today));
     } else {
-      // group or anything else
+      // broadcast or anything else
       output.push(_buildRecord(row, templates, today));
     }
   });
@@ -194,7 +196,7 @@ function _loadEventRef() {
     const rows = _sheetToObjects('event_ref');
     const ref = {};
     rows.forEach(r => {
-      const name = String(r.event_name || '').toLowerCase().trim();
+      const name = String(r.event_type || r.event_name || '').toLowerCase().trim();
       const cat  = String(r.event_category || 'historical').toLowerCase().trim();
       if (name) ref[name] = cat;
     });
@@ -234,6 +236,12 @@ function _matchesToday(row, todayDt) {
   if (!raw) return false;
   const d = _parseDate(raw);
   if (!d) { Logger.log('Unrecognised date: ' + raw); return false; }
+  // 1900-01-01 = fully unknown date sentinel — skip with warning
+  if (d.getFullYear() === 1900 && d.getMonth() === 0 && d.getDate() === 1) {
+    Logger.log('WARNING: id=' + row.id + ' has fully unknown date (1900-01-01) — skipping');
+    return false;
+  }
+  // 1900 year = unknown birth year — still match on month+day
   return d.getMonth() === todayDt.getMonth() && d.getDate() === todayDt.getDate();
 }
 
@@ -292,10 +300,10 @@ function _renderTemplate(row, templates) {
   // individual-sourced group card uses group tone too
   
 
-  // ── cascade_birthday: message to parent (chat_type=individual in templates) ──
-  if (chatType === 'cascade_birthday') {
+  // ── cascade_birthday: message to parent — detected via event_type, not chat_type ──
+  const eventType3 = String(row.event_type || '').toLowerCase().trim();
+  if (eventType3 === 'cascade_birthday') {
     const tmpl = _findTemplate(templates, 'personalized', 'cascade_birthday', language, tone)
-      || _findTemplate(templates, 'personalized', 'birthday', language, tone)
       || { template_text: 'Hi {{cascade_name}}, wishing little {{name}} a very Happy Birthday! 🎂' };
     const text = String(tmpl.template_text || '');
     return text
@@ -583,7 +591,7 @@ function aiGenerate(data) {
 
   const name      = String(data.name || 'there');
   const eventType = String(data.event_type || 'occasion');
-  const relation  = String(data.relation || '');
+  const relation  = String(data.relation || '').replace(/ via Parent$/i, '').trim();
   const language  = String(data.language || 'en');
   const tone      = String(data.tone || 'warm');
   const current   = String(data.current_text || '');
@@ -632,7 +640,7 @@ function addContact(data) {
   // Validate required fields
   if (!data.id)         return { ok: false, error: 'id is required' };
   if (!data.name)       return { ok: false, error: 'name is required' };
-  if (!data.event_name) return { ok: false, error: 'event_name is required' };
+  if (!data.event_type && !data.event_name) return { ok: false, error: 'event_type is required' };
   if (!data.chat_type)  return { ok: false, error: 'chat_type is required' };
 
   // Check duplicate id
