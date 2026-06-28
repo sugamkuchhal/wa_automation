@@ -1,220 +1,162 @@
-# WhatsApp Personal Messaging Agent (Android, Safe Automation)
+# WA Automated Wishes
 
-A **human-in-the-loop WhatsApp workflow** using Google Sheets as the source of truth.
+A human-in-the-loop WhatsApp messaging agent. Generates personalised birthday, anniversary, and festival messages — you review and send from your phone.
 
-Runs as a Python/Flask server. It prepares send-ready messages — you manually send from the WhatsApp UI.
+**Zero cost. No server. Runs entirely on Google infrastructure.**
 
 ---
 
-## What it does
+## Architecture
 
-### Data model in Google Sheets
-The system expects these tabs:
+```
+Google Apps Script (Code.gs)
+    ├── Time trigger 9 AM IST  → prepareDailyQueue()
+    ├── Time trigger 7 PM IST  → eveningRun()
+    └── Web App endpoint       → dashboard API
 
-- `people_and_groups` — columns in order:
-  `id | chat_type | event_name | event_date | group_invite_link | phone | name | relation | language | tone | media_mode | is_active`
-- `festival_calendar`
-- `message_templates`
-- (auto-created) `ready_queue`
+GitHub Pages (index.html)
+    └── Dashboard UI → calls Apps Script
 
-### Queue generation flow
-
-At queue-generation time (`prepare_daily_queue`):
-
-1. Read contacts, templates, festivals from Sheets.
-2. Compute today in configured timezone.
-3. Include matching contacts for today where `active=TRUE`.
-4. Add any matching festivals for today.
-5. Build final message text from best-match template (exact match, then fallback).
-6. Optionally build a media URL placeholder (`image`/`gif`; blank for `text`/`manual_photo`).
-7. Build WhatsApp deep link (`wa.me`) for individuals.
-8. Write all records to `ready_queue` with `action_status=ready`.
-9. Send an email notification if `NOTIFY_EMAIL` / `SMTP_*` env vars are set.
-
-### Dashboard flow
-
-`Dashboard.html` loads today's queue and lets you:
-
-- Open WhatsApp with prefilled text (manual final send).
-- Save message edits back to the sheet.
-- Mark a message as `sent` or `skipped`.
-- Copy/share text from Android browser.
+Google Sheets
+    ├── people_and_groups   — everyone who gets a wish
+    ├── event_ref           — event name → category mapping
+    ├── festival_calendar   — festival dates by year
+    ├── message_templates   — message variants
+    ├── ready_queue         — today's pending messages (auto-generated)
+    ├── send_history        — permanent archive
+    └── _meta               — AI usage counter
+```
 
 ---
 
 ## Setup
 
-### 1) Prerequisites
+### 1. Google Sheet
 
-- Python 3.10+
-- A Google account
-- A Google Sheet with tabs listed above
-- A Google Cloud service account JSON key
+Create a sheet at [sheets.new](https://sheets.new) and add these tabs with exact names:
 
-### 2) Create and share the Sheet
-
-1. Create a Google Sheet.
-2. Add tabs: `contacts_events`, `festival_calendar`, `message_templates`.
-3. Put headers exactly as documented in **Sheet schema** below.
-4. Copy the sheet ID from the URL:
-   `https://docs.google.com/spreadsheets/d/<THIS_PART>/edit`
-5. Share the sheet with your service account email (`...iam.gserviceaccount.com`) as Editor.
-
-### 3) Configure environment
-
-Create a `.env` (or export env vars in shell):
-
-```bash
-export SPREADSHEET_ID="your_sheet_id"
-export ANTHROPIC_API_KEY="sk-ant-..."   # Optional — only needed for AI Generate button
-export GOOGLE_APPLICATION_CREDENTIALS="/full/path/to/service_account.json"
-export TZ="Asia/Kolkata"
-export PORT="8080"
-
-# Optional — real media sources
-export GIPHY_API_KEY="your_giphy_key"          # GIF search; falls back to Giphy public beta key
-export GDRIVE_IMAGE_FOLDER_ID="folder_id"      # Drive folder for event images (share with service account)
-export UNSPLASH_ACCESS_KEY="your_key"          # Free at unsplash.com/developers; used for image fallback
-export AI_DAILY_LIMIT="30"                     # Max AI Generate calls per day (default: 30)
-# Optional — email notification when queue is ready
-export NOTIFY_EMAIL="you@example.com"
-export SMTP_HOST="smtp.gmail.com"
-export SMTP_PORT="587"
-export SMTP_USER="sender@gmail.com"
-export SMTP_PASS="your_app_password"
+**`people_and_groups`**
+```
+id | chat_type | event_name | event_date | group_invite_link | phone | name | relation | language | tone | media_mode | is_active
 ```
 
-> If `GOOGLE_APPLICATION_CREDENTIALS` is omitted, code defaults to `service_account.json` in repo root.
-
-### 4) Install dependencies
-
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+**`event_ref`**
 ```
-
-### 5) Build today's queue once
-
-```bash
-python -c "from app import prepare_daily_queue; print(len(prepare_daily_queue()))"
+event_name | event_category
 ```
+Values for event_category: `historical`, `fixed_festival`, `variable_festival`
+Import `event_ref.csv` from this repo.
 
-If this succeeds, your Sheets auth + schema are working.
-
-### 6) Start the dashboard server
-
-```bash
-python app.py
+**`festival_calendar`**
 ```
+festival | year | month | day
+```
+Import `festival_calendar.csv` from this repo.
 
-Open:
+**`message_templates`**
+```
+event_type | language | tone | template_text
+```
+Import `templates.csv` and `templates_additional.csv` from this repo.
 
-- `http://localhost:8080` (desktop)
-- `http://<your-lan-ip>:8080` from Android on the same Wi-Fi
+### 2. Apps Script
+
+1. Open your sheet → Extensions → Apps Script
+2. Paste the entire contents of `Code.gs`
+3. Update `SHEET_ID` at the top with your sheet ID
+4. Update `NOTIFY_TO` and `NOTIFY_FROM` with your email addresses
+
+### 3. Script Properties
+
+Apps Script editor → Project Settings → Script Properties:
+
+| Key | Value |
+|---|---|
+| `ANTHROPIC_API_KEY` | For AI Generate button (optional) |
+| `TELEGRAM_BOT_TOKEN` | From BotFather (optional) |
+| `TELEGRAM_CHAT_ID` | Your Telegram chat ID (optional) |
+| `GIPHY_API_KEY` | For GIF media (optional) |
+| `UNSPLASH_ACCESS_KEY` | For image media (optional) |
+
+### 4. Deploy as Web App
+
+Deploy → New deployment → Web app → Execute as Me → Anyone → Deploy.
+Copy the URL and update `GAS_URL` in `index.html`.
+
+### 5. Install time triggers
+
+In Apps Script editor, run `installTriggers()` once.
+This sets up 9 AM (queue generation) and 7 PM (reminder) triggers automatically.
+
+### 6. Enable GitHub Pages
+
+Repo → Settings → Pages → Branch: main → / (root) → Save.
+Dashboard available at: `https://{username}.github.io/{repo}/`
+
+### 7. Verify
+
+Run `runChecks()` in Apps Script editor — validates all sheets, phones, duplicate ids.
+Run `morningRun()` once to test the full flow.
 
 ---
 
-## Setup (Docker)
+## Sheet schemas
 
-The easiest way to run the server — no Python install needed.
+### people_and_groups
 
-### 1) Create a `.env` file
+| Column | Values | Notes |
+|---|---|---|
+| id | mom-bday | Unique. Group card gets -group suffix. |
+| chat_type | individual / group | Controls destination and tone. |
+| event_name | birthday, diwali | Must match event_ref and festival_calendar exactly. |
+| event_date | 1987-05-20 | Used for historical events only (month+day matching). |
+| group_invite_link | https://chat.whatsapp.com/... | Required for group. Generates 2nd card if on individual row. |
+| phone | 919876543210 | Digits only. |
+| name | Mom | Replaces {{name}} in individual templates. |
+| relation | mother, cousin | Used in AI Generate prompt. |
+| language | en / hi / hinglish | Template matching. |
+| tone | warm / casual / fun / formal | Groups always forced to formal. |
+| media_mode | text / image / gif / manual_photo | |
+| is_active | TRUE / FALSE | FALSE rows skipped. |
 
-```bash
-SPREADSHEET_ID=your_sheet_id
-TZ=Asia/Kolkata
+### event_ref
 
-# Optional email notification
-NOTIFY_EMAIL=you@example.com
-SMTP_USER=sender@gmail.com
-SMTP_PASS=your_app_password
-```
+| event_category | Firing rule |
+|---|---|
+| historical | Fires on month+day every year (birthday, anniversary) |
+| fixed_festival | Fires when festival_calendar month+day matches today (year ignored) |
+| variable_festival | Fires when festival_calendar exact year+month+day matches today (year required) |
 
-### 2) Place your service account key
+### festival_calendar
 
-Put `service_account.json` in the repo root. Docker Compose mounts it as a secret — it is never baked into the image.
+| Column | Notes |
+|---|---|
+| festival | Must match event_name in people_and_groups exactly |
+| year | Blank = fires every year (fixed). Filled = fires that year only (variable). |
+| month | Integer 1–12 |
+| day | Integer 1–31 |
 
-### 3) Build and run
+### message_templates
 
-```bash
-docker compose up --build
-```
-
-Open `http://localhost:8080`.
-
-### 4) Run in the background
-
-```bash
-docker compose up -d
-```
-
-### 5) Trigger queue generation inside the container
-
-```bash
-docker compose exec wa_automation python -c "from app import prepare_daily_queue; prepare_daily_queue()"
-```
-
----
-
-## Triggering queue creation daily at 9 AM (cron)
-
-```bash
-0 9 * * * cd /path/to/repo && /path/to/venv/bin/python -c "from app import prepare_daily_queue; prepare_daily_queue()"
-```
+Templates support `{{name}}` placeholder. Match priority: exact (event+lang+tone) → language → event → hardcoded fallback.
 
 ---
 
-## Sheet schema
+## Message rules
 
-### `contacts_events`
-- `id`
-- `name`
-- `phone` (E.164 for individuals)
-- `chat_type` (`individual` | `group`)
-- `group_invite_link`
-- `event_type`
-- `event_date` (`YYYY-MM-DD`) — the original date of the event
-- `recurrence` (`yearly` | `monthly` | `weekly` | leave blank for one-time)
-  - `yearly` — fires every year on the same month/day (birthdays, anniversaries)
-  - `monthly` — fires every month on the same day-of-month
-  - `weekly` — fires every week on the same weekday as `event_date`
-  - blank — fires once on the exact `event_date`
-- `relation`
-- `language` (`en` | `hi` | `hinglish`)
-- `tone` (`warm` | `casual` | `formal` | `fun`)
-- `media_mode` (`text` | `image` | `gif` | `manual_photo`)
-- `active` (`TRUE` | `FALSE`)
-
-### `festival_calendar`
-- `festival` — name e.g. Diwali, Christmas
-- `year` — optional. If filled, fires only that year (moveable festivals: Diwali, Holi, Eid). If blank or 0, fires every year on month/day (fixed festivals: Christmas, New Year, Republic Day).
-- `month` — integer 1–12
-- `day` — integer 1–31
-
-This sheet is a **date lookup only**. Language, tone and media are set per row in `contacts_events` and `group_events`.
-
-### `message_templates`
-- `event_type`
-- `language`
-- `tone`
-- `template_text` (supports `{{name}}`)
+| chat_type | destination | tone | {{name}} |
+|---|---|---|---|
+| individual | wa.me/{phone} | from sheet | replaced |
+| individual + group_invite_link (card 1) | wa.me/{phone} | from sheet | replaced |
+| individual + group_invite_link (card 2) | group invite link | forced formal | replaced |
+| group | group invite link | forced formal | stripped |
 
 ---
 
-## Common setup mistakes (and fixes)
+## Daily flow
 
-- `Missing sheet: ...` — ensure tab names are exact and case-sensitive.
-- Empty dashboard — verify `event_date` matches today in `TZ` timezone; confirm `active` is `TRUE`.
-- Auth errors — confirm service account JSON path and that the sheet is shared with that account.
-- WhatsApp link not opening a contact — ensure `chat_type=individual` and a valid numeric phone exists.
+**9 AM:** Apps Script generates queue → archives yesterday → writes ready_queue → sends email + Telegram with names.
 
----
+**You:** Open dashboard on phone → review cards → tap Send on WhatsApp → message pre-filled → tap send arrow in WhatsApp.
 
-## Compliance-first design
-
-- Uses personal WhatsApp only (no Business API).
-- No direct WhatsApp API calls.
-- No auto-send / background send.
-- No WhatsApp Web scraping or automation.
-- Final send always happens inside the WhatsApp UI.
+**7 PM:** If any messages still pending → reminder email + Telegram. If all done → silence.
