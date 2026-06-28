@@ -21,7 +21,7 @@
     /* queue header */
     .qhead { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
     .qhead span { font-size: 13px; color: #666; }
-    #prep-btn { padding: 8px 14px; border-radius: 8px; border: 0; background: #222; color: white; font-weight: 600; font-size: 13px; cursor: pointer; }
+    #prep-btn { display: none; }
 
     /* offline bar */
     #offline-bar { display: none; background: #fee2e2; color: #991b1b; padding: 9px 14px; border-radius: 9px; margin-bottom: 12px; font-size: 13px; font-weight: 600; text-align: center; }
@@ -157,7 +157,7 @@
 
 <script>
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbzGcZiIqLzhrX2PjylcH7Aw8CB08fN_cA5OwHe9GqwvjpA4JaMYHKxgPx37Webb3qGR/exec';
-const EMOJI = { birthday:'🎂', anniversary:'💍', diwali:'🪔', holi:'🎨', christmas:'🎄', 'new year':'🎉' };
+const EMOJI = { birthday:'🎂', cascade_birthday:'🎂', anniversary:'💍', diwali:'🪔', holi:'🎨', christmas:'🎄', 'new year':'🎉' };
 const AI_COOLDOWN = 10000;
 
 let allRows = [], selected = new Set(), sessQueue = [], sessIdx = 0, histRows = [];
@@ -462,6 +462,9 @@ async function sessNext(action) {
   if (text !== r.final_message_text) {
     const d = await gasPost({ action: 'edit', id: r.id, text });
     if (d.ok && d.wa_link) { r.wa_link = d.wa_link; r.final_message_text = text; document.getElementById('btn-ss').href = d.wa_link; }
+    // Also mark the final action (sent/skipped) after editing
+    if (action === 'sent') await gasPost({ action: 'mark', id: r.id, status: 'sent' });
+    if (action === 'skipped') await gasPost({ action: 'mark', id: r.id, status: 'skipped' });
   } else {
     await gasPost({ action: 'mark', id: r.id, status: action });
   }
