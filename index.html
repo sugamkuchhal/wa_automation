@@ -96,8 +96,9 @@
 <h1>📨 WA Automated Wishes</h1>
 
 <div class="tabs">
-  <button class="tab on" onclick="showTab('queue',this)">Today's Queue</button>
-  <button class="tab" onclick="showTab('history',this)">Send History</button>
+  <button class="tab on" onclick="showTab('queue',this)">Queue</button>
+  <button class="tab" onclick="showTab('history',this)">History</button>
+  <button class="tab" onclick="refreshAll()" title="Refresh" style="padding:8px 12px">&#8635;</button>
 </div>
 
 <!-- ── Queue pane ── -->
@@ -198,7 +199,12 @@ function showTab(name, btn) {
   document.querySelectorAll('.tab').forEach(b => b.classList.remove('on'));
   document.getElementById('pane-' + name).classList.add('on');
   btn.classList.add('on');
-  if (name === 'history') loadHistory();
+  refreshAll();
+}
+
+function refreshAll() {
+  loadQueue();
+  loadHistory();
 }
 
 // ── Queue ────────────────────────────────────────────────────────────────────
