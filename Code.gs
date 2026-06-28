@@ -42,7 +42,7 @@ function doPost(e) {
     const data = JSON.parse(e.postData.contents);
     const action = (data.action || '').toLowerCase();
     if (action === 'mark')        return _json(markRow(data.id, data.status));
-    if (action === 'edit')        return _json(editRow(data.id, data.text, data.skip_status || false));
+    if (action === 'edit')        return _json(editRow(data.id, data.text, data.skipStatus || data.skip_status || false));
     if (action === 'ai_generate') return _json(aiGenerate(data));
     if (action === 'add_contact') return _json(addContact(data));
     if (action === 'prepare')     return _json({ ok: true, count: prepareDailyQueue().length });
