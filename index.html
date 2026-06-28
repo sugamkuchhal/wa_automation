@@ -156,10 +156,11 @@
 
 <script>
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbzGcZiIqLzhrX2PjylcH7Aw8CB08fN_cA5OwHe9GqwvjpA4JaMYHKxgPx37Webb3qGR/exec';
-const EMOJI = { birthday:'🎂', cascade_birthday:'🎂', anniversary:'💍', diwali:'🪔', holi:'🎨', christmas:'🎄', 'new year':'🎉' };
+const EMOJI = { birthday:'🎂', anniversary:'💍', diwali:'🪔', holi:'🎨', christmas:'🎄', 'new year':'🎉' };
 const AI_COOLDOWN = 10000;
 
 let allRows = [], selected = new Set(), sessQueue = [], sessIdx = 0, histRows = [];
+const _belateSaved = new Set(); // tracks ids that have had belated text auto-saved this session
 
 // ── Utilities ────────────────────────────────────────────────────────────────
 
@@ -271,20 +272,22 @@ function render(rows) {
     const hasMedia = !!r.media_url;
 
     // Auto-prepend Belated for missed messages not yet edited
-    // Also auto-save so wa_link reflects the belated text
+    // Track saved ids so auto-save fires only once per session, not on every render
     let msgText = r.final_message_text || '';
     const needsBelated = isMissed && status === 'ready' &&
       !msgText.toLowerCase().startsWith('belated') &&
       !msgText.toLowerCase().startsWith('sorry');
     if (needsBelated) {
       msgText = 'Belated ' + msgText;
-      // Auto-save in background so wa_link is updated
-      gasPost({ action: 'edit', id: r.id, text: msgText }).then(d => {
-        if (d.ok && d.wa_link) {
-          const wa = document.getElementById('wa-' + r.id);
-          if (wa) wa.href = d.wa_link;
-        }
-      });
+      if (!_belateSaved.has(r.id)) {
+        _belateSaved.add(r.id);
+        gasPost({ action: 'edit', id: r.id, text: msgText }).then(d => {
+          if (d.ok && d.wa_link) {
+            const wa = document.getElementById('wa-' + r.id);
+            if (wa) wa.href = d.wa_link;
+          }
+        });
+      }
     }
 
     const actionBtns = isSkipped

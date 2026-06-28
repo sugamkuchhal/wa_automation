@@ -392,9 +392,10 @@ function _archiveToHistory() {
     const dataRows = values.slice(1);
 
     const hist = _getOrCreate('send_history');
-    const existing = hist.getDataRange().getValues();
-    if (!existing || existing.length === 0 || existing[0].join(',') !== QUEUE_HEADERS.join(',')) {
-      if (existing.length === 0) {
+    // Only read A1 to check header — avoids reading entire sheet on every run
+    const a1 = hist.getLastRow() === 0 ? '' : String(hist.getRange('A1').getValue()).trim();
+    if (a1 !== 'id') {
+      if (hist.getLastRow() === 0) {
         hist.appendRow(QUEUE_HEADERS);
       } else {
         hist.insertRowBefore(1);
@@ -472,8 +473,7 @@ function editRow(id, text) {
 
 function getHistory(days) {
   try {
-    let ws;
-    try { ws = _ws('send_history'); } catch(e) { return []; }
+    const ws = _ws('send_history');
     const values = ws.getDataRange().getValues();
     if (values.length < 2) return [];
     const headers = values[0].map(h => String(h).trim());
