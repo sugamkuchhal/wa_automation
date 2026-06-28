@@ -223,7 +223,7 @@ def build_media(row, text):
     if mode in ('manual_photo', 'text'):
         return {'media_url': ''}
 
-    event_type = str(row.get('event_name', row.get('event_type', 'celebration')))
+    event_type = str(row.get('event_type', 'celebration'))
 
     if mode == 'gif':
         url = _giphy_url(f'{event_type} celebration')
@@ -437,7 +437,7 @@ def prepare_daily_queue():
 
 @app.get('/')
 def home():
-    return send_from_directory('.', 'Dashboard.html')
+    return send_from_directory('.', 'index.html')
 
 
 @app.get('/api/today_queue')
@@ -489,7 +489,7 @@ def prepare_queue():
 def mark_action():
     payload = request.get_json(force=True)
     rid = str(payload.get('id'))
-    action = str(payload.get('action'))
+    action = str(payload.get('status', payload.get('action')))
 
     ws = _queue_worksheet()
     values = ws.get_all_values()
