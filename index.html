@@ -509,11 +509,12 @@ async function sessNext(action) {
   r._s = action;
   const text = document.getElementById('sess-msg').value;
   if (text !== r.final_message_text) {
-    // Save edit first, then mark final action — two separate writes intentionally
-    const d = await gasPost({ action: 'edit', id: r.id, text });
+    // skip_status=true so editRow only updates text+wa_link
+    // markRow below sets the final action_status in one atomic write
+    const d = await gasPost({ action: 'edit', id: r.id, text, skip_status: true });
     if (d.ok && d.wa_link) { r.wa_link = d.wa_link; r.final_message_text = text; document.getElementById('btn-ss').href = d.wa_link; }
   }
-  // Always mark the final action — one write only
+  // Final status always set by mark — no timing ambiguity
   await gasPost({ action: 'mark', id: r.id, status: action });
   setStatus(r.id, action);
   sessIdx++; showSessCard();

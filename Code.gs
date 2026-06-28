@@ -42,7 +42,7 @@ function doPost(e) {
     const data = JSON.parse(e.postData.contents);
     const action = (data.action || '').toLowerCase();
     if (action === 'mark')        return _json(markRow(data.id, data.status));
-    if (action === 'edit')        return _json(editRow(data.id, data.text));
+    if (action === 'edit')        return _json(editRow(data.id, data.text, data.skip_status || false));
     if (action === 'ai_generate') return _json(aiGenerate(data));
     if (action === 'add_contact') return _json(addContact(data));
     if (action === 'prepare')     return _json({ ok: true, count: prepareDailyQueue().length });
@@ -433,7 +433,9 @@ function markRow(id, status) {
   return { ok: false, error: 'Row not found: ' + id };
 }
 
-function editRow(id, text) {
+function editRow(id, text, skipStatus) {
+  // skipStatus=true when called before markRow (e.g. bulk session) so the
+  // final action_status is set by markRow, not overwritten here as 'edited'
   const ws = _ws('ready_queue');
   const values = ws.getDataRange().getValues();
   const headers = values[0].map(h => String(h).trim());
@@ -458,9 +460,11 @@ function editRow(id, text) {
       const waLink   = _buildWaLink(rowObj, text, mediaUrl);
 
       ws.getRange(row, textCol).setValue(text);
-      ws.getRange(row, statusCol).setValue('edited');
-      ws.getRange(row, tsCol).setValue(_nowStr());
       ws.getRange(row, waCol).setValue(waLink);
+      if (!skipStatus) {
+        ws.getRange(row, statusCol).setValue('edited');
+        ws.getRange(row, tsCol).setValue(_nowStr());
+      }
       return { ok: true, wa_link: waLink };
     }
   }
@@ -473,8 +477,8 @@ function editRow(id, text) {
 
 function getHistory(days) {
   try {
-    const ws = _ss().getSheetByName('send_history');
-    if (!ws) return [];
+    let ws;
+    try { ws = _ws('send_history'); } catch(e) { return []; }
     const values = ws.getDataRange().getValues();
     if (values.length < 2) return [];
     const headers = values[0].map(h => String(h).trim());
