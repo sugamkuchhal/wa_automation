@@ -183,9 +183,11 @@ def _gdrive_image_url(event_type):
     if not GDRIVE_IMAGE_FOLDER_ID:
         return None
     try:
-        drive = _sheet().client.auth  # reuse existing credentials
+        creds_file = os.getenv('GOOGLE_APPLICATION_CREDENTIALS', 'service_account.json')
+        from google.oauth2.service_account import Credentials as _Creds
+        drive_creds = _Creds.from_service_account_file(creds_file, scopes=['https://www.googleapis.com/auth/drive'])
         from googleapiclient.discovery import build as _build
-        svc = _build('drive', 'v3', credentials=drive)
+        svc = _build('drive', 'v3', credentials=drive_creds)
         q = f"'{GDRIVE_IMAGE_FOLDER_ID}' in parents and mimeType contains 'image/' and name contains '{event_type}' and trashed=false"
         results = svc.files().list(q=q, fields='files(id,name)', pageSize=1).execute()
         files = results.get('files', [])
@@ -264,7 +266,7 @@ def build_queue_record(row, templates, date_str, id_suffix='', chat_type_overrid
         'queue_date': date_str,
         'name': row.get('name'),
         'chat_type': chat_type,
-        'event_type': row.get('event_name', row.get('event_type')),
+        'event_type': row.get('event_type'),
         'phone': row.get('phone', ''),
         'group_invite_link': row.get('group_invite_link', ''),
         'media_mode': row.get('media_mode'),
@@ -440,21 +442,6 @@ def home():
     return send_from_directory('.', 'index.html')
 
 
-@app.get('/api/today_queue')
-def today_queue():
-    rows = get_sheet_rows('ready_queue')
-    # Return all unsent/unresolved rows regardless of date
-    # so missed days accumulate until actioned
-    pending = [r for r in rows if str(r.get('action_status', '')).lower() in ('ready', 'edited', 'skipped', '')]
-    return jsonify(pending)
-
-
-@app.get('/api/today_queue_all')
-def today_queue_all():
-    """Return all rows from ready_queue including sent — used by History tab to show today's sent messages."""
-    rows = get_sheet_rows('ready_queue')
-    return jsonify(rows)
-
 
 @app.get('/api/history')
 def get_history():
@@ -500,10 +487,10 @@ def mark_action():
 
     action_col = headers.index('action_status') + 1
     ts_col = headers.index('action_ts') + 1
-    # Batch both cell updates in a single API call
+    ts_value = '' if action == 'ready' else datetime.now(ZoneInfo(TZ)).isoformat()
     ws.batch_update([
         {'range': gspread.utils.rowcol_to_a1(i, action_col), 'values': [[action]]},
-        {'range': gspread.utils.rowcol_to_a1(i, ts_col),     'values': [[datetime.now(ZoneInfo(TZ)).isoformat()]]},
+        {'range': gspread.utils.rowcol_to_a1(i, ts_col),     'values': [[ts_value]]},
     ])
     return jsonify({'ok': True})
 
@@ -587,7 +574,6 @@ def _write_ai_usage(count):
 
 
 def _check_ai_rate_limit():
-    today = _today_str()
     count = _read_ai_usage()
     if count >= AI_DAILY_LIMIT:
         return False, f'Daily AI limit of {AI_DAILY_LIMIT} calls reached. Resets tomorrow.'
