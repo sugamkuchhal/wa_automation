@@ -6,7 +6,6 @@
 const SHEET_ID   = '1xYfyHukNh379NXdS99SJ3plqts0NlUt_w7bkIIKxvLQ';
 const TZ         = 'Asia/Kolkata';
 const NOTIFY_TO  = 'sugam.kuchhal.iimc@gmail.com';
-const NOTIFY_FROM = 'sugamkuchhal@gmail.com';
 const DASHBOARD_URL = 'https://sugamkuchhal.github.io/wa_automation/';
 
 const QUEUE_HEADERS = [
@@ -73,7 +72,7 @@ function _ws(name) {
   return ws;
 }
 
-function _getOrCreate(name, rows, cols) {
+function _getOrCreate(name) {
   const ss = _ss();
   return ss.getSheetByName(name) || ss.insertSheet(name);
 }
@@ -129,7 +128,6 @@ function _parseDate(raw) {
 // ============================================================================
 
 function prepareDailyQueue() {
-  const ss       = _ss();
   const people   = _sheetToObjects('people_and_groups');
   const templates= _sheetToObjects('message_templates');
   const festivals= _sheetToObjects('festival_calendar');

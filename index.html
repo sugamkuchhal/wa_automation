@@ -178,14 +178,29 @@ function today() {
   return new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
 }
 
+const GAS_TIMEOUT_MS = 10000;
+
+async function _fetchWithTimeout(url, opts = {}) {
+  const ctrl = new AbortController();
+  const tid = setTimeout(() => ctrl.abort(), GAS_TIMEOUT_MS);
+  try {
+    const res = await fetch(url, { ...opts, signal: ctrl.signal });
+    clearTimeout(tid);
+    return res;
+  } catch(e) {
+    clearTimeout(tid);
+    throw e;
+  }
+}
+
 async function gasGet(params) {
   const url = GAS_URL + '?' + new URLSearchParams(params);
-  const res = await fetch(url);
+  const res = await _fetchWithTimeout(url);
   return res.json();
 }
 
 async function gasPost(data) {
-  const res = await fetch(GAS_URL, {
+  const res = await _fetchWithTimeout(GAS_URL, {
     method: 'POST',
     body: JSON.stringify(data)
   });
@@ -213,6 +228,7 @@ async function loadQueue() {
   document.getElementById('offline-bar').classList.remove('on');
   try {
     const rows = await gasGet({ action: 'queue' });
+    if (rows && rows.error) throw new Error(rows.error);
     allRows = Array.isArray(rows) ? rows : [];
     const todayStr2 = today();
     const pending = allRows.length;
@@ -453,14 +469,12 @@ async function sessNext(action) {
   r._s = action;
   const text = document.getElementById('sess-msg').value;
   if (text !== r.final_message_text) {
+    // Save edit first, then mark final action — two separate writes intentionally
     const d = await gasPost({ action: 'edit', id: r.id, text });
     if (d.ok && d.wa_link) { r.wa_link = d.wa_link; r.final_message_text = text; document.getElementById('btn-ss').href = d.wa_link; }
-    // Also mark the final action (sent/skipped) after editing
-    if (action === 'sent') await gasPost({ action: 'mark', id: r.id, status: 'sent' });
-    if (action === 'skipped') await gasPost({ action: 'mark', id: r.id, status: 'skipped' });
-  } else {
-    await gasPost({ action: 'mark', id: r.id, status: action });
   }
+  // Always mark the final action — one write only
+  await gasPost({ action: 'mark', id: r.id, status: action });
   setStatus(r.id, action);
   sessIdx++; showSessCard();
 }
@@ -482,15 +496,12 @@ async function loadHistory() {
   const days = document.getElementById('hist-days').value;
   document.getElementById('hist-body').innerHTML = 'Loading…';
   try {
-    const [histData, queueData] = await Promise.all([
-      gasGet({ action: 'history', days }),
-      gasGet({ action: 'queue_all' })
-    ]);
-    const hist  = Array.isArray(histData)  ? histData  : [];
-    const queue = Array.isArray(queueData) ? queueData : [];
-    const todaySent = queue.filter(r => String(r.action_status).toLowerCase() === 'sent');
-    const histIds   = new Set(hist.map(r => r.id));
-    histRows = [...hist, ...todaySent.filter(r => !histIds.has(r.id))];
+    const data = await gasGet({ action: 'history', days });
+    if (data && data.error) {
+      document.getElementById('hist-body').innerHTML = '❌ ' + data.error;
+      return;
+    }
+    histRows = Array.isArray(data) ? data : [];
     renderHistory();
   } catch(e) { document.getElementById('hist-body').innerHTML = '❌ Could not load history.'; }
 }
