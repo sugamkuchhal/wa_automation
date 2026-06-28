@@ -361,24 +361,17 @@ async function aiGen(id, name, eventType, relation, language, tone) {
   const el  = document.getElementById('msg-' + id);
   btn.disabled = true; btn.textContent = '⏳';
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5',
-        max_tokens: 256,
-        messages: [{ role: 'user', content:
-          `Write a short WhatsApp message for ${name} on their ${eventType}.${relation?' They are my '+relation+'.':''}\nLanguage: ${{en:'English',hi:'Hindi',hinglish:'Hinglish'}[language]||'English'}. Tone: ${{warm:'warm and heartfelt',casual:'casual and friendly',formal:'formal and respectful',fun:'fun and playful'}[tone]||'warm'}.\nKeep it under 3 sentences, personal, no hashtags.\nExisting message (improve it): ${el.value}\nReply with ONLY the message text.`
-        }]
-      })
+    const data = await gasPost({
+      action: 'ai_generate',
+      id, name, event_type: eventType, relation, language, tone,
+      current_text: el.value
     });
-    const d = await res.json();
-    if (d.content && d.content[0]) {
-      el.value = d.content[0].text.trim();
+    if (data.ok) {
+      el.value = data.text;
       onEdit(id);
       toast('✨ AI message ready — review before saving');
     } else {
-      toast('❌ AI failed — API key may be needed');
+      toast('❌ ' + (data.error || 'AI generation failed'));
     }
   } catch(e) { toast('❌ AI error'); }
   let s = AI_COOLDOWN / 1000;
