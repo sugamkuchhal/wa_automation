@@ -473,7 +473,8 @@ function editRow(id, text) {
 
 function getHistory(days) {
   try {
-    const ws = _ws('send_history');
+    const ws = _ss().getSheetByName('send_history');
+    if (!ws) return [];
     const values = ws.getDataRange().getValues();
     if (values.length < 2) return [];
     const headers = values[0].map(h => String(h).trim());

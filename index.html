@@ -242,6 +242,7 @@ async function prepareQueue() {
 }
 
 async function loadQueue() {
+  _belateSaved.clear(); // reset on each load so belated auto-save re-fires if needed
   document.getElementById('offline-bar').classList.remove('on');
   try {
     const rows = await gasGet({ action: 'queue' });
