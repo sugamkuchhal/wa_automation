@@ -28,9 +28,10 @@ function _prop(key) {
 function doGet(e) {
   const action = (e.parameter.action || 'queue').toLowerCase();
   try {
-    if (action === 'queue')   return _json(getTodayQueue());
-    if (action === 'history') return _json(getHistory(parseInt(e.parameter.days || '30')));
-    if (action === 'check')   return _json(runChecks());
+    if (action === 'queue')     return _json(getTodayQueue());
+    if (action === 'queue_all')  return _json(getQueueAll());
+    if (action === 'history')    return _json(getHistory(parseInt(e.parameter.days || '30')));
+    if (action === 'check')      return _json(runChecks());
     return _json({ error: 'Unknown action' });
   } catch(err) {
     return _json({ error: err.message });
@@ -164,13 +165,13 @@ function prepareDailyQueue() {
     const row = Object.assign({}, r, { event_type: eventName });
     const chatType = String(row.chat_type || '').toLowerCase();
 
-    if (chatType === 'individual') {
+    if (chatType === 'personalized') {
       // Card 1: personal wish to individual
       output.push(_buildRecord(row, templates, today));
       // Card 2: group card if group_invite_link also present
       if (String(row.group_invite_link || '').trim()) {
-        const rowGroup = Object.assign({}, row, { original_chat_type: 'individual' });
-        output.push(_buildRecord(rowGroup, templates, today, '-group', 'group'));
+        const rowGroup = Object.assign({}, row, { original_chat_type: 'personalized' });
+        output.push(_buildRecord(rowGroup, templates, today, '-broadcast', 'broadcast'));
       }
     } else if (chatType === 'cascade_birthday') {
       // cascade_birthday: message goes to parent's phone, references child by name
@@ -242,24 +243,44 @@ function _matchesToday(row, todayDt) {
 
 // Helper: find best template match given chat_type + event_type + language + tone
 // Priority: chat_type+event+lang+tone → chat_type+event+lang → chat_type+event
-//           → event+lang+tone → event+lang → event → hardcoded
+//           → event+lang+tone → event+lang → event → null
+// Returns a RANDOM match from the best-matching tier (not always first).
+function _filterTemplates(templates, filterFn) {
+  return templates.filter(filterFn);
+}
+
+function _pickRandom(arr) {
+  if (!arr || !arr.length) return null;
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
 function _findTemplate(templates, chatType, eventType, language, tone) {
   const ct = String(chatType || '').toLowerCase();
   const et = String(eventType || '');
   const la = String(language || '');
   const to = String(tone || '');
 
-  // With chat_type filter first
-  const t1 = templates.find(t => String(t.chat_type||'').toLowerCase() === ct && String(t.event_type||'') === et && String(t.language||'') === la && String(t.tone||'') === to);
-  const t2 = !t1 && templates.find(t => String(t.chat_type||'').toLowerCase() === ct && String(t.event_type||'') === et && String(t.language||'') === la);
-  const t3 = !t1 && !t2 && templates.find(t => String(t.chat_type||'').toLowerCase() === ct && String(t.event_type||'') === et);
+  // With chat_type filter — random pick from all matches at each tier
+  const p1 = _filterTemplates(templates, t => String(t.chat_type||'').toLowerCase() === ct && String(t.event_type||'') === et && String(t.language||'') === la && String(t.tone||'') === to);
+  if (p1.length) return _pickRandom(p1);
+
+  const p2 = _filterTemplates(templates, t => String(t.chat_type||'').toLowerCase() === ct && String(t.event_type||'') === et && String(t.language||'') === la);
+  if (p2.length) return _pickRandom(p2);
+
+  const p3 = _filterTemplates(templates, t => String(t.chat_type||'').toLowerCase() === ct && String(t.event_type||'') === et);
+  if (p3.length) return _pickRandom(p3);
 
   // Fallback without chat_type filter
-  const t4 = !t1 && !t2 && !t3 && templates.find(t => !t.chat_type && String(t.event_type||'') === et && String(t.language||'') === la && String(t.tone||'') === to);
-  const t5 = !t1 && !t2 && !t3 && !t4 && templates.find(t => !t.chat_type && String(t.event_type||'') === et && String(t.language||'') === la);
-  const t6 = !t1 && !t2 && !t3 && !t4 && !t5 && templates.find(t => !t.chat_type && String(t.event_type||'') === et);
+  const p4 = _filterTemplates(templates, t => !t.chat_type && String(t.event_type||'') === et && String(t.language||'') === la && String(t.tone||'') === to);
+  if (p4.length) return _pickRandom(p4);
 
-  return t1 || t2 || t3 || t4 || t5 || t6 || null;
+  const p5 = _filterTemplates(templates, t => !t.chat_type && String(t.event_type||'') === et && String(t.language||'') === la);
+  if (p5.length) return _pickRandom(p5);
+
+  const p6 = _filterTemplates(templates, t => !t.chat_type && String(t.event_type||'') === et);
+  if (p6.length) return _pickRandom(p6);
+
+  return null;
 }
 
 function _renderTemplate(row, templates) {
@@ -267,16 +288,14 @@ function _renderTemplate(row, templates) {
   const language  = String(row.language   || '').trim();
   const chatType  = String(row.chat_type  || '').toLowerCase();
   // Groups always forced formal — hard override
-  const tone = (chatType === 'group') ? 'formal' : String(row.tone || '').trim();
+  const tone = (chatType === 'broadcast') ? 'formal' : String(row.tone || '').trim();
   // individual-sourced group card uses group tone too
-  const effectiveChatType = (chatType === 'group' || String(row.original_chat_type||'').toLowerCase() === 'individual') && chatType !== 'cascade_birthday'
-    ? chatType
-    : chatType;
+  
 
   // ── cascade_birthday: message to parent (chat_type=individual in templates) ──
   if (chatType === 'cascade_birthday') {
-    const tmpl = _findTemplate(templates, 'individual', 'cascade_birthday', language, tone)
-      || _findTemplate(templates, 'individual', 'birthday', language, tone)
+    const tmpl = _findTemplate(templates, 'personalized', 'cascade_birthday', language, tone)
+      || _findTemplate(templates, 'personalized', 'birthday', language, tone)
       || { template_text: 'Hi {{cascade_name}}, wishing little {{name}} a very Happy Birthday! 🎂' };
     const text = String(tmpl.template_text || '');
     return text
@@ -288,14 +307,14 @@ function _renderTemplate(row, templates) {
   // For individual-sourced group card, use chat_type=group for template lookup
   const lookupChatType = chatType;
   const tmpl = _findTemplate(templates, lookupChatType, eventType, language, tone)
-    || { template_text: chatType === 'group'
+    || { template_text: chatType === 'broadcast'
       ? 'Wishing everyone a wonderful occasion!'
       : 'Hi {{name}}, wishing you a wonderful day!' };
   const text = String(tmpl.template_text || '');
 
   // Personalisation
   const originalChatType = String(row.original_chat_type || '').toLowerCase();
-  if (chatType === 'group' && originalChatType !== 'individual') {
+  if (chatType === 'broadcast' && originalChatType !== 'personalized') {
     // Pure group row — strip name
     return text.replace(/\{\{name\}\}/g, '').replace(/  +/g, ' ').trim();
   }
@@ -350,10 +369,10 @@ function _buildWaLink(row, text, mediaUrl) {
   const chatType = String(row.chat_type || '').toLowerCase();
   const phone    = String(row.phone || '').replace(/\D/g, '');
 
-  if (chatType === 'individual' && phone) {
+  if (chatType === 'personalized' && phone) {
     return 'https://wa.me/' + phone + '?text=' + encoded;
   }
-  if (chatType === 'group') {
+  if (chatType === 'broadcast') {
     const link = String(row.group_invite_link || '').trim();
     return link || '';
   }
@@ -393,6 +412,19 @@ function _buildRecord(row, templates, dateStr, idSuffix, chatTypeOverride) {
 // ============================================================================
 // ready_queue read / write
 // ============================================================================
+
+function getQueueAll() {
+  // Returns ALL rows from ready_queue regardless of status
+  // Used by History tab to show today's sent/skipped immediately
+  // without waiting for next morning's archive
+  try {
+    const ws = _ws('ready_queue');
+    const values = ws.getDataRange().getValues();
+    if (values.length < 2) return [];
+    const headers = values[0].map(h => String(h).trim());
+    return values.slice(1).map(r => _rowToObj(headers, r));
+  } catch(e) { return []; }
+}
 
 function getTodayQueue() {
   try {

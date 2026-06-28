@@ -537,12 +537,21 @@ async function loadHistory() {
   const days = document.getElementById('hist-days').value;
   document.getElementById('hist-body').innerHTML = 'Loading…';
   try {
-    const data = await gasGet({ action: 'history', days });
-    if (data && data.error) {
-      document.getElementById('hist-body').innerHTML = '❌ ' + data.error;
+    // Load history archive + today's ready_queue together
+    const [histData, queueData] = await Promise.all([
+      gasGet({ action: 'history', days }),
+      gasGet({ action: 'queue_all' })
+    ]);
+    if (histData && histData.error) {
+      document.getElementById('hist-body').innerHTML = '❌ ' + histData.error;
       return;
     }
-    histRows = Array.isArray(data) ? data : [];
+    const hist  = Array.isArray(histData)  ? histData  : [];
+    const queue = Array.isArray(queueData) ? queueData : [];
+    // Merge today's queue rows not already in history (dedup by id)
+    const histIds = new Set(hist.map(r => r.id));
+    const todayRows = queue.filter(r => !histIds.has(r.id));
+    histRows = [...hist, ...todayRows];
     renderHistory();
   } catch(e) { document.getElementById('hist-body').innerHTML = '❌ Could not load history.'; }
 }
