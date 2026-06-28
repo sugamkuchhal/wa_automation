@@ -162,14 +162,22 @@ function prepareDailyQueue() {
   todays.forEach(r => {
     const eventName = String(r.event_name || r.event_type || '').toLowerCase().trim();
     const row = Object.assign({}, r, { event_type: eventName });
+    const chatType = String(row.chat_type || '').toLowerCase();
 
-    if (String(row.chat_type || '').toLowerCase() === 'individual') {
+    if (chatType === 'individual') {
+      // Card 1: personal wish to individual
       output.push(_buildRecord(row, templates, today));
+      // Card 2: group card if group_invite_link also present
       if (String(row.group_invite_link || '').trim()) {
         const rowGroup = Object.assign({}, row, { original_chat_type: 'individual' });
         output.push(_buildRecord(rowGroup, templates, today, '-group', 'group'));
       }
+    } else if (chatType === 'cascade_birthday') {
+      // cascade_birthday: message goes to parent's phone, references child by name
+      // No group card generated
+      output.push(_buildRecord(row, templates, today));
     } else {
+      // group or anything else
       output.push(_buildRecord(row, templates, today));
     }
   });
@@ -239,6 +247,39 @@ function _renderTemplate(row, templates) {
   // Groups always forced formal — hard override
   const tone = (chatType === 'group') ? 'formal' : String(row.tone || '').trim();
 
+  // ── cascade_birthday: message to parent about child's birthday ──────────────
+  if (chatType === 'cascade_birthday') {
+    // Try cascade_birthday-specific templates first, fall back to birthday templates
+    const cbExact = templates.find(t =>
+      String(t.event_type||'').toLowerCase() === 'cascade_birthday' &&
+      String(t.language||'') === language &&
+      String(t.tone||'') === tone
+    );
+    const cbLang = !cbExact && templates.find(t =>
+      String(t.event_type||'').toLowerCase() === 'cascade_birthday' &&
+      String(t.language||'') === language
+    );
+    const cbEvent = !cbExact && !cbLang && templates.find(t =>
+      String(t.event_type||'').toLowerCase() === 'cascade_birthday'
+    );
+    // Fall back to regular birthday templates if no cascade-specific ones exist
+    const bdExact = !cbExact && !cbLang && !cbEvent && templates.find(t =>
+      String(t.event_type||'') === 'birthday' &&
+      String(t.language||'') === language &&
+      String(t.tone||'') === tone
+    );
+    const bdFallback = !cbExact && !cbLang && !cbEvent && !bdExact && templates.find(t =>
+      String(t.event_type||'') === 'birthday'
+    );
+    const tmpl = cbExact || cbLang || cbEvent || bdExact || bdFallback ||
+      { template_text: 'Hi {{cascade_name}}, wishing little {{name}} a very Happy Birthday! 🎂' };
+    const text = String(tmpl.template_text || '');
+    return text
+      .replace(/\{\{cascade_name\}\}/g, String(row.cascade_name || 'there'))
+      .replace(/\{\{name\}\}/g, String(row.name || ''));
+  }
+
+  // ── Standard template matching ───────────────────────────────────────────────
   // Match priority: exact → language → event → hardcoded
   const exact = templates.find(t =>
     String(t.event_type||'') === eventType &&
