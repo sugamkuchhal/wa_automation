@@ -21,8 +21,6 @@
     /* queue header */
     .qhead { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
     .qhead span { font-size: 13px; color: #666; }
-    #prep-btn { display: none; }
-
     /* offline bar */
     #offline-bar { display: none; background: #fee2e2; color: #991b1b; padding: 9px 14px; border-radius: 9px; margin-bottom: 12px; font-size: 13px; font-weight: 600; text-align: center; }
     #offline-bar.on { display: block; }
@@ -98,7 +96,7 @@
 <div class="tabs">
   <button class="tab on" onclick="showTab('queue',this)">Queue</button>
   <button class="tab" onclick="showTab('history',this)">History</button>
-  <button class="tab" onclick="refreshAll()" title="Refresh" style="padding:8px 12px">&#8635;</button>
+  <button class="tab" onclick="refreshCurrent()" title="Refresh" style="padding:8px 12px">&#8635;</button>
 </div>
 
 <!-- ── Queue pane ── -->
@@ -217,6 +215,12 @@ function showTab(name, btn) {
   btn.classList.add('on');
   if (name === 'queue')   loadQueue();
   if (name === 'history') loadHistory();
+}
+
+function refreshCurrent() {
+  const activePane = document.querySelector('.pane.on');
+  if (activePane && activePane.id === 'pane-history') loadHistory();
+  else loadQueue();
 }
 
 // ── Queue ────────────────────────────────────────────────────────────────────
@@ -409,10 +413,19 @@ async function aiGen(id, name, eventType, relation, language, tone) {
       el.value = data.text;
       onEdit(id);
       toast('✨ AI message ready — review before saving');
+      _startAiCooldown(btn);
     } else {
       toast('❌ ' + (data.error || 'AI generation failed'));
+      btn.disabled = false; btn.textContent = '✨ AI';
     }
-  } catch(e) { toast('❌ AI error'); }
+  } catch(e) {
+    toast('❌ AI error');
+    btn.disabled = false; btn.textContent = '✨ AI';
+    return;
+  }
+}
+
+function _startAiCooldown(btn) {
   let s = AI_COOLDOWN / 1000;
   btn.textContent = `✨ AI (${s}s)`;
   const t = setInterval(() => {
@@ -484,7 +497,7 @@ function showSessCard() {
   document.getElementById('sess-msg').value = r.final_message_text;
   const sb = document.getElementById('btn-ss');
   sb.href = r.wa_link || '#';
-  sb.onclick = () => { sessCopy(); sessNext('sent'); };
+  sb.onclick = () => sessNext('sent');
 }
 
 async function sessNext(action) {
