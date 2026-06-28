@@ -240,69 +240,66 @@ function _matchesToday(row, todayDt) {
 // Template rendering
 // ============================================================================
 
+// Helper: find best template match given chat_type + event_type + language + tone
+// Priority: chat_type+event+lang+tone → chat_type+event+lang → chat_type+event
+//           → event+lang+tone → event+lang → event → hardcoded
+function _findTemplate(templates, chatType, eventType, language, tone) {
+  const ct = String(chatType || '').toLowerCase();
+  const et = String(eventType || '');
+  const la = String(language || '');
+  const to = String(tone || '');
+
+  // With chat_type filter first
+  const t1 = templates.find(t => String(t.chat_type||'').toLowerCase() === ct && String(t.event_type||'') === et && String(t.language||'') === la && String(t.tone||'') === to);
+  const t2 = !t1 && templates.find(t => String(t.chat_type||'').toLowerCase() === ct && String(t.event_type||'') === et && String(t.language||'') === la);
+  const t3 = !t1 && !t2 && templates.find(t => String(t.chat_type||'').toLowerCase() === ct && String(t.event_type||'') === et);
+
+  // Fallback without chat_type filter
+  const t4 = !t1 && !t2 && !t3 && templates.find(t => !t.chat_type && String(t.event_type||'') === et && String(t.language||'') === la && String(t.tone||'') === to);
+  const t5 = !t1 && !t2 && !t3 && !t4 && templates.find(t => !t.chat_type && String(t.event_type||'') === et && String(t.language||'') === la);
+  const t6 = !t1 && !t2 && !t3 && !t4 && !t5 && templates.find(t => !t.chat_type && String(t.event_type||'') === et);
+
+  return t1 || t2 || t3 || t4 || t5 || t6 || null;
+}
+
 function _renderTemplate(row, templates) {
   const eventType = String(row.event_type || '').trim();
   const language  = String(row.language   || '').trim();
   const chatType  = String(row.chat_type  || '').toLowerCase();
   // Groups always forced formal — hard override
   const tone = (chatType === 'group') ? 'formal' : String(row.tone || '').trim();
+  // individual-sourced group card uses group tone too
+  const effectiveChatType = (chatType === 'group' || String(row.original_chat_type||'').toLowerCase() === 'individual') && chatType !== 'cascade_birthday'
+    ? chatType
+    : chatType;
 
-  // ── cascade_birthday: message to parent about child's birthday ──────────────
+  // ── cascade_birthday: message to parent (chat_type=individual in templates) ──
   if (chatType === 'cascade_birthday') {
-    // Try cascade_birthday-specific templates first, fall back to birthday templates
-    const cbExact = templates.find(t =>
-      String(t.event_type||'').toLowerCase() === 'cascade_birthday' &&
-      String(t.language||'') === language &&
-      String(t.tone||'') === tone
-    );
-    const cbLang = !cbExact && templates.find(t =>
-      String(t.event_type||'').toLowerCase() === 'cascade_birthday' &&
-      String(t.language||'') === language
-    );
-    const cbEvent = !cbExact && !cbLang && templates.find(t =>
-      String(t.event_type||'').toLowerCase() === 'cascade_birthday'
-    );
-    // Fall back to regular birthday templates if no cascade-specific ones exist
-    const bdExact = !cbExact && !cbLang && !cbEvent && templates.find(t =>
-      String(t.event_type||'') === 'birthday' &&
-      String(t.language||'') === language &&
-      String(t.tone||'') === tone
-    );
-    const bdFallback = !cbExact && !cbLang && !cbEvent && !bdExact && templates.find(t =>
-      String(t.event_type||'') === 'birthday'
-    );
-    const tmpl = cbExact || cbLang || cbEvent || bdExact || bdFallback ||
-      { template_text: 'Hi {{cascade_name}}, wishing little {{name}} a very Happy Birthday! 🎂' };
+    const tmpl = _findTemplate(templates, 'individual', 'cascade_birthday', language, tone)
+      || _findTemplate(templates, 'individual', 'birthday', language, tone)
+      || { template_text: 'Hi {{cascade_name}}, wishing little {{name}} a very Happy Birthday! 🎂' };
     const text = String(tmpl.template_text || '');
     return text
       .replace(/\{\{cascade_name\}\}/g, String(row.cascade_name || 'there'))
       .replace(/\{\{name\}\}/g, String(row.name || ''));
   }
 
-  // ── Standard template matching ───────────────────────────────────────────────
-  // Match priority: exact → language → event → hardcoded
-  const exact = templates.find(t =>
-    String(t.event_type||'') === eventType &&
-    String(t.language||'')   === language  &&
-    String(t.tone||'')       === tone
-  );
-  const byLang = !exact && templates.find(t =>
-    String(t.event_type||'') === eventType &&
-    String(t.language||'')   === language
-  );
-  const byEvent = !exact && !byLang && templates.find(t =>
-    String(t.event_type||'') === eventType
-  );
-  const tmpl = (exact || byLang || byEvent || { template_text: 'Hi {{name}}, wishing you a wonderful day!' });
+  // ── Standard matching using chat_type column in templates ───────────────────
+  // For individual-sourced group card, use chat_type=group for template lookup
+  const lookupChatType = chatType;
+  const tmpl = _findTemplate(templates, lookupChatType, eventType, language, tone)
+    || { template_text: chatType === 'group'
+      ? 'Wishing everyone a wonderful occasion!'
+      : 'Hi {{name}}, wishing you a wonderful day!' };
   const text = String(tmpl.template_text || '');
 
-  // Personalisation rules
-  const originalChatType = String(row.original_chat_type || row.chat_type || '').toLowerCase();
-  if (originalChatType === 'group') {
+  // Personalisation
+  const originalChatType = String(row.original_chat_type || '').toLowerCase();
+  if (chatType === 'group' && originalChatType !== 'individual') {
     // Pure group row — strip name
     return text.replace(/\{\{name\}\}/g, '').replace(/  +/g, ' ').trim();
   }
-  // Individual (or individual-sourced group card) — keep name
+  // Individual or individual-sourced group card — keep name
   return text.replace(/\{\{name\}\}/g, String(row.name || 'there'));
 }
 
