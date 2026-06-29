@@ -599,7 +599,7 @@ function renderHistory() {
   if (!rows.length) { document.getElementById('hist-body').innerHTML = '<p style="color:#777;font-size:13px">No records found.</p>'; return; }
   const sorted = [...rows].sort((a,b) => String(b.queue_date).localeCompare(String(a.queue_date)));
   const colors = { sent:'#1a7a42', skipped:'#666', edited:'#856404', ready:'#1a56db' };
-  document.getElementById('hist-body').innerHTML = `
+  const tbl = `
     <table class="htbl">
       <thead><tr><th>Date</th><th>Name</th><th>Event</th><th>Status</th><th>Time</th></tr></thead>
       <tbody>${sorted.map(r => `<tr>
@@ -610,6 +610,10 @@ function renderHistory() {
         <td style="color:#999;font-size:11px">${r.action_ts ? String(r.action_ts).replace('T',' ').substring(0,16) : '—'}</td>
       </tr>`).join('')}</tbody>
     </table>`;
+  const footer = (hasMore && !q)
+    ? `<div style="text-align:center;margin-top:12px"><button onclick="loadMoreHistory()" style="padding:8px 20px;border-radius:8px;border:0;background:#222;color:#fff;font-size:13px;font-weight:600;cursor:pointer">Load more (${(total||0) - histRows.length} remaining)</button></div>`
+    : '';
+  document.getElementById('hist-body').innerHTML = tbl + footer;
 }
 
 // ── Boot ──────────────────────────────────────────────────────────────────────

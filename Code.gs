@@ -30,7 +30,7 @@ function doGet(e) {
   try {
     if (action === 'queue')     return _json(getTodayQueue());
     if (action === 'queue_all')  return _json(getQueueAll());
-    if (action === 'history')    return _json(getHistory(parseInt(e.parameter.days || '30')));
+    if (action === 'history')    return _json(getHistory(parseInt(e.parameter.days || '30'), e.parameter.page, e.parameter.pageSize));
     if (action === 'check')      return _json(runChecks());
     return _json({ error: 'Unknown action' });
   } catch(err) {
@@ -577,23 +577,33 @@ function editRow(id, text, skipStatus) {
 // History
 // ============================================================================
 
-function getHistory(days) {
+function getHistory(days, page, pageSize) {
+  // Lazy pagination: page is 0-indexed, pageSize defaults to 50
+  // Returns { rows, total, page, pageSize, hasMore }
+  page = parseInt(page) || 0;
+  pageSize = parseInt(pageSize) || 50;
   try {
     let ws;
-    try { ws = _ws('send_history'); } catch(e) { return []; }
+    try { ws = _ws('send_history'); } catch(e) { return { rows: [], total: 0, page, pageSize, hasMore: false }; }
     const values = ws.getDataRange().getValues();
-    if (values.length < 2) return [];
+    if (values.length < 2) return { rows: [], total: 0, page, pageSize, hasMore: false };
     const headers = values[0].map(h => String(h).trim());
     let rows = values.slice(1).map(r => _rowToObj(headers, r));
+    // Filter by days
     if (days > 0) {
       const cutoff = new Date();
       cutoff.setDate(cutoff.getDate() - days);
       const cutoffStr = Utilities.formatDate(cutoff, TZ, 'yyyy-MM-dd');
       rows = rows.filter(r => String(r.queue_date || '') >= cutoffStr);
     }
-    return rows;
+    // Sort newest first
+    rows.sort((a, b) => String(b.queue_date || '').localeCompare(String(a.queue_date || '')));
+    const total = rows.length;
+    const start = page * pageSize;
+    const pageRows = rows.slice(start, start + pageSize);
+    return { rows: pageRows, total, page, pageSize, hasMore: start + pageSize < total };
   } catch(e) {
-    return [];
+    return { rows: [], total: 0, page, pageSize, hasMore: false };
   }
 }
 
@@ -735,7 +745,25 @@ function morningRun() {
   }
 }
 
+function _cleanupAiUsageKeys() {
+  // Delete ai_usage_YYYY-MM-DD keys older than 7 days
+  const props = PropertiesService.getScriptProperties().getProperties();
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - 7);
+  const cutoffStr = Utilities.formatDate(cutoff, TZ, 'yyyy-MM-dd');
+  const toDelete = Object.keys(props).filter(k => {
+    if (!k.startsWith('ai_usage_')) return false;
+    const dateStr = k.replace('ai_usage_', '');
+    return dateStr < cutoffStr;
+  });
+  if (toDelete.length) {
+    toDelete.forEach(k => PropertiesService.getScriptProperties().deleteProperty(k));
+    Logger.log('Cleaned up ' + toDelete.length + ' old AI usage keys');
+  }
+}
+
 function _morningRunInner() {
+  _cleanupAiUsageKeys();
   const results = prepareDailyQueue();
   const today   = Utilities.formatDate(new Date(), TZ, 'dd MMMM yyyy');
 
