@@ -179,8 +179,17 @@ function prepareDailyQueue() {
         const rowGroup = Object.assign({}, row, { original_chat_type: 'personalized' });
         output.push(_buildRecord(rowGroup, templates, today, '-broadcast', 'broadcast'));
       }
+    } else if (chatType === 'broadcast') {
+      const bPhone = String(row.phone || '').replace(/\D/g, '');
+      const bLink  = String(row.group_invite_link || '').trim();
+      if (bPhone && bLink) {
+        // Both phone and group link — generate 2 broadcast cards
+        output.push(_buildRecord(row, templates, today, '-phone', 'broadcast'));
+        output.push(_buildRecord(row, templates, today, '-group', 'broadcast'));
+      } else {
+        output.push(_buildRecord(row, templates, today));
+      }
     } else {
-      // broadcast or anything else
       output.push(_buildRecord(row, templates, today));
     }
   });
@@ -381,8 +390,11 @@ function _buildWaLink(row, text, mediaUrl) {
     return 'https://wa.me/' + phone + '?text=' + encoded;
   }
   if (chatType === 'broadcast') {
+    // Prefer group invite link; fall back to phone wa.me if no link
     const link = String(row.group_invite_link || '').trim();
-    return link || '';
+    if (link) return link;
+    if (phone) return 'https://wa.me/' + phone + '?text=' + encoded;
+    return '';
   }
   return '';
 }
