@@ -781,7 +781,7 @@ function _morningRunInner() {
   const summary = lines.join('\n');
   const count   = results.length;
 
-  _sendTelegram('📨 *WA Wishes — ' + today + '*\n\n' + summary + '\n\n👉 ' + DASHBOARD_URL);
+  _sendTelegram('📨 WA Wishes — ' + today + '\n\n' + summary + '\n\n👉 ' + DASHBOARD_URL);
   _sendEmail(
     '📨 WA Wishes — ' + count + ' message(s) for ' + today,
     'Good morning! Here\'s your WhatsApp queue for ' + today + ':\n\n' + summary + '\n\nOpen dashboard:\n' + DASHBOARD_URL + '\n\n— WA Automated Wishes'
@@ -809,7 +809,7 @@ function eveningRun() {
   const summary = lines.join('\n');
   const count   = pending.length;
 
-  _sendTelegram('⏰ *WA Wishes reminder*\n\nYou still have ' + count + ' message(s) unsent:\n\n' + summary + '\n\n👉 ' + DASHBOARD_URL);
+  _sendTelegram('⏰ WA Wishes reminder\n\nYou still have ' + count + ' message(s) unsent:\n\n' + summary + '\n\n👉 ' + DASHBOARD_URL);
   _sendEmail(
     '⏰ WA Wishes reminder — ' + count + ' message(s) still pending',
     'Friendly reminder — you still have unsent messages for ' + today + ':\n\n' + summary + '\n\nOpen dashboard:\n' + DASHBOARD_URL + '\n\n— WA Automated Wishes'
@@ -889,7 +889,7 @@ function testMedia() {
 
 function testTelegram() {
   const today = Utilities.formatDate(new Date(), TZ, 'dd MMMM yyyy');
-  const msg = '✅ *WA Wishes — Telegram working!*\n\n' +
+  const msg = '✅ WA Wishes — Telegram working!\n\n' +
     'Bot is connected and ready.\n' +
     'Date: ' + today + '\n\n' +
     '👉 ' + DASHBOARD_URL;
