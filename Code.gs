@@ -709,14 +709,19 @@ function _sendEmail(subject, body) {
 function _sendTelegram(text) {
   const token  = _prop('TELEGRAM_BOT_TOKEN');
   const chatId = _prop('TELEGRAM_CHAT_ID');
-  if (!token || token === 'placeholder') return;
+  if (!token || token === 'placeholder') {
+    Logger.log('Telegram: no token set');
+    return;
+  }
   try {
-    UrlFetchApp.fetch('https://api.telegram.org/bot' + token + '/sendMessage', {
+    const res = UrlFetchApp.fetch('https://api.telegram.org/bot' + token + '/sendMessage', {
       method: 'post',
       contentType: 'application/json',
       payload: JSON.stringify({ chat_id: chatId, text, parse_mode: 'Markdown' }),
       muteHttpExceptions: true
     });
+    const body = res.getContentText();
+    Logger.log('Telegram response: ' + body);
   } catch(e) {
     Logger.log('Telegram failed: ' + e.message);
   }
