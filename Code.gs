@@ -889,12 +889,11 @@ function testMedia() {
 
 function testTelegram() {
   const today = Utilities.formatDate(new Date(), TZ, 'dd MMMM yyyy');
-  _sendTelegram('✅ *WA Wishes — Telegram working!*
-
-' + 'Bot is connected and ready.
-' + 'Date: ' + today + '
-
-' + '👉 ' + DASHBOARD_URL);
+  const msg = '✅ *WA Wishes — Telegram working!*\n\n' +
+    'Bot is connected and ready.\n' +
+    'Date: ' + today + '\n\n' +
+    '👉 ' + DASHBOARD_URL;
+  _sendTelegram(msg);
   Logger.log('Telegram test sent');
 }
 
