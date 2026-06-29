@@ -864,6 +864,24 @@ function _rowToObj(headers, row) {
 // Test functions — run manually to verify setup
 // ============================================================================
 
+function testMedia() {
+  // Test Giphy
+  try {
+    const gifUrl = _buildMedia({ media_mode: 'gif', event_type: 'birthday' });
+    Logger.log('Giphy: ' + (gifUrl ? '✅ ' + gifUrl : '❌ no URL returned'));
+  } catch(e) {
+    Logger.log('Giphy error: ' + e.message);
+  }
+
+  // Test Unsplash
+  try {
+    const imgUrl = _buildMedia({ media_mode: 'image', event_type: 'birthday' });
+    Logger.log('Unsplash: ' + (imgUrl ? '✅ ' + imgUrl : '❌ no URL returned — check UNSPLASH_ACCESS_KEY'));
+  } catch(e) {
+    Logger.log('Unsplash error: ' + e.message);
+  }
+}
+
 function testTelegram() {
   const today = Utilities.formatDate(new Date(), TZ, 'dd MMMM yyyy');
   _sendTelegram('✅ *WA Wishes — Telegram working!*
