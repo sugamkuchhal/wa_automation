@@ -717,7 +717,7 @@ function _sendTelegram(text) {
     const res = UrlFetchApp.fetch('https://api.telegram.org/bot' + token + '/sendMessage', {
       method: 'post',
       contentType: 'application/json',
-      payload: JSON.stringify({ chat_id: chatId, text, parse_mode: 'Markdown' }),
+      payload: JSON.stringify({ chat_id: chatId, text }),
       muteHttpExceptions: true
     });
     const body = res.getContentText();
