@@ -159,41 +159,51 @@ function prepareDailyQueue() {
   });
 
   // Build queue records
+  // phone and group_invite_link support comma-separated multiple values
   const output = [];
   todays.forEach(r => {
     const eventName = String(r.event_name || r.event_type || '').toLowerCase().trim();
     const row = Object.assign({}, r, { event_type: eventName });
-    const chatType = String(row.chat_type || '').toLowerCase();
-
+    const chatType  = String(row.chat_type || '').toLowerCase();
     const eventType2 = String(row.event_type || '').toLowerCase().trim();
 
-    const hasPhone = !!String(row.phone || '').replace(/\D/g, '');
-    const hasLink  = !!String(row.group_invite_link || '').trim();
+    // Parse comma-separated phones and group links
+    const phones = String(row.phone || '').split(',')
+      .map(p => p.replace(/\D/g, '').trim()).filter(p => p.length >= 7);
+    const links = String(row.group_invite_link || '').split(',')
+      .map(l => l.trim()).filter(l => l.startsWith('http'));
 
     if (eventType2 === 'cascade_birthday') {
-      // cascade_birthday: always goes to parent phone, sheet tone
-      output.push(_buildRecord(Object.assign({}, row, { _dest: 'phone' }), templates, today));
+      // cascade_birthday: one card per phone (all go to parent)
+      phones.forEach((phone, i) => {
+        const suffix = phones.length > 1 ? '-p' + (i+1) : '';
+        output.push(_buildRecord(Object.assign({}, row, { phone, _dest: 'phone' }), templates, today, suffix));
+      });
 
     } else if (chatType === 'personalized') {
-      if (hasPhone) {
-        // Card 1: personal → phone, sheet tone
-        output.push(_buildRecord(Object.assign({}, row, { _dest: 'phone' }), templates, today));
-      }
-      if (hasLink) {
-        // Card 2 (or only card): → group link, forced formal, name kept
-        const rowGroup = Object.assign({}, row, { _dest: 'group', original_chat_type: 'personalized' });
-        output.push(_buildRecord(rowGroup, templates, today, hasPhone ? '-group' : '', 'broadcast'));
-      }
+      // One card per phone (sheet tone, name kept)
+      phones.forEach((phone, i) => {
+        const suffix = phones.length > 1 ? '-p' + (i+1) : '';
+        output.push(_buildRecord(Object.assign({}, row, { phone, _dest: 'phone' }), templates, today, suffix));
+      });
+      // One card per group link (forced formal, name kept, original_chat_type=personalized)
+      links.forEach((link, i) => {
+        const base = phones.length > 0 ? '-g' + (i+1) : (links.length > 1 ? '-g' + (i+1) : '');
+        const rowGroup = Object.assign({}, row, { group_invite_link: link, _dest: 'group', original_chat_type: 'personalized' });
+        output.push(_buildRecord(rowGroup, templates, today, base, 'broadcast'));
+      });
 
     } else if (chatType === 'broadcast') {
-      if (hasPhone && hasLink) {
-        output.push(_buildRecord(Object.assign({}, row, { _dest: 'phone' }), templates, today, '-phone', 'broadcast'));
-        output.push(_buildRecord(Object.assign({}, row, { _dest: 'group' }), templates, today, '-group', 'broadcast'));
-      } else if (hasPhone) {
-        output.push(_buildRecord(Object.assign({}, row, { _dest: 'phone' }), templates, today));
-      } else {
-        output.push(_buildRecord(Object.assign({}, row, { _dest: 'group' }), templates, today));
-      }
+      // One card per phone (forced formal, name stripped)
+      phones.forEach((phone, i) => {
+        const suffix = (phones.length > 1 || links.length > 0) ? '-p' + (i+1) : '';
+        output.push(_buildRecord(Object.assign({}, row, { phone, group_invite_link: '', _dest: 'phone' }), templates, today, suffix));
+      });
+      // One card per group link (forced formal, name stripped)
+      links.forEach((link, i) => {
+        const suffix = (links.length > 1 || phones.length > 0) ? '-g' + (i+1) : '';
+        output.push(_buildRecord(Object.assign({}, row, { group_invite_link: link, phone: '', _dest: 'group' }), templates, today, suffix));
+      });
 
     } else {
       output.push(_buildRecord(row, templates, today));
