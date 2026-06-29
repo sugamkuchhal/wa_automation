@@ -43,7 +43,7 @@ function doPost(e) {
     const data = JSON.parse(e.postData.contents);
     const action = (data.action || '').toLowerCase();
     if (action === 'mark')        return _json(markRow(data.id, data.status));
-    if (action === 'edit')        return _json(editRow(data.id, data.text, data.skipStatus || data.skip_status || false));
+    if (action === 'edit')        return _json(editRow(data.id, data.text, data.skipStatus || false));
     if (action === 'ai_generate') return _json(aiGenerate(data));
     if (action === 'add_contact') return _json(addContact(data));
     if (action === 'prepare')     return _json({ ok: true, count: prepareDailyQueue().length });
@@ -327,11 +327,9 @@ function _renderTemplate(row, templates) {
   const destIsGroup = String(row._dest || '').toLowerCase() === 'group'
     || (chatType !== 'personalized' && !!String(row.group_invite_link || '').trim() && !String(row.phone || '').trim());
   const tone = (chatType === 'broadcast' || destIsGroup) ? 'formal' : String(row.tone || '').trim();
-  
 
   // ── cascade_birthday: message to parent — detected via event_type, not chat_type ──
-  const eventType3 = String(row.event_type || '').toLowerCase().trim();
-  if (eventType3 === 'cascade_birthday') {
+  if (eventType.toLowerCase() === 'cascade_birthday') {
     const tmpl = _findTemplate(templates, 'personalized', 'cascade_birthday', language, tone)
       || { template_text: 'Hi {{cascade_name}}, wishing little {{name}} a very Happy Birthday! 🎂' };
     const text = String(tmpl.template_text || '');
@@ -435,12 +433,12 @@ function _buildRecord(row, templates, dateStr, idSuffix, chatTypeOverride) {
   return {
     id:                 String(row.id || '') + idSuffix,
     queue_date:         dateStr,
-    name:               String(row.name || ''),
+    name:               String(resolved.name || ''),
     chat_type:          chatType,
     event_type:         eventType,
-    phone:              String(row.phone || ''),
-    group_invite_link:  String(row.group_invite_link || ''),
-    media_mode:         String(row.media_mode || ''),
+    phone:              String(resolved.phone || '').replace(/\D/g, ''),
+    group_invite_link:  String(resolved.group_invite_link || '').trim(),
+    media_mode:         String(resolved.media_mode || ''),
     media_url:          mediaUrl,
     final_message_text: text,
     wa_link:            waLink,
@@ -502,15 +500,9 @@ function _archiveToHistory() {
     const dataRows = values.slice(1);
 
     const hist = _getOrCreate('send_history');
-    // Only read A1 to check header — avoids reading entire sheet on every run
-    const a1 = hist.getLastRow() === 0 ? '' : String(hist.getRange('A1').getValue()).trim();
-    if (a1 !== 'id') {
-      if (hist.getLastRow() === 0) {
-        hist.appendRow(QUEUE_HEADERS);
-      } else {
-        hist.insertRowBefore(1);
-        hist.getRange(1, 1, 1, QUEUE_HEADERS.length).setValues([QUEUE_HEADERS]);
-      }
+    // Ensure header row exists — only write if sheet is empty
+    if (hist.getLastRow() === 0) {
+      hist.appendRow(QUEUE_HEADERS);
     }
     hist.getRange(hist.getLastRow()+1, 1, dataRows.length, dataRows[0].length).setValues(dataRows);
     Logger.log('Archived ' + dataRows.length + ' rows to send_history');
@@ -811,7 +803,7 @@ function runChecks() {
       const active = String(r.is_active || r.active || '').toUpperCase();
       ids.push(String(r.id || ''));
       if (active !== 'TRUE') return;
-      if (String(r.chat_type || '').toLowerCase() !== 'individual') return;
+      if (String(r.chat_type || '').toLowerCase() !== 'personalized') return;
       const phone = String(r.phone || '').trim();
       const digits = phone.replace(/\D/g, '');
       if (!phone)            warnings.push('id=' + r.id + ': phone is blank');
