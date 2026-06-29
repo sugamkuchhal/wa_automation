@@ -1,0 +1,781 @@
+chat_type,event_type,language,tone,template_text
+personalized,birthday,en,warm,Happy Birthday {{name}}! 🎂 Wishing you a day as wonderful as you are — full of love and laughter.
+personalized,birthday,en,warm,"Many happy returns, {{name}}! 🎉 May this year bring you everything your heart desires."
+personalized,birthday,en,warm,Happy Birthday {{name}}! 🌟 You deserve all the joy and happiness in the world today and always.
+personalized,birthday,en,warm,"Wishing you a beautiful birthday, {{name}}! 💐 May every moment of today be filled with warmth."
+personalized,birthday,en,warm,"Happy Birthday {{name}}! 🥳 Sending you love, good health, and wonderful memories this year."
+personalized,birthday,en,warm,"It's your special day, {{name}}! 🎂 Hope it's as amazing as you make every day for those around you."
+personalized,birthday,en,warm,Happy Birthday {{name}}! ✨ May the year ahead be your best chapter yet.
+personalized,birthday,en,warm,"Warmest birthday wishes, {{name}}! 🎁 May good health and happiness be yours always."
+personalized,birthday,en,warm,Happy Birthday {{name}}! 🌈 Here's to a year filled with beautiful moments and cherished memories.
+personalized,birthday,en,warm,"Wishing you a truly wonderful birthday, {{name}}! 🥂 May all your dreams bloom this year."
+personalized,birthday,en,casual,"Hey {{name}}, Happy Birthday! 🎉 Hope you're having the most amazing day!"
+personalized,birthday,en,casual,Happy Birthday {{name}}! 🎂 Hope it's absolutely brilliant from start to finish!
+personalized,birthday,en,casual,Happy B-day {{name}}! 🥳 Go celebrate — you totally deserve it!
+personalized,birthday,en,casual,Hey {{name}}! It's your day — enjoy every single second of it! 🎈
+personalized,birthday,en,casual,Happy Birthday {{name}}! 🎊 Hope someone's sorted the cake situation!
+personalized,birthday,en,casual,"Big birthday wishes, {{name}}! 🎂 Hope you're surrounded by good people and great food!"
+personalized,birthday,en,casual,Happy Birthday {{name}}! 🙌 Hope today's full of fun and all your favourite things!
+personalized,birthday,en,casual,It's {{name}}'s birthday! 🎉 Hope you're having the best time right now!
+personalized,birthday,en,casual,Happy Birthday {{name}}! 🎁 Treat yourself today — you only turn this age once!
+personalized,birthday,en,casual,Wishing the happiest of birthdays to {{name}}! 🥳 Go have an absolute blast!
+personalized,birthday,en,fun,Happy Birthday {{name}}! 🎂 You're not getting older — you're levelling up!
+personalized,birthday,en,fun,"Congrats on another trip around the sun, {{name}}! 🌍 Hope the ride only gets better!"
+personalized,birthday,en,fun,Happy Birthday {{name}}! 🥳 Age is just a number — and yours is looking great!
+personalized,birthday,en,fun,"{{name}}, Happy Birthday! 🎉 Today's agenda: cake, zero responsibilities, repeat."
+personalized,birthday,en,fun,"Happy Birthday {{name}}! 🎂 The older you get, the better the stories — keep collecting them!"
+personalized,birthday,en,fun,"{{name}}, you magnificent human! 🎊 Happy Birthday — somehow getting cooler every year!"
+personalized,birthday,en,fun,Happy Birthday {{name}}! 🎈 May all your wishes come true — except that one. You know which one.
+personalized,birthday,en,fun,It's {{name}}'s birthday! 🥳 Full permission to be extra today — use it wisely!
+personalized,birthday,en,fun,Happy Birthday {{name}}! 🎂 May your wifi be strong and your birthday be legendary!
+personalized,birthday,en,fun,"{{name}}, Happy Birthday! 🎉 Eat the cake — birthday calories are scientifically proven not to count!"
+personalized,birthday,en,formal,"Dear {{name}}, warmest birthday greetings. May this year bring you continued success and good health."
+personalized,birthday,en,formal,Happy Birthday {{name}}. May this special occasion be celebrated with great joy and bring you prosperity.
+personalized,birthday,en,formal,"On your birthday {{name}}, I extend my warmest wishes for a year filled with achievement and happiness."
+personalized,birthday,en,formal,"Dear {{name}}, please accept my sincere birthday congratulations. May this year be truly fulfilling."
+personalized,birthday,en,formal,"Many happy returns of the day, {{name}}. May every year bring you closer to your goals."
+personalized,birthday,en,formal,"Happy Birthday {{name}}. I wish you excellent health, peace of mind, and lasting happiness."
+personalized,birthday,en,formal,"Dear {{name}}, heartiest birthday congratulations. May the coming year be filled with great accomplishments."
+personalized,birthday,en,formal,"On this auspicious occasion {{name}}, I extend my warmest birthday greetings to you."
+personalized,birthday,en,formal,Happy Birthday {{name}}. May you be blessed with wonderful health and continued success this year.
+personalized,birthday,en,formal,"Dear {{name}}, wishing you a very Happy Birthday and a year that surpasses all expectations."
+personalized,birthday,hi,warm,"{{name}}, जन्मदिन की हार्दिक शुभकामनाएं! 🎂 भगवान आपको सदा खुश और स्वस्थ रखें।"
+personalized,birthday,hi,warm,जन्मदिन मुबारक हो {{name}}! 🎉 आपका यह दिन बहुत खास और यादगार हो।
+personalized,birthday,hi,warm,"{{name}}, जन्मदिन की ढेरों बधाइयां! 🌟 आपकी हर मनोकामना पूरी हो इस साल।"
+personalized,birthday,hi,warm,"प्यारे {{name}}, जन्मदिन मुबारक! 💐 दिल से दुआ है आप हमेशा मुस्कुराते रहें।"
+personalized,birthday,hi,warm,"{{name}}, आपके जन्मदिन पर ढेर सारा प्यार! 🎈 भगवान आपको लंबी उम्र दें।"
+personalized,birthday,hi,warm,जन्मदिन की बधाई {{name}} जी! 🎂 आपके सारे सपने पूरे हों।
+personalized,birthday,hi,warm,"{{name}}, आज आपका खास दिन है! ✨ खूब खुश रहें और जश्न मनाएं।"
+personalized,birthday,hi,warm,जन्मदिन मुबारक {{name}}! 🌺 ईश्वर आप पर अपनी कृपा बनाए रखें।
+personalized,birthday,hi,warm,"{{name}}, जन्मदिन की हार्दिक बधाई! 🌈 यह साल आपके लिए सुनहरा हो।"
+personalized,birthday,hi,warm,बहुत बहुत जन्मदिन मुबारक {{name}}! 🥂 खुशियां आपके साथ हमेशा रहें।
+personalized,birthday,hi,casual,"{{name}} यार, जन्मदिन मुबारक! 🎉 आज तो खूब मस्ती करो!"
+personalized,birthday,hi,casual,"अरे {{name}}, Happy Birthday! 🎂 पार्टी कब दे रहे हो?"
+personalized,birthday,hi,casual,"{{name}} भाई/दी, जन्मदिन की बधाई! 🥳 आज का दिन एन्जॉय करो पूरा!"
+personalized,birthday,hi,casual,"यार {{name}}, जन्मदिन मुबारक! 🎊 आज छुट्टी लो और मस्ती करो!"
+personalized,birthday,hi,casual,"{{name}}, जन्मदिन मुबारक दोस्त! 🎈 खूब खाओ, खूब हंसो!"
+personalized,birthday,hi,casual,"अरे {{name}}, बहुत बहुत बधाई! 🎁 आज का दिन खूब धमाकेदार हो!"
+personalized,birthday,hi,casual,"{{name}} जी, जन्मदिन मुबारक! 🎂 सेलिब्रेशन होना चाहिए आज!"
+personalized,birthday,hi,casual,"यार {{name}}, जन्मदिन की बधाई! 🎉 ट्रीट देनी है!"
+personalized,birthday,hi,casual,"{{name}}, Happy Birthday! 🥳 आज तो सब तुम्हारी बात मानेंगे!"
+personalized,birthday,hi,casual,जन्मदिन मुबारक {{name}}! 🎊 इस साल भी कमाल करो!
+personalized,birthday,hi,fun,"{{name}}, जन्मदिन मुबारक! 🎂 एक और साल बड़े हो गए — पर लगते बिल्कुल नहीं!"
+personalized,birthday,hi,fun,"अरे {{name}}, जन्मदिन मुबारक! 🥳 उम्र बढ़ रही है पर style वही है!"
+personalized,birthday,hi,fun,"{{name}}, Happy Birthday! 🎉 आज डाइट भूल जाओ — केक तो बनता है!"
+personalized,birthday,hi,fun,जन्मदिन मुबारक {{name}}! 🎈 इस साल और विंटेज हो गए — vintage is classy!
+personalized,birthday,hi,fun,"{{name}}, जन्मदिन की बधाई! 🎊 आज की permission है — सब तुम्हारी मर्जी से!"
+personalized,birthday,hi,fun,"अरे {{name}}, जन्मदिन मुबारक! 🥳 Google भी आज तुम्हें याद करता है — special हो!"
+personalized,birthday,hi,fun,"{{name}}, Happy Birthday! 🎂 एक और साल survive — real achievement!"
+personalized,birthday,hi,fun,जन्मदिन मुबारक {{name}}! 🎁 आज सब तुम्हारी बात मानेंगे — wisely use!
+personalized,birthday,hi,fun,"{{name}}, जन्मदिन की बधाई दोस्त! 🎉 आज extra होने की full permission है!"
+personalized,birthday,hi,fun,"अरे {{name}}, जन्मदिन मुबारक! 🎂 एक और birthday = एक और chance to be awesome!"
+personalized,birthday,hi,formal,"{{name}} जी, जन्मदिन की हार्दिक बधाई। ईश्वर आपको दीर्घायु और सुखमय जीवन दें।"
+personalized,birthday,hi,formal,"आदरणीय {{name}}, जन्मदिन की हार्दिक शुभकामनाएं। सदा सुख और समृद्धि बनी रहे।"
+personalized,birthday,hi,formal,"{{name}} जी, इस विशेष अवसर पर हार्दिक बधाई। आपके हर कार्य में सफलता मिले।"
+personalized,birthday,hi,formal,"प्रिय {{name}}, जन्मदिन पर अनेकानेक शुभकामनाएं। आपका यह वर्ष अत्यंत शुभ हो।"
+personalized,birthday,hi,formal,"{{name}} जी, जन्मदिन की बधाई स्वीकार करें। आप स्वस्थ, प्रसन्न और सफल रहें।"
+personalized,birthday,hi,formal,"आदरणीय {{name}}, जन्मदिन के पावन अवसर पर शुभकामनाएं। ईश्वर कृपा बनाए रखें।"
+personalized,birthday,hi,formal,"{{name}} जी, जन्मदिन की हार्दिक शुभकामनाएं। आपका भविष्य उज्जवल हो।"
+personalized,birthday,hi,formal,"प्रिय {{name}}, आपके जन्मदिन पर हार्दिक बधाई। जीवन की हर राह में सफलता मिले।"
+personalized,birthday,hi,formal,"{{name}} जी, जन्मदिन की अनेकानेक बधाइयां। आप सदा स्वस्थ और समृद्ध रहें।"
+personalized,birthday,hi,formal,"आदरणीय {{name}}, इस विशेष दिवस पर हार्दिक बधाई। आप चिरायु हों।"
+personalized,birthday,hinglish,warm,Happy Birthday {{name}}! 🎂 Dil se wish — aaj ka din bahut khaas ho!
+personalized,birthday,hinglish,warm,"{{name}}, janamdin mubarak! 🎉 Bhagwan kare har khwaish poori ho!"
+personalized,birthday,hinglish,warm,Happy Birthday {{name}} yaar! 🌟 Aaj ka din sirf aapka hai — enjoy karo!
+personalized,birthday,hinglish,warm,"{{name}}, janamdin ki dher saari shubhkamnayen! 💐 Is saal sab kuch acha ho!"
+personalized,birthday,hinglish,warm,Happy Birthday {{name}}! 🎈 Khushiyan aapke saath hamesha rahen!
+personalized,birthday,hinglish,warm,"{{name}}, aapke janamdin par dil se badhai! 🥳 Ye saal bahut khaas ho!"
+personalized,birthday,hinglish,warm,Happy Birthday {{name}}! 🌺 Bhagwan aapko lambi umar aur acchi sehat de!
+personalized,birthday,hinglish,warm,"{{name}}, janamdin mubarak! 🎁 Aapke sapne poore hon — dil se dua!"
+personalized,birthday,hinglish,warm,Happy Birthday {{name}}! ✨ Aap bahut khaas hain — aaj khub khushi manao!
+personalized,birthday,hinglish,warm,"{{name}}, janamdin mubarak ho! 🥂 Ye saal aur bhi behtareen ho!"
+personalized,birthday,hinglish,casual,"Arre {{name}}, Happy Birthday yaar! 🎉 Aaj toh khub masti karo!"
+personalized,birthday,hinglish,casual,"{{name}} bhai/didi, janamdin mubarak! 🎂 Party kab de rahe ho?"
+personalized,birthday,hinglish,casual,Happy Birthday {{name}}! 🥳 Aaj ka din toh sirf tumhara hai!
+personalized,birthday,hinglish,casual,"{{name}}, janamdin mubarak dost! 🎊 Cake kha lo aur enjoy karo!"
+personalized,birthday,hinglish,casual,"Yaar {{name}}, Happy Birthday! 🎈 Is baar kuch toh special karo!"
+personalized,birthday,hinglish,casual,Happy Birthday {{name}}! 🎁 Aaj toh sab tumhari baat manenge!
+personalized,birthday,hinglish,casual,"{{name}}, janamdin mubarak! 🥳 Aaj chhutti lo aur celebrate karo!"
+personalized,birthday,hinglish,casual,Happy Birthday {{name}} yaar! 🎂 Is saal bhi kuch khatarnak karo!
+personalized,birthday,hinglish,casual,"Yaar {{name}}, janamdin mubarak! 🎉 Selfie toh banti hai aaj!"
+personalized,birthday,hinglish,casual,Happy Birthday {{name}}! 🎊 Enjoy karo aur mast raho!
+personalized,birthday,hinglish,fun,Happy Birthday {{name}}! 🎂 Ek aur saal beet gaya — par tu toh waise hi bindaas hai!
+personalized,birthday,hinglish,fun,"{{name}}, janamdin mubarak! 🥳 Umar badh rahi hai par style waise hi hai!"
+personalized,birthday,hinglish,fun,Happy Birthday {{name}}! 🎉 Aaj diet bhool jao — cake toh banta hai!
+personalized,birthday,hinglish,fun,"{{name}}, janamdin mubarak dost! 🎂 Ab toh vintage ho gaye — vintage is classy!"
+personalized,birthday,hinglish,fun,Happy Birthday {{name}}! 🎈 Aaj sab tumhari baat manenge — wisely use karo!
+personalized,birthday,hinglish,fun,"{{name}}, janamdin mubarak! 🎊 Ek aur saal survive — achievement unlocked!"
+personalized,birthday,hinglish,fun,Happy Birthday {{name}}! 🎁 Google bhi tumhe yaad karta hai — special ho!
+personalized,birthday,hinglish,fun,"{{name}}, janamdin mubarak yaar! 🥳 Ek aur saal aur bhi cool ho gaye!"
+personalized,birthday,hinglish,fun,Happy Birthday {{name}}! 🎂 Birthday calories count nahi hoti — enjoy!
+personalized,birthday,hinglish,fun,"{{name}}, janamdin mubarak! 🎉 Best chapter abhi likhna baaki hai!"
+personalized,birthday,hinglish,formal,"{{name}} ji, aapko janamdin ki haardik shubhkamnayen. Ishwar aapko dirghayu aur sukhmay jeevan de."
+personalized,birthday,hinglish,formal,Happy Birthday {{name}} ji. Dil se dua — aapka ye saal bahut accha aur safal ho.
+personalized,birthday,hinglish,formal,"{{name}} ji, janamdin ke khaas avsar par haardik badhai. Sadaa swasth aur prasann rahein."
+personalized,birthday,hinglish,formal,"Aadarniya {{name}}, janamdin ki haardik shubhkamnayen. Jeevan mein sukh aur samriddhi bani rahe."
+personalized,birthday,hinglish,formal,"{{name}} ji, aapke janamdin par haardik badhai. Ye saal aapke liye bahut shubh ho."
+personalized,birthday,hinglish,formal,Happy Birthday {{name}} ji. Ishwar se prarthna — aap sadaa khush aur aage badhein.
+personalized,birthday,hinglish,formal,"{{name}} ji, janamdin par dil se badhai. Aapka bhavishy roshan ho."
+personalized,birthday,hinglish,formal,"Aadarniya {{name}}, is vishesh din par haardik shubhkamnayen. Aapke sabhi kaaryein safal hon."
+personalized,birthday,hinglish,formal,"{{name}} ji, janamdin par anekanekon shubhkamnayen. Sehat aur khushi aapke saath rahe."
+personalized,birthday,hinglish,formal,Happy Birthday {{name}} ji. Aapke jeevan ka ye saal bahut khaas aur yaadgaar ho.
+personalized,cascade_birthday,en,warm,Hi {{cascade_name}}! 🎂 Wishing your little {{name}} a very Happy Birthday — may it be magical!
+personalized,cascade_birthday,en,warm,"Dear {{cascade_name}}, sending warm birthday wishes for {{name}}! 🎉 Hope the day is filled with joy."
+personalized,cascade_birthday,en,warm,"{{cascade_name}}, Happy Birthday to {{name}}! 🌟 May your little star have the most wonderful day!"
+personalized,cascade_birthday,en,warm,Hi {{cascade_name}}! 🎈 Today is {{name}}'s special day — wishing them smiles and celebrations!
+personalized,cascade_birthday,en,warm,"Dear {{cascade_name}}, a very Happy Birthday to {{name}}! 🥳 May every wish they make come true."
+personalized,cascade_birthday,en,warm,"{{cascade_name}}, sending lots of love for {{name}}'s birthday! 🎁 Hope it's an amazing day!"
+personalized,cascade_birthday,en,warm,"Happy Birthday to {{name}}! 🌺 {{cascade_name}}, hope the whole family has a wonderful celebration."
+personalized,cascade_birthday,en,warm,"Hi {{cascade_name}}! 🎂 Wishing {{name}} a day full of cake, gifts, and endless smiles!"
+personalized,cascade_birthday,en,warm,"Dear {{cascade_name}}, birthday love for {{name}}! 🎊 May they have the happiest of days."
+personalized,cascade_birthday,en,warm,"{{cascade_name}}, wishing {{name}} a truly special birthday! 💐 Lots of love to your little one."
+personalized,cascade_birthday,en,casual,Hey {{cascade_name}}! 🎉 Happy Birthday to {{name}} — hope they're having the best day!
+personalized,cascade_birthday,en,casual,"{{cascade_name}}, big birthday wishes for {{name}}! 🎂 Hope the little one is loving their special day!"
+personalized,cascade_birthday,en,casual,"Happy Birthday to {{name}}! 🥳 {{cascade_name}}, hope you're all celebrating in style!"
+personalized,cascade_birthday,en,casual,Hey {{cascade_name}}! 🎈 Wishing {{name}} a super fun birthday — hope there's plenty of cake!
+personalized,cascade_birthday,en,casual,"{{cascade_name}}, hope {{name}} is having an amazing birthday! 🎁 Give them a big hug from me!"
+personalized,cascade_birthday,en,casual,"Happy Birthday {{name}}! 🎉 {{cascade_name}}, hope the celebrations are going brilliantly!"
+personalized,cascade_birthday,en,casual,Hey {{cascade_name}}! 🎊 It's {{name}}'s big day — hope they're loving every minute!
+personalized,cascade_birthday,en,casual,"{{cascade_name}}, wishing {{name}} the happiest birthday! 🎂 Hope they get everything they wished for!"
+personalized,cascade_birthday,en,casual,"Happy Birthday to {{name}}! 🎈 {{cascade_name}}, hope it's a day to remember for everyone!"
+personalized,cascade_birthday,en,casual,Hey {{cascade_name}}! 🥳 Big shoutout to birthday kid {{name}} — hope the day's been fab!
+personalized,cascade_birthday,en,fun,"{{cascade_name}}, Happy Birthday to {{name}}! 🎂 One more year and they'll be giving YOU advice!"
+personalized,cascade_birthday,en,fun,Hey {{cascade_name}}! 🎉 {{name}} is another year older — more cake-eating rights unlocked!
+personalized,cascade_birthday,en,fun,"Happy Birthday {{name}}! 🥳 {{cascade_name}}, at this rate {{name}} will catch up to you soon!"
+personalized,cascade_birthday,en,fun,"{{cascade_name}}, birthday time for {{name}}! 🎂 The little boss is another year more in charge!"
+personalized,cascade_birthday,en,fun,Hey {{cascade_name}}! 🎈 {{name}} is officially one year more awesome today — celebrate accordingly!
+personalized,cascade_birthday,en,fun,"Happy Birthday {{name}}! 🎁 {{cascade_name}}, enjoy today — phone borrowing season is coming soon!"
+personalized,cascade_birthday,en,fun,"{{cascade_name}}, wishing {{name}} a birthday as energetic as they always are! 🎉 You'll need coffee!"
+personalized,cascade_birthday,en,fun,"Happy Birthday {{name}}! 🎂 {{cascade_name}}, birthday kids make the rules today — good luck!"
+personalized,cascade_birthday,en,fun,Hey {{cascade_name}}! 🥳 {{name}}'s another year older and probably already planning the next gift list!
+personalized,cascade_birthday,en,fun,"{{cascade_name}}, Happy Birthday to {{name}}! 🎊 The tiny legend is growing up fast!"
+personalized,cascade_birthday,en,formal,"Dear {{cascade_name}}, warmest birthday greetings to {{name}}. May they grow in good health and happiness."
+personalized,cascade_birthday,en,formal,"{{cascade_name}}, on {{name}}'s birthday please accept my heartfelt congratulations and best wishes."
+personalized,cascade_birthday,en,formal,"Dear {{cascade_name}}, wishing {{name}} a very Happy Birthday. May they be blessed with a bright future."
+personalized,cascade_birthday,en,formal,"{{cascade_name}}, please convey my sincere birthday wishes to {{name}}. May they grow wonderfully."
+personalized,cascade_birthday,en,formal,"Dear {{cascade_name}}, on this occasion of {{name}}'s birthday I extend my warmest greetings."
+personalized,cascade_birthday,en,formal,"{{cascade_name}}, warmest birthday wishes for {{name}}. May they be blessed with good health and a bright mind."
+personalized,cascade_birthday,en,formal,"Dear {{cascade_name}}, I wish {{name}} a very Happy Birthday. May they grow each day in wisdom and joy."
+personalized,cascade_birthday,en,formal,"{{cascade_name}}, heartiest congratulations on {{name}}'s birthday. May they have a bright year ahead."
+personalized,cascade_birthday,en,formal,"Dear {{cascade_name}}, warm birthday greetings for {{name}}. May they always be healthy and cheerful."
+personalized,cascade_birthday,en,formal,"{{cascade_name}}, sincere birthday congratulations to {{name}}. May they grow in love and positivity."
+personalized,cascade_birthday,hi,warm,"{{cascade_name}} ji, {{name}} ke janamdin ki haardik shubhkamnayen! 🎂 Bhagwan unhe sukhi rakhe!"
+personalized,cascade_birthday,hi,warm,"Priy {{cascade_name}}, pyaare {{name}} ko janamdin mubarak! 🎉 Is nanhey ki muskaan bani rahe!"
+personalized,cascade_birthday,hi,warm,"{{cascade_name}} ji, {{name}} ke khaas din par badhai! 🌟 Bachche ka bhavishy roshan ho!"
+personalized,cascade_birthday,hi,warm,"{{cascade_name}}, {{name}} ko bahut saara pyaar aur janamdin ki dua! 💐 Khushiyan bani rahein!"
+personalized,cascade_birthday,hi,warm,"Priy {{cascade_name}}, {{name}} ke janamdin par haardik dua! 🎈 Ishwar unhe lambi umar de!"
+personalized,cascade_birthday,hi,warm,"{{cascade_name}} ji, {{name}} ka janamdin mubarak ho! 🥳 Aapka ghar khushiyon se bhara rahe!"
+personalized,cascade_birthday,hi,warm,"{{cascade_name}}, {{name}} ke janamdin par dil se shubhkamnayen! 🎁 Is bachche mein bahut talent hai!"
+personalized,cascade_birthday,hi,warm,"Priy {{cascade_name}}, {{name}} ko haardik janamdin ki badhai! 🌺 Aapka parivaar sadaa sukhi rahe!"
+personalized,cascade_birthday,hi,warm,"{{cascade_name}} ji, {{name}} ke is vishesh din par badhai! 🎊 Ye nanha taara chamakta rahe!"
+personalized,cascade_birthday,hi,warm,"{{cascade_name}}, {{name}} ko janamdin mubarak! ✨ Dil se pyaar aur dua aapke parivaar ke liye!"
+personalized,cascade_birthday,hi,casual,"Arre {{cascade_name}} yaar, {{name}} ko janamdin mubarak! 🎉 Aaj toh party honi chahiye!"
+personalized,cascade_birthday,hi,casual,"{{cascade_name}} bhai/didi, {{name}} ka janamdin mubarak! 🎂 Khub masti karo aaj!"
+personalized,cascade_birthday,hi,casual,"{{cascade_name}}, {{name}} ko janamdin mubarak dost! 🥳 Cake toh banta hai!"
+personalized,cascade_birthday,hi,casual,"Arre {{cascade_name}}, {{name}} ka janamdin hai! 🎊 Kuch khaas plan kiya?"
+personalized,cascade_birthday,hi,casual,"{{cascade_name}} yaar, {{name}} ko Happy Birthday! 🎈 Ek cute photo toh daalo!"
+personalized,cascade_birthday,hi,casual,"{{cascade_name}}, {{name}} ke janamdin par badhai! 🎁 Parivaar ko meri taraf se salaam!"
+personalized,cascade_birthday,hi,casual,"Arre {{cascade_name}}, {{name}} ko janamdin mubarak dost! 🎂 Aaj sab {{name}} ke liye!"
+personalized,cascade_birthday,hi,casual,"{{cascade_name}} bhai/didi, {{name}} ko Happy Birthday! 🥳 Aaj ka din yaadgaar karo!"
+personalized,cascade_birthday,hi,casual,"{{cascade_name}}, {{name}} ka janamdin mubarak! 🎉 Celebration toh honi chahiye!"
+personalized,cascade_birthday,hi,casual,"Arre {{cascade_name}}, {{name}} ke janamdin par khushiyan! 🎊 Enjoy karo sab mila ke!"
+personalized,cascade_birthday,hi,fun,"{{cascade_name}}, {{name}} ka janamdin mubarak! 🎂 Ab ek aur saal ki demands ready hongi!"
+personalized,cascade_birthday,hi,fun,"Arre {{cascade_name}}, {{name}} ek saal aur bade! 🥳 Aur ek saal aur entertaining!"
+personalized,cascade_birthday,hi,fun,"{{cascade_name}}, Happy Birthday {{name}} ko! 🎉 Aaj sab bacche ki marzi — good luck!"
+personalized,cascade_birthday,hi,fun,"{{cascade_name}} bhai/didi, {{name}} ka janamdin! 🎂 Gifts ki list bahut lambi hogi!"
+personalized,cascade_birthday,hi,fun,"{{cascade_name}}, {{name}} ek saal aur bade! 🎈 Ab aur bhi zyada sawaal poochenge!"
+personalized,cascade_birthday,hi,fun,"Arre {{cascade_name}}, {{name}} ke liye cake laaye? 🎁 Agar nahi toh mushkil ho sakti!"
+personalized,cascade_birthday,hi,fun,"{{cascade_name}}, {{name}} ka janamdin! 🥳 Chote boss ka raaj ek saal aur badhaa!"
+personalized,cascade_birthday,hi,fun,"{{cascade_name}} bhai/didi, {{name}} ko janamdin mubarak! 🎂 Aaj sab kuch wo bolega!"
+personalized,cascade_birthday,hi,fun,"Arre {{cascade_name}}, {{name}} ke janamdin par badhai! 🎊 Pizza ki demand pakki hai!"
+personalized,cascade_birthday,hi,fun,"{{cascade_name}}, {{name}} ek saal aur bade! 🎉 Aur ek saal aur bhi cute!"
+personalized,cascade_birthday,hi,formal,"{{cascade_name}} ji, {{name}} ke janamdin par haardik shubhkamnayen. Ishwar unhe dirghayu de."
+personalized,cascade_birthday,hi,formal,"Aadarniya {{cascade_name}}, {{name}} ke janamdin ke shubh avsar par haardik badhai."
+personalized,cascade_birthday,hi,formal,"{{cascade_name}} ji, pyaare {{name}} ke janamdin par aapke parivaar ko haardik dua."
+personalized,cascade_birthday,hi,formal,"Priy {{cascade_name}}, {{name}} ke janamdin par anek shubhkamnayen. Bachche ka bhavishy ujjwal ho."
+personalized,cascade_birthday,hi,formal,"{{cascade_name}} ji, {{name}} ke janamdin par haardik badhai. Ishwar unhe uttam swasthya de."
+personalized,cascade_birthday,hi,formal,"Aadarniya {{cascade_name}}, {{name}} ke is vishesh avsar par haardik shubhkamnayen."
+personalized,cascade_birthday,hi,formal,"{{cascade_name}} ji, {{name}} ke janamdin par dil se badhai. Inhe uttam bhavishy mile."
+personalized,cascade_birthday,hi,formal,"Priy {{cascade_name}}, {{name}} ke janamdin par haardik shubhkamnayen. Sadaa swasth rahein."
+personalized,cascade_birthday,hi,formal,"{{cascade_name}} ji, {{name}} ke janamdin ke mangalmay din par haardik dua aur badhai."
+personalized,cascade_birthday,hi,formal,"Aadarniya {{cascade_name}}, {{name}} ke janamdin par haardik badhai. Ye nanha taara chamakta rahe."
+personalized,cascade_birthday,hinglish,warm,"{{cascade_name}}, {{name}} ko bahut saara pyaar aur janamdin ki shubhkamnayen! 🎂 Dil se dua!"
+personalized,cascade_birthday,hinglish,warm,Hi {{cascade_name}}! {{name}} ke janamdin par dil se badhai! 🎉 Bachche ko hug hamare taraf se!
+personalized,cascade_birthday,hinglish,warm,"{{cascade_name}} ji, {{name}} ka janamdin mubarak! 🌟 Is nanhey tare ko khushiyan milein!"
+personalized,cascade_birthday,hinglish,warm,"{{cascade_name}}, Happy Birthday to {{name}}! 🎂 Aapka ye chhota sa wonder hamesha muskurata rahe!"
+personalized,cascade_birthday,hinglish,warm,Hi {{cascade_name}}! 🎈 {{name}} ke special day par dil se badhai — bahut pyaara bachcha hai!
+personalized,cascade_birthday,hinglish,warm,"{{cascade_name}}, {{name}} ke janamdin par dher saari dua! 🥳 Ishwar unhe hamesha khush rakhe!"
+personalized,cascade_birthday,hinglish,warm,"{{cascade_name}} ji, {{name}} ko janamdin ki badhai! 🎁 Aapka parivaar bahut pyaara hai!"
+personalized,cascade_birthday,hinglish,warm,Hi {{cascade_name}}! 🌺 {{name}} ke janamdin par bahut saara pyaar — ghar mein khushiyan bani rahein!
+personalized,cascade_birthday,hinglish,warm,"{{cascade_name}}, {{name}} ko janamdin mubarak! 🎊 Bahut saari dua aapke parivaar ke liye!"
+personalized,cascade_birthday,hinglish,warm,"{{cascade_name}} ji, {{name}} ke janamdin par haardik shubhkamnayen! 🥳 Ye nanha sitara chamakta rahe!"
+personalized,cascade_birthday,hinglish,casual,Arre {{cascade_name}}! {{name}} ka janamdin mubarak! 🎉 Party kab hai? Hum bhi ayenge!
+personalized,cascade_birthday,hinglish,casual,"{{cascade_name}} yaar, {{name}} ko Happy Birthday! 🎂 Kuch khaas plan hai bachche ke liye?"
+personalized,cascade_birthday,hinglish,casual,Hi {{cascade_name}}! {{name}} ka janamdin mubarak! 🥳 Cake toh cut ho gaya na?
+personalized,cascade_birthday,hinglish,casual,"{{cascade_name}} bhai/didi, {{name}} ko Happy Birthday! 🎊 Aaj toh celebrate karo!"
+personalized,cascade_birthday,hinglish,casual,"Arre {{cascade_name}}, {{name}} ka janamdin hai! 🎈 Ek cute pic toh daalo!"
+personalized,cascade_birthday,hinglish,casual,"{{cascade_name}}, {{name}} ko janamdin mubarak dost! 🎁 Aaj toh mast din hai!"
+personalized,cascade_birthday,hinglish,casual,Hi {{cascade_name}}! 🎂 {{name}} ka birthday — kitna exciting! Enjoy karo sab mila ke!
+personalized,cascade_birthday,hinglish,casual,"{{cascade_name}} yaar, {{name}} ko Happy Birthday! 🥳 Give them a big hug from me!"
+personalized,cascade_birthday,hinglish,casual,"Arre {{cascade_name}}, {{name}} ke janamdin par mubarak! 🎉 Kuch plan kiya aaj ke liye?"
+personalized,cascade_birthday,hinglish,casual,"{{cascade_name}} bhai/didi, {{name}} ko janamdin mubarak! 🎊 Bachcha kitna bada ho gaya!"
+personalized,cascade_birthday,hinglish,fun,"{{cascade_name}}, {{name}} ka janamdin mubarak! 🎂 Ab toh ek aur saal ki demands ready!"
+personalized,cascade_birthday,hinglish,fun,Arre {{cascade_name}}! {{name}} ek saal aur bade — aur ek saal aur nakhrey! 🥳
+personalized,cascade_birthday,hinglish,fun,"{{cascade_name}}, {{name}} ka janamdin! 🎉 Chote boss ki reign shuru — good luck!"
+personalized,cascade_birthday,hinglish,fun,"{{cascade_name}} bhai/didi, {{name}} ko Happy Birthday! 🎂 Gifts ki list bahut lambi hogi!"
+personalized,cascade_birthday,hinglish,fun,"Arre {{cascade_name}}, {{name}} ek saal aur bade! 🎈 Ab aur bhi entertaining honge!"
+personalized,cascade_birthday,hinglish,fun,"{{cascade_name}}, {{name}} ke janamdin par mubarak! 🎁 Cake toh poora {{name}} khayega!"
+personalized,cascade_birthday,hinglish,fun,Hi {{cascade_name}}! {{name}} ka janamdin! 🥳 Aaj ghar mein full on tamasha hoga — enjoy!
+personalized,cascade_birthday,hinglish,fun,"{{cascade_name}} yaar, {{name}} ko Happy Birthday! 🎂 Ek saal aur cute ho gaye!"
+personalized,cascade_birthday,hinglish,fun,"Arre {{cascade_name}}, {{name}} ke janamdin par mubarak! 🎊 Aaj bacche ki marzi hi law!"
+personalized,cascade_birthday,hinglish,fun,"{{cascade_name}} bhai/didi, {{name}} ka janamdin! 🎉 Aaj pizza ki demand toh pakki hai!"
+personalized,cascade_birthday,hinglish,formal,"{{cascade_name}} ji, {{name}} ke janamdin par haardik shubhkamnayen. Ishwar unhe sukhmay jeevan de."
+personalized,cascade_birthday,hinglish,formal,"Aadarniya {{cascade_name}}, {{name}} ke is vishesh din par haardik badhai. Bhavishy roshan ho."
+personalized,cascade_birthday,hinglish,formal,"{{cascade_name}} ji, {{name}} ke janamdin par dil se badhai. Ishwar unhe uttam swasthya de."
+personalized,cascade_birthday,hinglish,formal,"Priy {{cascade_name}}, {{name}} ke janamdin par aapke poore parivaar ko haardik shubhkamnayen."
+personalized,cascade_birthday,hinglish,formal,"{{cascade_name}} ji, {{name}} ke janamdin ke shubh avsar par haardik dua. Sadaa aage badhein."
+personalized,cascade_birthday,hinglish,formal,"Aadarniya {{cascade_name}}, {{name}} ke janamdin par haardik badhai. Ye bachcha aapka garv ho."
+personalized,cascade_birthday,hinglish,formal,"{{cascade_name}} ji, {{name}} ke janamdin par haardik shubhkamnayen. Inhe gyaan aur bal mile."
+personalized,cascade_birthday,hinglish,formal,"Priy {{cascade_name}}, {{name}} ke janamdin par aneko shubhkamnayen. Khushiyan bhari rahein."
+personalized,cascade_birthday,hinglish,formal,"{{cascade_name}} ji, {{name}} ke khaas avsar par haardik badhai. Sadaa swasth rahein."
+personalized,cascade_birthday,hinglish,formal,"Aadarniya {{cascade_name}}, {{name}} ke janamdin par haardik shubhkamnayen. Parivaar sukhi rahe."
+personalized,anniversary,en,warm,"Happy Anniversary {{name}}! 💍 Wishing you both a lifetime of love, laughter, and beautiful memories."
+personalized,anniversary,en,warm,"Many congratulations on your anniversary, {{name}}! 🌹 May your bond grow stronger every year."
+personalized,anniversary,en,warm,Happy Anniversary {{name}}! 💑 May your love story continue to inspire everyone around you.
+personalized,anniversary,en,warm,"{{name}}, warmest anniversary wishes! 🌸 May this day remind you of all the beautiful moments shared."
+personalized,anniversary,en,warm,Happy Anniversary {{name}}! 🥂 Here's to love that only deepens with time.
+personalized,anniversary,en,warm,"Warmest anniversary wishes, {{name}}! 💝 May your home always be filled with love and togetherness."
+personalized,anniversary,en,warm,Happy Anniversary {{name}}! 🎊 Celebrating your beautiful journey — may it continue forever.
+personalized,anniversary,en,warm,"{{name}}, wishing you both a very Happy Anniversary! 💍 May your love be an anchor through every storm."
+personalized,anniversary,en,warm,Happy Anniversary {{name}}! 🌺 May the years ahead bring even more joy than those already shared.
+personalized,anniversary,en,warm,"Heartfelt anniversary wishes, {{name}}! 💕 May your love bloom with every passing season."
+personalized,anniversary,en,casual,Happy Anniversary {{name}}! 💑 Hope you're celebrating in style — you both deserve it!
+personalized,anniversary,en,casual,"Congrats on your anniversary, {{name}}! 🎉 Here's to another year of choosing each other!"
+personalized,anniversary,en,casual,Happy Anniversary {{name}}! 🥂 Hope you two have a wonderful day celebrating your bond!
+personalized,anniversary,en,casual,"{{name}}, Happy Anniversary! 💍 Hope there's a lovely dinner and some romance involved today!"
+personalized,anniversary,en,casual,"Happy Anniversary {{name}}! 🌹 Another year, another reason to love each other even more!"
+personalized,anniversary,en,casual,Congrats {{name}}! 💑 Happy Anniversary — hope the celebration is as amazing as your relationship!
+personalized,anniversary,en,casual,"Happy Anniversary {{name}}! 🎊 Hope today's full of romance, laughter, and great food!"
+personalized,anniversary,en,casual,"{{name}}, Happy Anniversary! 🥂 Hope the day is as special as you two are together!"
+personalized,anniversary,en,casual,Happy Anniversary {{name}}! 💕 Another great year — keep the good times rolling!
+personalized,anniversary,en,casual,Many happy returns {{name}}! 🌸 Happy Anniversary — hope today is perfectly yours!
+personalized,anniversary,en,fun,Happy Anniversary {{name}}! 💍 Another year of successfully choosing each other — no small thing!
+personalized,anniversary,en,fun,Congrats {{name}}! 🎉 Another year of finding each other's jokes funny. Or pretending to!
+personalized,anniversary,en,fun,Happy Anniversary {{name}}! 💑 Proof that love and laughter can absolutely coexist!
+personalized,anniversary,en,fun,"{{name}}, Happy Anniversary! 🥂 Here's to another year of sharing blankets and remote controls!"
+personalized,anniversary,en,fun,Happy Anniversary {{name}}! 🌹 Another year of agreeing on what to watch after 45 minutes of scrolling!
+personalized,anniversary,en,fun,Congrats {{name}}! 💕 Marriage: the only job where working 24/7 means the benefits keep getting better!
+personalized,anniversary,en,fun,Happy Anniversary {{name}}! 🎊 You two are living proof that love is patient — and has great taste!
+personalized,anniversary,en,fun,"{{name}}, Happy Anniversary! 💍 Another year wiser, another year more in love — that was the plan!"
+personalized,anniversary,en,fun,Happy Anniversary {{name}}! 🥂 Here's to another year of adventures and perfectly timed misadventures!
+personalized,anniversary,en,fun,"Congrats {{name}}! 💑 You looked at forever and said 'sounds fun, let's do it' — still going strong!"
+personalized,anniversary,en,formal,"Dear {{name}}, warmest congratulations on your anniversary. May your bond continue to grow in love."
+personalized,anniversary,en,formal,"On the occasion of your anniversary {{name}}, please accept my heartfelt congratulations."
+personalized,anniversary,en,formal,"{{name}}, warmest anniversary greetings. May this occasion remind you of your beautiful commitment."
+personalized,anniversary,en,formal,"Dear {{name}}, congratulations on your anniversary. May the years ahead bring peace, joy, and togetherness."
+personalized,anniversary,en,formal,"On your anniversary {{name}}, I extend my sincerest congratulations. May your love remain a source of strength."
+personalized,anniversary,en,formal,"Dear {{name}}, heartfelt anniversary wishes. May your marriage be a journey of continuous growth and happiness."
+personalized,anniversary,en,formal,"{{name}}, warmest congratulations on your anniversary. May your partnership be a model of love and respect."
+personalized,anniversary,en,formal,"On this special anniversary {{name}}, please accept my warmest wishes for continued happiness."
+personalized,anniversary,en,formal,"Dear {{name}}, sincere congratulations on your wedding anniversary. May your bond strengthen each year."
+personalized,anniversary,en,formal,"{{name}}, on your anniversary I wish you both a future filled with harmony, love, and shared joy."
+personalized,anniversary,hi,warm,"{{name}}, saalgirah mubarak! 💍 Aap dono ka pyaar hamesha aisa hi roshan rahe!"
+personalized,anniversary,hi,warm,"{{name}} ji, saalgirah ki haardik badhai! 🌹 Aap dono ka bandhan aur mazboot ho!"
+personalized,anniversary,hi,warm,"{{name}}, shadi ki saalgirah mubarak! 💑 Ishwar aap dono ko hamesha khush rakhe!"
+personalized,anniversary,hi,warm,"Priy {{name}}, saalgirah ki shubhkamnayen! 🌸 Ye rishta aur gehraata rahe!"
+personalized,anniversary,hi,warm,"{{name}}, saalgirah mubarak! 🥂 Aap dono ka pyaar roshan sitare ki tarah chamakta rahe!"
+personalized,anniversary,hi,warm,"{{name}} ji, saalgirah ki dher saari badhai! 💕 Aapke ghar mein sadaa khushiyan hon!"
+personalized,anniversary,hi,warm,"{{name}}, saalgirah ki haardik shubhkamnayen! 🌺 Aapka pyaar kabhi kam na ho!"
+personalized,anniversary,hi,warm,"Priy {{name}}, saalgirah mubarak ho! 💍 Is pyaare rishtey ko aur bhi khoobsoorat banaate rahein!"
+personalized,anniversary,hi,warm,"{{name}} ji, saalgirah mubarak! 💑 Aap dono milke aur bhi khoobsoorat ho gaye hain!"
+personalized,anniversary,hi,warm,"{{name}}, saalgirah ki bahut badhai! 💝 Aapka jeevan pyaar se paripoorn ho!"
+personalized,anniversary,hi,casual,"{{name}} yaar, saalgirah mubarak! 💍 Aaj toh romantic dinner banta hai!"
+personalized,anniversary,hi,casual,"Arre {{name}}, saalgirah mubarak! 🎉 Aap dono ki jodi number one hai!"
+personalized,anniversary,hi,casual,"{{name}} bhai/didi, saalgirah mubarak! 💑 Aaj toh kuch khaas karo!"
+personalized,anniversary,hi,casual,"{{name}}, saalgirah mubarak dost! 🥂 Kuch plan kiya hai aaj ke liye?"
+personalized,anniversary,hi,casual,"Yaar {{name}}, saalgirah mubarak! 🌹 Aaj couple wali photo daalo!"
+personalized,anniversary,hi,casual,"{{name}}, saalgirah ki badhai! 💕 Aap dono bahut cute ho saath mein!"
+personalized,anniversary,hi,casual,"Arre {{name}}, saalgirah mubarak! 🌸 Enjoy karo aaj ka din!"
+personalized,anniversary,hi,casual,"{{name}} bhai/didi, saalgirah mubarak! 💍 Aaj toh special date banti hai!"
+personalized,anniversary,hi,casual,"{{name}}, saalgirah mubarak yaar! 🎊 Treat toh banti hai!"
+personalized,anniversary,hi,casual,"Yaar {{name}}, saalgirah ki badhai! 💑 Aaj full on romantic mode mein raho!"
+personalized,anniversary,hi,fun,"{{name}}, saalgirah mubarak! 💍 Ek aur saal ek doosre ko jhelte hue — real love!"
+personalized,anniversary,hi,fun,"Arre {{name}}, saalgirah mubarak! 🎉 Remote control pe compromise — that's marriage!"
+personalized,anniversary,hi,fun,"{{name}} bhai/didi, saalgirah mubarak! 💑 Ek aur saal survive — achievement unlocked!"
+personalized,anniversary,hi,fun,"{{name}}, saalgirah mubarak dost! 🥂 Netflix choice pe ek ghante debate — pure love!"
+personalized,anniversary,hi,fun,"Yaar {{name}}, saalgirah mubarak! 🌹 Ek doosre ke jokes pe hansna — dedication!"
+personalized,anniversary,hi,fun,"{{name}}, saalgirah mubarak! 💕 Aap dono ne prove kar diya ki 'forever' possible hai!"
+personalized,anniversary,hi,fun,"Arre {{name}}, saalgirah mubarak! 💍 Roz ek doosre ko choose karna — that's real love!"
+personalized,anniversary,hi,fun,"{{name}} bhai/didi, saalgirah mubarak! 🎊 Aap dono ka combination lab mein nahi banta!"
+personalized,anniversary,hi,fun,"{{name}}, saalgirah mubarak yaar! 💑 Ek aur saal saath — aur bhi interesting ho gaye!"
+personalized,anniversary,hi,fun,"Yaar {{name}}, saalgirah mubarak! 🌸 Aap dono ki love story sabse mast hai!"
+personalized,anniversary,hi,formal,"{{name}} ji, saalgirah ki haardik shubhkamnayen. Ishwar aap dono ko sadaa sukhi rakhe."
+personalized,anniversary,hi,formal,"Aadarniya {{name}}, vivah saalgirah par haardik badhai. Aapka bandhan aur mazboot ho."
+personalized,anniversary,hi,formal,"{{name}} ji, saalgirah ke shubh avsar par haardik shubhkamnayen. Jeevan aanandmay ho."
+personalized,anniversary,hi,formal,"Priy {{name}}, saalgirah ki badhai. Aap dono ka rishta pyaar aur vishwas se bhari rahe."
+personalized,anniversary,hi,formal,"{{name}} ji, vivah saalgirah par haardik dua. Aapke ghar mein sadaa khushiyan hon."
+personalized,anniversary,hi,formal,"Aadarniya {{name}}, saalgirah par haardik shubhkamnayen. Aap dono saath aage badhein."
+personalized,anniversary,hi,formal,"{{name}} ji, saalgirah ki haardik badhai. Ishwar aap dono ko har khushi aur sukh de."
+personalized,anniversary,hi,formal,"Priy {{name}}, saalgirah ke mangalmay avsar par haardik badhai aur shubhkamnayen."
+personalized,anniversary,hi,formal,"{{name}} ji, saalgirah par anekanekon shubhkamnayen. Aapka saath hamesha aisa bana rahe."
+personalized,anniversary,hi,formal,"Aadarniya {{name}}, vivah saalgirah par haardik badhai. Aap dono ka pyaar aur gehra ho."
+personalized,anniversary,hinglish,warm,"{{name}}, saalgirah mubarak! 💍 Dil se wish — aap dono ka pyaar aur roshan ho!"
+personalized,anniversary,hinglish,warm,Happy Anniversary {{name}}! 🌹 Aap dono ka bandhan bahut khoobsoorat hai!
+personalized,anniversary,hinglish,warm,"{{name}} ji, saalgirah ki haardik badhai! 💑 Ye safar aur bhi sunhera ho!"
+personalized,anniversary,hinglish,warm,"{{name}}, Happy Anniversary! 🥂 Is khoobsoorat rishtey ko aur bhi khoobsoorat banaate rahein!"
+personalized,anniversary,hinglish,warm,Happy Anniversary {{name}}! 💕 Aap dono ne milke ek bahut pyaara safar bana diya!
+personalized,anniversary,hinglish,warm,"{{name}}, saalgirah mubarak! 🌸 Bhagwan kare aap dono ka pyaar hamesha bana rahe!"
+personalized,anniversary,hinglish,warm,Happy Anniversary {{name}} ji! 💍 Aapka ye khaas din bahut yaadgaar ho!
+personalized,anniversary,hinglish,warm,"{{name}}, saalgirah ki dher saari shubhkamnayen! 💑 Aap dono ka rishta bahut sunhera hai!"
+personalized,anniversary,hinglish,warm,Happy Anniversary {{name}}! 🌺 Is pyaare safar mein aur bhi sunhare rang aayein!
+personalized,anniversary,hinglish,warm,"{{name}} ji, saalgirah mubarak! 💕 Aap dono ki jodi dekh ke dil mein pyaar aata hai!"
+personalized,anniversary,hinglish,casual,"Arre {{name}}, saalgirah mubarak! 💍 Aap dono ki jodi number one hai yaar!"
+personalized,anniversary,hinglish,casual,"{{name}} bhai/didi, Happy Anniversary! 🎉 Aaj toh celebrate karo!"
+personalized,anniversary,hinglish,casual,"Yaar {{name}}, saalgirah mubarak! 🥂 Romantic dinner plan hua?"
+personalized,anniversary,hinglish,casual,"{{name}}, Happy Anniversary dost! 💑 Aap dono bahut cute ho saath mein!"
+personalized,anniversary,hinglish,casual,"Arre {{name}}, saalgirah ki badhai! 🌹 Aaj toh kuch special karo!"
+personalized,anniversary,hinglish,casual,"{{name}} bhai/didi, saalgirah mubarak! 💕 Aap dono ka pyaar dekh ke acha lagta hai!"
+personalized,anniversary,hinglish,casual,"Yaar {{name}}, Happy Anniversary! 🎊 Love works — aap dono ne prove kar diya!"
+personalized,anniversary,hinglish,casual,"{{name}}, saalgirah mubarak! 💍 Aaj toh date night banti hai!"
+personalized,anniversary,hinglish,casual,"Arre {{name}}, Happy Anniversary! 🥂 Mast couple ho tum dono!"
+personalized,anniversary,hinglish,casual,"{{name}} bhai/didi, saalgirah mubarak! 💑 Celebrate karo khub aaj!"
+personalized,anniversary,hinglish,fun,"{{name}}, Happy Anniversary! 💍 Ek aur saal ek doosre ko tolerate — true love!"
+personalized,anniversary,hinglish,fun,"Arre {{name}}, saalgirah mubarak! 🎉 Remote control pe compromise — that's marriage!"
+personalized,anniversary,hinglish,fun,"{{name}} bhai/didi, Happy Anniversary! 💑 Aap dono ne prove kar diya — forever possible hai!"
+personalized,anniversary,hinglish,fun,"Yaar {{name}}, saalgirah mubarak! 🥂 Ek aur saal — aur bhi interesting ho gaye dono!"
+personalized,anniversary,hinglish,fun,"{{name}}, Happy Anniversary! 🌹 Roz ek doosre ko choose karna — that's real love!"
+personalized,anniversary,hinglish,fun,"Arre {{name}}, saalgirah ki badhai! 💕 Netflix choice pe agreement — growth!"
+personalized,anniversary,hinglish,fun,"{{name}} bhai/didi, saalgirah mubarak! 💍 Aap dono ki jodi — full entertainment package!"
+personalized,anniversary,hinglish,fun,"Yaar {{name}}, Happy Anniversary! 🎊 Ek doosre ke jokes pe hansna — dedication!"
+personalized,anniversary,hinglish,fun,"{{name}}, saalgirah mubarak! 💑 Ek aur saal saath — achievement unlocked!"
+personalized,anniversary,hinglish,fun,"Arre {{name}}, Happy Anniversary! 🥂 Aap dono ki love story sabse mast hai — no debate!"
+personalized,anniversary,hinglish,formal,"{{name}} ji, saalgirah par haardik shubhkamnayen. Ishwar aap dono ko sadaa sukhi rakhe."
+personalized,anniversary,hinglish,formal,"Aadarniya {{name}}, vivah saalgirah par haardik badhai. Pyaar aur bandhan mazboot ho."
+personalized,anniversary,hinglish,formal,"{{name}} ji, saalgirah ke khaas avsar par haardik dua. Jeevan aanandmay ho."
+personalized,anniversary,hinglish,formal,"Priy {{name}}, Happy Anniversary. Aap dono ka safar hamesha khushiyon se bhara rahe."
+personalized,anniversary,hinglish,formal,"{{name}} ji, saalgirah par anekanekon shubhkamnayen. Ishwar aap dono ko har sukh de."
+personalized,anniversary,hinglish,formal,"Aadarniya {{name}}, saalgirah par haardik badhai. Aap dono ka bandhan aur gehraata rahe."
+personalized,anniversary,hinglish,formal,"{{name}} ji, vivah saalgirah par haardik shubhkamnayen. Ghar mein sadaa khushiyan hon."
+personalized,anniversary,hinglish,formal,"Priy {{name}}, saalgirah ke mangalmay din par haardik badhai aur dua."
+personalized,anniversary,hinglish,formal,"{{name}} ji, saalgirah par dil se badhai. Aap dono ka rishta hamesha roshan rahe."
+personalized,anniversary,hinglish,formal,"Aadarniya {{name}}, saalgirah ki haardik shubhkamnayen. Jeevan mein sukh aur shanti rahe."
+broadcast,lohri,en,formal,"Warm Lohri greetings to all! 🔥 May the festival of harvest bring joy, prosperity, and warmth to every home."
+broadcast,lohri,en,formal,Happy Lohri! 🔥 May the sacred bonfire illuminate your lives and fill the season with happiness and abundance.
+broadcast,lohri,en,formal,Wishing everyone a very Happy Lohri! 🔥 May this auspicious occasion bring blessings and good fortune.
+broadcast,lohri,en,formal,Lohri greetings to all! 🔥 May the warmth of the festival fill your hearts with joy and your homes with prosperity.
+broadcast,lohri,en,formal,Happy Lohri to everyone! 🔥 May this harvest festival usher in a season of happiness and togetherness.
+broadcast,lohri,en,formal,"Warmest Lohri wishes! 🔥 May the bonfire's glow bring light, warmth, and prosperity to all."
+broadcast,lohri,en,formal,Wishing a joyful Lohri to all! 🔥 May this festive occasion be marked by celebration and goodwill.
+broadcast,lohri,en,formal,Happy Lohri! 🔥 May the festival's spirit of joy and community bring happiness to every heart.
+broadcast,lohri,en,formal,Season's Lohri greetings! 🔥 May prosperity and happiness be yours in abundance this season.
+broadcast,lohri,en,formal,"Happy Lohri to all! 🔥 May this wonderful festival bring warmth, togetherness, and great cheer."
+broadcast,lohri,hi,formal,सभी को लोहड़ी की हार्दिक शुभकामनाएं! 🔥 यह पर्व आपके जीवन में खुशियां और समृद्धि लाए।
+broadcast,lohri,hi,formal,लोहड़ी मुबारक हो! 🔥 इस पावन अवसर पर ईश्वर आप सभी पर अपनी कृपा बनाए रखें।
+broadcast,lohri,hi,formal,सभी को लोहड़ी की बधाई! 🔥 यह त्योहार आपके घर में उजाला और खुशियां लाए।
+broadcast,lohri,hi,formal,लोहड़ी की हार्दिक शुभकामनाएं! 🔥 यह पर्व सभी के जीवन में सुख और समृद्धि लाए।
+broadcast,lohri,hi,formal,सभी को लोहड़ी मुबारक हो! 🔥 ईश्वर से प्रार्थना है कि आप सभी खुश और स्वस्थ रहें।
+broadcast,lohri,hi,formal,लोहड़ी की ढेरों शुभकामनाएं! 🔥 यह त्योहार सभी के जीवन में नई ऊर्जा और उमंग भरे।
+broadcast,lohri,hi,formal,सभी को लोहड़ी की बधाई हो! 🔥 इस पावन पर्व पर आप सभी को हार्दिक शुभकामनाएं।
+broadcast,lohri,hi,formal,लोहड़ी मुबारक! 🔥 यह उत्सव आपके परिवार में सदा खुशियां बनाए रखे।
+broadcast,lohri,hi,formal,सभी को हार्दिक लोहड़ी की बधाई! 🔥 यह पर्व आपके जीवन को और भी खुशहाल बनाए।
+broadcast,lohri,hi,formal,लोहड़ी की शुभकामनाएं! 🔥 इस त्योहार की आग की तरह आपका जीवन भी रोशन हो।
+broadcast,lohri,hinglish,formal,Sabko Happy Lohri! 🔥 Is tyohar ki roshni aap sabke ghar mein khushiyan aur samriddhi laaye.
+broadcast,lohri,hinglish,formal,Lohri mubarak ho sabko! 🔥 Is pavan avsar par Ishwar aap sab par apni kripa banaye rakhe.
+broadcast,lohri,hinglish,formal,Sabko Lohri ki haardik shubhkamnayen! 🔥 Ye parv aapke jeevan mein sukh aur khushiyan laaye.
+broadcast,lohri,hinglish,formal,Happy Lohri to all! 🔥 Is khaas din par aap sab khushi aur utsah se bhare rahein.
+broadcast,lohri,hinglish,formal,Lohri ki dher saari badhai! 🔥 Is tyohar ki aag ki tarah aapki zindagi bhi roshan ho.
+broadcast,lohri,hinglish,formal,Sabko Lohri mubarak! 🔥 Ye parv aapke ghar mein naya josh aur khushiyan laaye.
+broadcast,lohri,hinglish,formal,Happy Lohri sabko! 🔥 Is utsav par aap sab ko haardik shubhkamnayen.
+broadcast,lohri,hinglish,formal,Lohri ki shubhkamnayen! 🔥 Is pavan parv par sabke dil mein khushi aur pyaar bana rahe.
+broadcast,lohri,hinglish,formal,Sabko Lohri ki bahut badhai! 🔥 Ye tyohar aapke jeevan mein samriddhi laaye.
+broadcast,lohri,hinglish,formal,Happy Lohri! 🔥 Is tyohar ki roshni mein aap sab aur bhi khush rahein.
+broadcast,republic day,en,formal,Happy Republic Day to all! 🇮🇳 Let us honour the spirit of our great Constitution and celebrate our democratic values.
+broadcast,republic day,en,formal,Warm Republic Day greetings! 🇮🇳 Jai Hind — may our nation continue to prosper and inspire the world.
+broadcast,republic day,en,formal,Wishing everyone a Happy Republic Day! 🇮🇳 Let us take pride in our nation and its remarkable journey.
+broadcast,republic day,en,formal,"Happy Republic Day! 🇮🇳 May the values of justice, liberty, and equality continue to guide our great nation."
+broadcast,republic day,en,formal,Republic Day greetings to all! 🇮🇳 Let us celebrate the spirit of unity and the strength of our Constitution.
+broadcast,republic day,en,formal,"Happy Republic Day! 🇮🇳 Jai Bharat — may our nation flourish in peace, progress, and prosperity."
+broadcast,republic day,en,formal,Warm greetings on Republic Day! 🇮🇳 May we always cherish and uphold the democratic values of our nation.
+broadcast,republic day,en,formal,Happy Republic Day to everyone! 🇮🇳 Let us salute the vision of our founding fathers and the spirit of India.
+broadcast,republic day,en,formal,"Republic Day wishes to all! 🇮🇳 May our nation continue its journey of growth, unity, and progress."
+broadcast,republic day,en,formal,Happy Republic Day! 🇮🇳 Vande Mataram — may the tricolour always fly high with pride and honour.
+broadcast,republic day,hi,formal,सभी को गणतंत्र दिवस की हार्दिक शुभकामनाएं! 🇮🇳 जय हिंद! भारत माता की जय!
+broadcast,republic day,hi,formal,गणतंत्र दिवस मुबारक! 🇮🇳 हमारा संविधान हमारी शान है। वंदे मातरम!
+broadcast,republic day,hi,formal,सभी को गणतंत्र दिवस की बधाई! 🇮🇳 भारत का यह महापर्व हमें गर्व से भर देता है।
+broadcast,republic day,hi,formal,गणतंत्र दिवस की हार्दिक बधाई! 🇮🇳 जय भारत! हमारा लोकतंत्र विश्व में अनूठा है।
+broadcast,republic day,hi,formal,सभी को गणतंत्र दिवस मुबारक! 🇮🇳 इस राष्ट्रीय पर्व पर देश के वीरों को नमन।
+broadcast,republic day,hi,formal,गणतंत्र दिवस की शुभकामनाएं! 🇮🇳 भारत की एकता और अखंडता अमर रहे।
+broadcast,republic day,hi,formal,सभी को गणतंत्र दिवस की बधाई हो! 🇮🇳 वंदे मातरम! जय हिंद जय भारत!
+broadcast,republic day,hi,formal,गणतंत्र दिवस मुबारक हो! 🇮🇳 हमारे संविधान ने हमें एकता का सूत्र दिया है।
+broadcast,republic day,hi,formal,सभी को हार्दिक गणतंत्र दिवस की बधाई! 🇮🇳 भारत गणराज्य की शान सदा बनी रहे।
+broadcast,republic day,hi,formal,गणतंत्र दिवस की ढेरों शुभकामनाएं! 🇮🇳 जय हिंद! भारत माता की जय!
+broadcast,republic day,hinglish,formal,Sabko Happy Republic Day! 🇮🇳 Jai Hind! Humara desh aur aage badhta rahe.
+broadcast,republic day,hinglish,formal,Republic Day mubarak ho sabko! 🇮🇳 Is mahaan desh ka hissa hone par garv hai.
+broadcast,republic day,hinglish,formal,Sabko Republic Day ki haardik shubhkamnayen! 🇮🇳 Bharat Mata ki Jai!
+broadcast,republic day,hinglish,formal,Happy Republic Day! 🇮🇳 Jai Bharat! Humara samvidhan humari shaan hai.
+broadcast,republic day,hinglish,formal,Sabko Republic Day ki badhai! 🇮🇳 Vande Mataram! Desh ki unnati ho.
+broadcast,republic day,hinglish,formal,Republic Day ki shubhkamnayen! 🇮🇳 Jai Hind! Is mahaan parv par desh ko salaam.
+broadcast,republic day,hinglish,formal,Happy Republic Day sabko! 🇮🇳 Humari azaadi aur loktantra amar rahe.
+broadcast,republic day,hinglish,formal,Sabko Republic Day mubarak! 🇮🇳 Jai Bharat! Tiranga hamesha uncha rahe.
+broadcast,republic day,hinglish,formal,Republic Day ki bahut badhai! 🇮🇳 Is rashtriya parv par Bharat Mata ko naman.
+broadcast,republic day,hinglish,formal,Happy Republic Day! 🇮🇳 Jai Hind Jai Bharat! Desh ki shaan bani rahe.
+broadcast,christmas,en,formal,Merry Christmas to all! 🎄 May the joy and peace of the season fill your hearts and homes.
+broadcast,christmas,en,formal,Season's Greetings to everyone! 🎄 Wishing you a blessed and joyful Christmas celebration.
+broadcast,christmas,en,formal,"Wishing all a very Merry Christmas! 🎄 May this festive season bring happiness, love, and togetherness."
+broadcast,christmas,en,formal,"Merry Christmas! 🎄 May the spirit of this wonderful season bring peace, joy, and goodwill to all."
+broadcast,christmas,en,formal,Warmest Christmas greetings to all! 🎄 May your celebrations be filled with love and wonderful memories.
+broadcast,christmas,en,formal,"Merry Christmas everyone! 🎄 May this season bring you the gift of health, happiness, and peace."
+broadcast,christmas,en,formal,Season's Greetings! 🎄 Wishing everyone a joyful Christmas and a prosperous New Year ahead.
+broadcast,christmas,en,formal,Happy Christmas to all! 🎄 May the warmth and cheer of this season be with you always.
+broadcast,christmas,en,formal,Merry Christmas! 🎄 May the blessings of this beautiful season be upon everyone.
+broadcast,christmas,en,formal,Warmest Christmas wishes to all! 🎄 May this festive occasion bring much joy and celebration.
+broadcast,christmas,hi,formal,सभी को क्रिसमस की हार्दिक शुभकामनाएं! 🎄 यह पर्व सभी के जीवन में खुशियां लाए।
+broadcast,christmas,hi,formal,मेरी क्रिसमस! 🎄 इस पावन अवसर पर ईश्वर आप सभी पर अपनी कृपा बनाए रखें।
+broadcast,christmas,hi,formal,सभी को क्रिसमस की बधाई! 🎄 यह त्योहार सभी के घर में उजाला और खुशियां लाए।
+broadcast,christmas,hi,formal,क्रिसमस की हार्दिक शुभकामनाएं! 🎄 यह पर्व सभी के लिए सुख और शांति लाए।
+broadcast,christmas,hi,formal,सभी को क्रिसमस मुबारक! 🎄 इस खुशी के मौसम में ईश्वर सबको खुशियां दे।
+broadcast,christmas,hi,formal,क्रिसमस की ढेरों शुभकामनाएं! 🎄 यह त्योहार सभी के जीवन में नई खुशियां लाए।
+broadcast,christmas,hi,formal,सभी को क्रिसमस की बधाई हो! 🎄 इस पावन पर्व पर आप सभी को हार्दिक शुभकामनाएं।
+broadcast,christmas,hi,formal,क्रिसमस मुबारक! 🎄 यह उत्सव सभी के परिवार में प्रेम और खुशियां बनाए रखे।
+broadcast,christmas,hi,formal,सभी को हार्दिक क्रिसमस बधाई! 🎄 यह पर्व आपके जीवन को और भी खुशहाल बनाए।
+broadcast,christmas,hi,formal,क्रिसमस की शुभकामनाएं! 🎄 इस त्योहार की रोशनी से सभी का जीवन रोशन हो।
+broadcast,christmas,hinglish,formal,Sabko Merry Christmas! 🎄 Is tyohar ki khushiyan aap sabke ghar mein khushiyan laayein.
+broadcast,christmas,hinglish,formal,Christmas mubarak ho sabko! 🎄 Is pavan avsar par Ishwar aap sab par apni kripa banaye rakhe.
+broadcast,christmas,hinglish,formal,Sabko Christmas ki haardik shubhkamnayen! 🎄 Ye parv aapke jeevan mein sukh aur aanand laaye.
+broadcast,christmas,hinglish,formal,Happy Christmas to all! 🎄 Is khaas din par aap sab khushi aur utsah se bhare rahein.
+broadcast,christmas,hinglish,formal,Christmas ki dher saari badhai! 🎄 Is tyohar ki roshni mein aapka jeevan bhi roshan ho.
+broadcast,christmas,hinglish,formal,Sabko Christmas mubarak! 🎄 Ye parv aapke ghar mein pyaar aur khushiyan laaye.
+broadcast,christmas,hinglish,formal,Merry Christmas sabko! 🎄 Is utsav par aap sab ko haardik shubhkamnayen.
+broadcast,christmas,hinglish,formal,Christmas ki shubhkamnayen! 🎄 Is pavan parv par sabke dil mein khushi aur shanti bani rahe.
+broadcast,christmas,hinglish,formal,Sabko Christmas ki bahut badhai! 🎄 Ye tyohar aapke jeevan mein samriddhi laaye.
+broadcast,christmas,hinglish,formal,Happy Christmas! 🎄 Is tyohar ke mausam mein aap sab aur bhi khush rahein.
+broadcast,new year,en,formal,"Happy New Year to all! 🎊 May the year ahead bring health, happiness, and great success to everyone."
+broadcast,new year,en,formal,Warmest New Year wishes! 🎊 May this year be filled with wonderful opportunities and joyful moments.
+broadcast,new year,en,formal,"Wishing everyone a very Happy New Year! 🎊 May the coming year bring peace, prosperity, and progress."
+broadcast,new year,en,formal,"Happy New Year! 🎊 Here's to a year of new beginnings, great achievements, and lasting happiness."
+broadcast,new year,en,formal,New Year greetings to all! 🎊 May this year bring you all closer to your dreams and aspirations.
+broadcast,new year,en,formal,"Happy New Year everyone! 🎊 May the new year usher in joy, good health, and wonderful experiences."
+broadcast,new year,en,formal,Warmest New Year greetings! 🎊 May this year be brighter and better than the one before.
+broadcast,new year,en,formal,"Happy New Year to all! 🎊 Wishing you a year filled with love, laughter, and memorable moments."
+broadcast,new year,en,formal,"New Year wishes to everyone! 🎊 May health, peace, and prosperity be yours throughout the year."
+broadcast,new year,en,formal,Happy New Year! 🎊 May this new chapter bring all of you abundant joy and great fulfilment.
+broadcast,new year,hi,formal,सभी को नया साल मुबारक! 🎊 यह नया साल सबके जीवन में खुशियां और समृद्धि लाए।
+broadcast,new year,hi,formal,नव वर्ष की हार्दिक शुभकामनाएं! 🎊 ईश्वर से प्रार्थना है कि यह साल सभी के लिए शुभ हो।
+broadcast,new year,hi,formal,सभी को नव वर्ष की बधाई! 🎊 यह नया साल आपके जीवन में नई उमंग और खुशियां लाए।
+broadcast,new year,hi,formal,"नया साल मुबारक हो! 🎊 यह वर्ष सभी के लिए सुख, शांति और प्रगति लेकर आए।"
+broadcast,new year,hi,formal,"सभी को नव वर्ष मुबारक! 🎊 नया साल नई उम्मीदें, नई खुशियां और नई सफलताएं लाए।"
+broadcast,new year,hi,formal,नव वर्ष की ढेरों शुभकामनाएं! 🎊 यह साल सभी के जीवन में उजाला और आनंद लाए।
+broadcast,new year,hi,formal,सभी को नया साल की बधाई हो! 🎊 इस नव वर्ष पर सभी को हार्दिक शुभकामनाएं।
+broadcast,new year,hi,formal,नया साल मुबारक! 🎊 यह नया वर्ष सभी के परिवार में खुशहाली बनाए रखे।
+broadcast,new year,hi,formal,सभी को हार्दिक नव वर्ष बधाई! 🎊 यह वर्ष आपके जीवन को और भी खुशहाल बनाए।
+broadcast,new year,hi,formal,नव वर्ष की शुभकामनाएं! 🎊 इस नए साल में सभी के सपने पूरे हों।
+broadcast,new year,hinglish,formal,Sabko Happy New Year! 🎊 Naya saal aap sabke liye khushiyan aur safalta laaye.
+broadcast,new year,hinglish,formal,Naya saal mubarak ho sabko! 🎊 Is naye saal mein aap sab ki har khwaish poori ho.
+broadcast,new year,hinglish,formal,Sabko Naye Saal ki haardik shubhkamnayen! 🎊 Ye saal aapke liye bahut khaas ho.
+broadcast,new year,hinglish,formal,"Happy New Year to all! 🎊 Naye saal mein aap sab ko sehat, khushi aur safalta mile."
+broadcast,new year,hinglish,formal,Naye saal ki dher saari badhai! 🎊 Is saal aap sab ke sapne poore hon.
+broadcast,new year,hinglish,formal,Sabko Naya Saal Mubarak! 🎊 Ye saal aapke jeevan mein nayi khushiyan laaye.
+broadcast,new year,hinglish,formal,Happy New Year sabko! 🎊 Is naye adhyaay mein aap sab ko bahut badhai.
+broadcast,new year,hinglish,formal,Naye saal ki shubhkamnayen! 🎊 Is saal aap sab aur bhi aage badhein.
+broadcast,new year,hinglish,formal,Sabko Naye Saal ki bahut badhai! 🎊 Ye saal aapke liye samriddhi laaye.
+broadcast,new year,hinglish,formal,Happy New Year! 🎊 Naye saal mein aap sab ki zindagi aur bhi roshan ho.
+broadcast,independence day,en,formal,Happy Independence Day to all! 🇮🇳 Jai Hind — may our great nation continue to prosper and shine.
+broadcast,independence day,en,formal,Warm Independence Day greetings! 🇮🇳 Let us honour the sacrifice of our freedom fighters today.
+broadcast,independence day,en,formal,Wishing everyone a Happy Independence Day! 🇮🇳 May the tricolour always fly high with pride.
+broadcast,independence day,en,formal,Happy Independence Day! 🇮🇳 Vande Mataram — let us celebrate the freedom and glory of our nation.
+broadcast,independence day,en,formal,Independence Day greetings to all! 🇮🇳 May India continue its journey of progress and unity.
+broadcast,independence day,en,formal,"Happy Independence Day! 🇮🇳 Jai Bharat — may our nation be guided by peace, prosperity, and justice."
+broadcast,independence day,en,formal,Warm greetings on Independence Day! 🇮🇳 Let us cherish our freedom and work together for our nation.
+broadcast,independence day,en,formal,Happy Independence Day everyone! 🇮🇳 Let us salute every soul who made this freedom possible.
+broadcast,independence day,en,formal,Independence Day wishes to all! 🇮🇳 May India's glory and spirit inspire generations to come.
+broadcast,independence day,en,formal,Happy Independence Day! 🇮🇳 Jai Hind Jai Bharat — may our nation always stand united and strong.
+broadcast,independence day,hi,formal,सभी को स्वतंत्रता दिवस की हार्दिक शुभकामनाएं! 🇮🇳 जय हिंद! भारत माता की जय!
+broadcast,independence day,hi,formal,स्वतंत्रता दिवस मुबारक! 🇮🇳 वंदे मातरम! इस राष्ट्रीय पर्व पर देश को नमन।
+broadcast,independence day,hi,formal,सभी को स्वतंत्रता दिवस की बधाई! 🇮🇳 जय भारत! हमारे स्वतंत्रता सेनानियों को नमन।
+broadcast,independence day,hi,formal,स्वतंत्रता दिवस की हार्दिक बधाई! 🇮🇳 भारत की एकता और अखंडता अमर रहे।
+broadcast,independence day,hi,formal,सभी को स्वतंत्रता दिवस मुबारक! 🇮🇳 जय हिंद! तिरंगा सदा ऊंचा रहे।
+broadcast,independence day,hi,formal,स्वतंत्रता दिवस की शुभकामनाएं! 🇮🇳 भारत गणराज्य की शान सदा बनी रहे।
+broadcast,independence day,hi,formal,सभी को स्वतंत्रता दिवस की बधाई हो! 🇮🇳 वंदे मातरम! जय हिंद जय भारत!
+broadcast,independence day,hi,formal,स्वतंत्रता दिवस मुबारक हो! 🇮🇳 आजादी की कीमत जाननेवाले वीरों को शत-शत नमन।
+broadcast,independence day,hi,formal,सभी को हार्दिक स्वतंत्रता दिवस बधाई! 🇮🇳 भारत माता की जय! जय हिंद!
+broadcast,independence day,hi,formal,स्वतंत्रता दिवस की ढेरों शुभकामनाएं! 🇮🇳 हमारा भारत महान — जय हिंद!
+broadcast,independence day,hinglish,formal,Sabko Happy Independence Day! 🇮🇳 Jai Hind! Bharat Mata ki Jai!
+broadcast,independence day,hinglish,formal,Independence Day mubarak ho sabko! 🇮🇳 Is mahaan desh ka hissa hone par garv hai.
+broadcast,independence day,hinglish,formal,Sabko Independence Day ki haardik shubhkamnayen! 🇮🇳 Vande Mataram!
+broadcast,independence day,hinglish,formal,Happy Independence Day! 🇮🇳 Jai Bharat! Tiranga hamesha uncha rahe.
+broadcast,independence day,hinglish,formal,Sabko Independence Day ki badhai! 🇮🇳 Apne veeron ki kurbaani ko yaad karo.
+broadcast,independence day,hinglish,formal,Independence Day ki shubhkamnayen! 🇮🇳 Jai Hind! Desh ki shaan bani rahe.
+broadcast,independence day,hinglish,formal,Happy Independence Day sabko! 🇮🇳 Humari azaadi aur eikta amar rahe.
+broadcast,independence day,hinglish,formal,Sabko Independence Day mubarak! 🇮🇳 Jai Bharat! Is rashtriya parv par desh ko salaam.
+broadcast,independence day,hinglish,formal,Independence Day ki bahut badhai! 🇮🇳 Bharat Mata ki Jai! Jai Hind!
+broadcast,independence day,hinglish,formal,Happy Independence Day! 🇮🇳 Jai Hind Jai Bharat! Desh ki unnati ho.
+broadcast,baisakhi,en,formal,"Happy Baisakhi to all! 🌾 May this harvest festival bring prosperity, joy, and abundance to everyone."
+broadcast,baisakhi,en,formal,Warm Baisakhi greetings! 🌾 May the spirit of this auspicious occasion fill every heart with happiness.
+broadcast,baisakhi,en,formal,Wishing everyone a Happy Baisakhi! 🌾 May this festival mark new beginnings and great blessings.
+broadcast,baisakhi,en,formal,Happy Baisakhi! 🌾 May the harvest season bring renewed hope and prosperity to all.
+broadcast,baisakhi,en,formal,"Baisakhi greetings to all! 🌾 May this wonderful festival be a time of joy, togetherness, and celebration."
+broadcast,baisakhi,en,formal,Happy Baisakhi everyone! 🌾 May the warmth of this festival bring happiness to every home.
+broadcast,baisakhi,en,formal,Warmest Baisakhi wishes! 🌾 May this harvest festival usher in a season of abundance and good cheer.
+broadcast,baisakhi,en,formal,Happy Baisakhi to all! 🌾 May this auspicious day bring great prosperity and happiness.
+broadcast,baisakhi,en,formal,Baisakhi wishes to everyone! 🌾 May this festive occasion be marked by joy and togetherness.
+broadcast,baisakhi,en,formal,Happy Baisakhi! 🌾 May the blessings of this harvest festival be with all of you.
+broadcast,baisakhi,hi,formal,सभी को बैसाखी की हार्दिक शुभकामनाएं! 🌾 यह पर्व सभी के जीवन में खुशियां लाए।
+broadcast,baisakhi,hi,formal,बैसाखी मुबारक हो! 🌾 नई फसल और नई उमंगों के साथ यह पर्व सभी के लिए शुभ हो।
+broadcast,baisakhi,hi,formal,सभी को बैसाखी की बधाई! 🌾 यह त्योहार सभी के घर में समृद्धि और खुशियां लाए।
+broadcast,baisakhi,hi,formal,बैसाखी की हार्दिक शुभकामनाएं! 🌾 ईश्वर से प्रार्थना है कि यह पर्व सभी के लिए मंगलकारी हो।
+broadcast,baisakhi,hi,formal,सभी को बैसाखी मुबारक! 🌾 यह त्योहार सभी के जीवन में नई ऊर्जा और उमंग भरे।
+broadcast,baisakhi,hi,formal,बैसाखी की ढेरों शुभकामनाएं! 🌾 यह पर्व सभी के लिए सुख और समृद्धि लाए।
+broadcast,baisakhi,hi,formal,सभी को बैसाखी की बधाई हो! 🌾 इस पावन पर्व पर आप सभी को हार्दिक शुभकामनाएं।
+broadcast,baisakhi,hi,formal,बैसाखी मुबारक! 🌾 यह उत्सव सभी के परिवार में खुशहाली बनाए रखे।
+broadcast,baisakhi,hi,formal,सभी को हार्दिक बैसाखी बधाई! 🌾 यह पर्व आपके जीवन को और भी खुशहाल बनाए।
+broadcast,baisakhi,hi,formal,बैसाखी की शुभकामनाएं! 🌾 नई फसल की खुशियां सभी के घर में आएं।
+broadcast,baisakhi,hinglish,formal,Sabko Happy Baisakhi! 🌾 Is tyohar ki khushiyan aap sabke ghar mein samriddhi laayein.
+broadcast,baisakhi,hinglish,formal,Baisakhi mubarak ho sabko! 🌾 Nayi fasal ki khushiyan sabke ghar mein aayein.
+broadcast,baisakhi,hinglish,formal,Sabko Baisakhi ki haardik shubhkamnayen! 🌾 Ye parv aapke jeevan mein sukh laaye.
+broadcast,baisakhi,hinglish,formal,Happy Baisakhi to all! 🌾 Is khaas din par aap sab khushi se bhare rahein.
+broadcast,baisakhi,hinglish,formal,Baisakhi ki dher saari badhai! 🌾 Nayi umeedein aur nayi khushiyan sabke saath hon.
+broadcast,baisakhi,hinglish,formal,Sabko Baisakhi mubarak! 🌾 Ye parv aapke ghar mein naya josh aur samriddhi laaye.
+broadcast,baisakhi,hinglish,formal,Happy Baisakhi sabko! 🌾 Is utsav par aap sab ko haardik shubhkamnayen.
+broadcast,baisakhi,hinglish,formal,Baisakhi ki shubhkamnayen! 🌾 Is pavan parv par sabko khushi aur samriddhi mile.
+broadcast,baisakhi,hinglish,formal,Sabko Baisakhi ki bahut badhai! 🌾 Ye tyohar aapke jeevan mein nayi roshan laaye.
+broadcast,baisakhi,hinglish,formal,Happy Baisakhi! 🌾 Is tyohar ki khushiyan aap sab ke saath bani rahein.
+broadcast,maha shivratri,en,formal,Happy Maha Shivratri to all! 🙏 Har Har Mahadev — may Lord Shiva bless everyone with peace and prosperity.
+broadcast,maha shivratri,en,formal,Warm Maha Shivratri greetings! 🙏 May the divine blessings of Bholenath be upon all of you.
+broadcast,maha shivratri,en,formal,Wishing everyone a blessed Maha Shivratri! 🙏 Om Namah Shivaya — may Lord Shiva shower his grace.
+broadcast,maha shivratri,en,formal,"Happy Maha Shivratri! 🙏 May this auspicious occasion bring peace, health, and spiritual renewal."
+broadcast,maha shivratri,en,formal,Maha Shivratri blessings to all! 🙏 May Lord Shiva's grace remove all obstacles from your paths.
+broadcast,maha shivratri,en,formal,Happy Maha Shivratri everyone! 🙏 May the blessings of this sacred day fill every heart with peace.
+broadcast,maha shivratri,en,formal,Warmest Maha Shivratri wishes! 🙏 Har Har Mahadev — may all be blessed on this sacred occasion.
+broadcast,maha shivratri,en,formal,Happy Maha Shivratri to all! 🙏 May Lord Bholenath bestow good health and happiness on everyone.
+broadcast,maha shivratri,en,formal,Maha Shivratri wishes to everyone! 🙏 May this holy festival bring spiritual peace and divine blessings.
+broadcast,maha shivratri,en,formal,Happy Maha Shivratri! 🙏 Om Namah Shivaya — may Lord Shiva protect and bless all of you.
+broadcast,maha shivratri,hi,formal,सभी को महाशिवरात्रि की हार्दिक शुभकामनाएं! 🙏 हर हर महादेव! भगवान शिव की कृपा आप सभी पर बनी रहे।
+broadcast,maha shivratri,hi,formal,महाशिवरात्रि मुबारक! 🙏 ॐ नमः शिवाय! भोलेनाथ सभी की मनोकामनाएं पूरी करें।
+broadcast,maha shivratri,hi,formal,सभी को महाशिवरात्रि की बधाई! 🙏 भगवान शंकर सभी पर अपना आशीर्वाद बनाए रखें।
+broadcast,maha shivratri,hi,formal,महाशिवरात्रि की हार्दिक शुभकामनाएं! 🙏 हर हर महादेव! इस पावन अवसर पर शिव की कृपा हो।
+broadcast,maha shivratri,hi,formal,सभी को महाशिवरात्रि मुबारक! 🙏 भगवान भोलेनाथ सभी के कष्ट दूर करें।
+broadcast,maha shivratri,hi,formal,महाशिवरात्रि की ढेरों शुभकामनाएं! 🙏 ॐ नमः शिवाय! शिव का आशीर्वाद सदा मिले।
+broadcast,maha shivratri,hi,formal,सभी को महाशिवरात्रि की बधाई हो! 🙏 हर हर महादेव! इस पवित्र पर्व पर शुभकामनाएं।
+broadcast,maha shivratri,hi,formal,"महाशिवरात्रि मुबारक हो! 🙏 भगवान शिव सभी को सुख, शांति और समृद्धि दें।"
+broadcast,maha shivratri,hi,formal,सभी को हार्दिक महाशिवरात्रि बधाई! 🙏 भोलेनाथ का आशीर्वाद सदा बना रहे।
+broadcast,maha shivratri,hi,formal,महाशिवरात्रि की शुभकामनाएं! 🙏 हर हर महादेव! शिव कृपा सभी पर हो।
+broadcast,maha shivratri,hinglish,formal,Sabko Happy Maha Shivratri! 🙏 Har Har Mahadev! Bhagwan Shiv ki kripa aap sab par ho.
+broadcast,maha shivratri,hinglish,formal,Maha Shivratri mubarak ho sabko! 🙏 Om Namah Shivaya! Bholenath sabki manokamnayen poori karein.
+broadcast,maha shivratri,hinglish,formal,Sabko Maha Shivratri ki haardik shubhkamnayen! 🙏 Shiv ka ashirwad aap sab par bana rahe.
+broadcast,maha shivratri,hinglish,formal,Happy Maha Shivratri to all! 🙏 Har Har Mahadev! Is pavan avsar par Shiv ki kripa ho.
+broadcast,maha shivratri,hinglish,formal,Maha Shivratri ki dher saari badhai! 🙏 Bholenath sab ke kasht door karein.
+broadcast,maha shivratri,hinglish,formal,Sabko Maha Shivratri mubarak! 🙏 Om Namah Shivaya! Shiv ashirwad sadaa mile.
+broadcast,maha shivratri,hinglish,formal,Happy Maha Shivratri sabko! 🙏 Is pavan parv par aap sab ko haardik shubhkamnayen.
+broadcast,maha shivratri,hinglish,formal,Maha Shivratri ki shubhkamnayen! 🙏 Har Har Mahadev! Sabko sukh aur shanti mile.
+broadcast,maha shivratri,hinglish,formal,Sabko Maha Shivratri ki bahut badhai! 🙏 Bholenath ka ashirwad hamesha bana rahe.
+broadcast,maha shivratri,hinglish,formal,Happy Maha Shivratri! 🙏 Om Namah Shivaya! Shiv kripa sab par ho.
+broadcast,holi,en,formal,Happy Holi to all! 🎨 May the colours of this wonderful festival fill your lives with joy and happiness.
+broadcast,holi,en,formal,Warm Holi greetings to everyone! 🎨 May this festival of colours bring brightness and cheer to all.
+broadcast,holi,en,formal,Wishing everyone a very Happy Holi! 🎨 May the vibrant colours of Holi paint your lives with joy.
+broadcast,holi,en,formal,Happy Holi! 🎨 May the spirit of this colourful festival bring togetherness and celebration to all.
+broadcast,holi,en,formal,Holi greetings to all! 🎨 May this joyful festival fill every heart with love and happiness.
+broadcast,holi,en,formal,"Happy Holi everyone! 🎨 May the colours of Holi bring brightness, love, and wonderful memories."
+broadcast,holi,en,formal,Warmest Holi wishes! 🎨 May this festival of colours usher in a season of joy and togetherness.
+broadcast,holi,en,formal,Happy Holi to all! 🎨 May the vibrant spirit of Holi bring happiness and colour to your lives.
+broadcast,holi,en,formal,"Holi wishes to everyone! 🎨 May this festive occasion be a time of joy, celebration, and goodwill."
+broadcast,holi,en,formal,Happy Holi! 🎨 Bura na mano — may the colours of joy and happiness be with all of you.
+broadcast,holi,hi,formal,सभी को होली की हार्दिक शुभकामनाएं! 🎨 बुरा न मानो होली है! यह रंगों का त्योहार सभी के जीवन में खुशियां लाए।
+broadcast,holi,hi,formal,होली मुबारक हो! 🎨 इस रंगों के पर्व पर सभी के जीवन में खुशियों के रंग बिखरें।
+broadcast,holi,hi,formal,सभी को होली की बधाई! 🎨 यह त्योहार सभी के घर में उमंग और खुशियां लाए।
+broadcast,holi,hi,formal,होली की हार्दिक शुभकामनाएं! 🎨 इस पावन पर्व पर ईश्वर सभी पर कृपा बनाए रखें।
+broadcast,holi,hi,formal,सभी को होली मुबारक! 🎨 रंगों की इस होली में सभी के जीवन में खुशियां बिखरें।
+broadcast,holi,hi,formal,होली की ढेरों शुभकामनाएं! 🎨 यह पर्व सभी के जीवन में नई ऊर्जा और उमंग भरे।
+broadcast,holi,hi,formal,सभी को होली की बधाई हो! 🎨 इस पावन पर्व पर आप सभी को हार्दिक शुभकामनाएं।
+broadcast,holi,hi,formal,होली मुबारक! 🎨 यह उत्सव सभी के परिवार में प्रेम और खुशियां बनाए रखे।
+broadcast,holi,hi,formal,सभी को हार्दिक होली बधाई! 🎨 यह पर्व आपके जीवन को रंगों से भर दे।
+broadcast,holi,hi,formal,होली की शुभकामनाएं! 🎨 बुरा न मानो होली है — सभी को खुशियों की होली मुबारक!
+broadcast,holi,hinglish,formal,Sabko Happy Holi! 🎨 Bura na mano Holi hai! Is tyohar ke rang aap sabke jeevan mein khushiyan laayein.
+broadcast,holi,hinglish,formal,Holi mubarak ho sabko! 🎨 Is rangon ke parv par sabke jeevan mein khushiyan bikhrein.
+broadcast,holi,hinglish,formal,Sabko Holi ki haardik shubhkamnayen! 🎨 Ye parv aapke jeevan mein rang aur aanand laaye.
+broadcast,holi,hinglish,formal,Happy Holi to all! 🎨 Is khaas din par aap sab khushi aur utsah se bhare rahein.
+broadcast,holi,hinglish,formal,Holi ki dher saari badhai! 🎨 Is tyohar ke rang aapki zindagi mein khushiyan bhar den.
+broadcast,holi,hinglish,formal,Sabko Holi mubarak! 🎨 Ye parv aapke ghar mein naya josh aur pyaar laaye.
+broadcast,holi,hinglish,formal,Happy Holi sabko! 🎨 Bura na mano — is utsav par aap sab ko haardik shubhkamnayen.
+broadcast,holi,hinglish,formal,Holi ki shubhkamnayen! 🎨 Is pavan parv par sabke dil mein khushi aur rang bhari rahe.
+broadcast,holi,hinglish,formal,Sabko Holi ki bahut badhai! 🎨 Ye tyohar aapke jeevan ko aur bhi rangeen banaye.
+broadcast,holi,hinglish,formal,Happy Holi! 🎨 Is rang birangi Holi mein aap sab ke liye dher saari khushiyan.
+broadcast,janmashtami,en,formal,Happy Janmashtami to all! 🦚 Jai Shri Krishna — may Lord Krishna's blessings be upon everyone.
+broadcast,janmashtami,en,formal,Warm Janmashtami greetings! 🦚 May Lord Krishna's divine grace fill your lives with joy and peace.
+broadcast,janmashtami,en,formal,Wishing everyone a blessed Janmashtami! 🦚 Radhe Radhe — may Kanha's blessings be with all.
+broadcast,janmashtami,en,formal,"Happy Janmashtami! 🦚 May the birth of Lord Krishna bring joy, wisdom, and divine blessings to all."
+broadcast,janmashtami,en,formal,Janmashtami greetings to all! 🦚 Jai Shri Krishna — may Lord Krishna guide you with his divine wisdom.
+broadcast,janmashtami,en,formal,Happy Janmashtami everyone! 🦚 May the teachings and blessings of Lord Krishna be with all of you.
+broadcast,janmashtami,en,formal,Warmest Janmashtami wishes! 🦚 Radhe Radhe — may this auspicious occasion bring peace and happiness.
+broadcast,janmashtami,en,formal,"Happy Janmashtami to all! 🦚 May Lord Krishna bless everyone with health, happiness, and prosperity."
+broadcast,janmashtami,en,formal,Janmashtami wishes to everyone! 🦚 Jai Shri Krishna — may this sacred day bring divine blessings.
+broadcast,janmashtami,en,formal,Happy Janmashtami! 🦚 May Lord Kanha's grace and wisdom guide all of us on our journeys.
+broadcast,janmashtami,hi,formal,सभी को जन्माष्टमी की हार्दिक शुभकामनाएं! 🦚 जय श्री कृष्ण! भगवान कृष्ण की कृपा आप सभी पर बनी रहे।
+broadcast,janmashtami,hi,formal,जन्माष्टमी मुबारक हो! 🦚 राधे राधे! कान्हा का आशीर्वाद सभी पर बना रहे।
+broadcast,janmashtami,hi,formal,सभी को जन्माष्टमी की बधाई! 🦚 भगवान कृष्ण सभी के जीवन में सुख और समृद्धि लाएं।
+broadcast,janmashtami,hi,formal,जन्माष्टमी की हार्दिक शुभकामनाएं! 🦚 जय श्री कृष्ण! इस पावन अवसर पर कृष्ण की कृपा हो।
+broadcast,janmashtami,hi,formal,सभी को जन्माष्टमी मुबारक! 🦚 भगवान कृष्ण सभी के कष्ट दूर करें और खुशियां दें।
+broadcast,janmashtami,hi,formal,जन्माष्टमी की ढेरों शुभकामनाएं! 🦚 राधे राधे! कृष्ण का आशीर्वाद सदा मिले।
+broadcast,janmashtami,hi,formal,सभी को जन्माष्टमी की बधाई हो! 🦚 जय श्री कृष्ण! इस पवित्र पर्व पर शुभकामनाएं।
+broadcast,janmashtami,hi,formal,जन्माष्टमी मुबारक हो! 🦚 भगवान श्री कृष्ण सभी को सुख और शांति दें।
+broadcast,janmashtami,hi,formal,सभी को हार्दिक जन्माष्टमी बधाई! 🦚 कान्हा का आशीर्वाद सदा बना रहे।
+broadcast,janmashtami,hi,formal,जन्माष्टमी की शुभकामनाएं! 🦚 जय श्री कृष्ण! कृष्ण कृपा सभी पर हो।
+broadcast,janmashtami,hinglish,formal,Sabko Happy Janmashtami! 🦚 Jai Shri Krishna! Bhagwan Krishna ki kripa aap sab par ho.
+broadcast,janmashtami,hinglish,formal,Janmashtami mubarak ho sabko! 🦚 Radhe Radhe! Kanha ka ashirwad sab par bana rahe.
+broadcast,janmashtami,hinglish,formal,Sabko Janmashtami ki haardik shubhkamnayen! 🦚 Krishna ji ki kripa sab par bani rahe.
+broadcast,janmashtami,hinglish,formal,Happy Janmashtami to all! 🦚 Jai Shri Krishna! Is pavan avsar par Kanha ki kripa ho.
+broadcast,janmashtami,hinglish,formal,Janmashtami ki dher saari badhai! 🦚 Radhe Radhe! Krishna ashirwad sadaa mile.
+broadcast,janmashtami,hinglish,formal,Sabko Janmashtami mubarak! 🦚 Jai Shri Krishna! Bhagwan sab ke kasht door karein.
+broadcast,janmashtami,hinglish,formal,Happy Janmashtami sabko! 🦚 Is pavan parv par aap sab ko haardik shubhkamnayen.
+broadcast,janmashtami,hinglish,formal,Janmashtami ki shubhkamnayen! 🦚 Jai Shri Krishna! Sabko sukh aur shanti mile.
+broadcast,janmashtami,hinglish,formal,Sabko Janmashtami ki bahut badhai! 🦚 Kanha ka ashirwad hamesha bana rahe.
+broadcast,janmashtami,hinglish,formal,Happy Janmashtami! 🦚 Radhe Radhe! Krishna kripa sab par ho.
+broadcast,raksha bandhan,en,formal,Happy Raksha Bandhan to all! 🎀 May the sacred bond of love between siblings be celebrated joyfully.
+broadcast,raksha bandhan,en,formal,Warm Raksha Bandhan greetings! 🎀 May the thread of love and protection keep all siblings connected.
+broadcast,raksha bandhan,en,formal,Wishing everyone a Happy Raksha Bandhan! 🎀 May this beautiful festival strengthen bonds of love.
+broadcast,raksha bandhan,en,formal,"Happy Raksha Bandhan! 🎀 May the divine thread of rakhi bind all with love, care, and togetherness."
+broadcast,raksha bandhan,en,formal,Raksha Bandhan greetings to all! 🎀 May this auspicious occasion be a time of joy and celebration.
+broadcast,raksha bandhan,en,formal,Happy Raksha Bandhan everyone! 🎀 May the love between brothers and sisters flourish always.
+broadcast,raksha bandhan,en,formal,Warmest Raksha Bandhan wishes! 🎀 May this festival of sibling love be celebrated with great joy.
+broadcast,raksha bandhan,en,formal,Happy Raksha Bandhan to all! 🎀 May every brother and sister celebrate this beautiful bond today.
+broadcast,raksha bandhan,en,formal,Raksha Bandhan wishes to everyone! 🎀 May this sacred festival bring happiness and blessings to all.
+broadcast,raksha bandhan,en,formal,Happy Raksha Bandhan! 🎀 May the love and protection symbolised by the rakhi be eternal.
+broadcast,raksha bandhan,hi,formal,सभी को रक्षाबंधन की हार्दिक शुभकामनाएं! 🎀 यह पावन पर्व भाई-बहन के प्रेम को और मजबूत करे।
+broadcast,raksha bandhan,hi,formal,रक्षाबंधन मुबारक हो! 🎀 इस पवित्र धागे की तरह भाई-बहन का रिश्ता अटूट रहे।
+broadcast,raksha bandhan,hi,formal,सभी को रक्षाबंधन की बधाई! 🎀 यह त्योहार सभी के घर में खुशियां और प्यार लाए।
+broadcast,raksha bandhan,hi,formal,रक्षाबंधन की हार्दिक शुभकामनाएं! 🎀 भाई-बहन का यह पावन रिश्ता अमर रहे।
+broadcast,raksha bandhan,hi,formal,सभी को रक्षाबंधन मुबारक! 🎀 इस पवित्र अवसर पर सभी भाई-बहनों को शुभकामनाएं।
+broadcast,raksha bandhan,hi,formal,रक्षाबंधन की ढेरों शुभकामनाएं! 🎀 यह पर्व प्यार और सुरक्षा के बंधन को मजबूत करे।
+broadcast,raksha bandhan,hi,formal,सभी को रक्षाबंधन की बधाई हो! 🎀 इस पावन पर्व पर सभी को हार्दिक शुभकामनाएं।
+broadcast,raksha bandhan,hi,formal,रक्षाबंधन मुबारक! 🎀 भाई-बहन के इस अटूट बंधन को नमन।
+broadcast,raksha bandhan,hi,formal,सभी को हार्दिक रक्षाबंधन बधाई! 🎀 यह पर्व आपके परिवार में खुशियां लाए।
+broadcast,raksha bandhan,hi,formal,रक्षाबंधन की शुभकामनाएं! 🎀 प्यार का यह धागा सदा अटूट रहे।
+broadcast,raksha bandhan,hinglish,formal,Sabko Happy Raksha Bandhan! 🎀 Is pavan parv par bhai-behen ka rishta aur mazboot ho.
+broadcast,raksha bandhan,hinglish,formal,Raksha Bandhan mubarak ho sabko! 🎀 Is pavitra dhagey ki tarah pyaar ka bandhan amar rahe.
+broadcast,raksha bandhan,hinglish,formal,Sabko Rakshabandhan ki haardik shubhkamnayen! 🎀 Bhai-behen ka pyaar hamesha roshan rahe.
+broadcast,raksha bandhan,hinglish,formal,Happy Raksha Bandhan to all! 🎀 Is khaas din par sabhi bhai-behen ko badhai.
+broadcast,raksha bandhan,hinglish,formal,Raksha Bandhan ki dher saari badhai! 🎀 Pyaar ka ye bandhan sadaa mazboot rahe.
+broadcast,raksha bandhan,hinglish,formal,Sabko Raksha Bandhan mubarak! 🎀 Is pavan avsar par sabko haardik shubhkamnayen.
+broadcast,raksha bandhan,hinglish,formal,Happy Raksha Bandhan sabko! 🎀 Is utsav par aap sab ko haardik shubhkamnayen.
+broadcast,raksha bandhan,hinglish,formal,Raksha Bandhan ki shubhkamnayen! 🎀 Bhai-behen ke is rishte ko salaam.
+broadcast,raksha bandhan,hinglish,formal,Sabko Raksha Bandhan ki bahut badhai! 🎀 Ye tyohar aapke ghar mein khushiyan laaye.
+broadcast,raksha bandhan,hinglish,formal,Happy Raksha Bandhan! 🎀 Is pavan parv par sabke dil mein pyaar bana rahe.
+broadcast,ganesh chaturthi,en,formal,Happy Ganesh Chaturthi to all! 🐘 Ganpati Bappa Morya — may Lord Ganesha remove all obstacles.
+broadcast,ganesh chaturthi,en,formal,"Warm Ganesh Chaturthi greetings! 🐘 May Lord Ganesha bless everyone with wisdom, prosperity, and success."
+broadcast,ganesh chaturthi,en,formal,Wishing everyone a blessed Ganesh Chaturthi! 🐘 Jai Ganesh — may Bappa's blessings be upon all.
+broadcast,ganesh chaturthi,en,formal,"Happy Ganesh Chaturthi! 🐘 May Lord Ganesha fill your lives with joy, success, and divine blessings."
+broadcast,ganesh chaturthi,en,formal,Ganesh Chaturthi greetings to all! 🐘 Ganpati Bappa Morya — may the Lord of wisdom guide us all.
+broadcast,ganesh chaturthi,en,formal,Happy Ganesh Chaturthi everyone! 🐘 May Lord Ganesha's grace remove obstacles and bring prosperity.
+broadcast,ganesh chaturthi,en,formal,Warmest Ganesh Chaturthi wishes! 🐘 Jai Ganesh — may this auspicious occasion bring divine blessings.
+broadcast,ganesh chaturthi,en,formal,Happy Ganesh Chaturthi to all! 🐘 May Bappa bless everyone with a life free of obstacles and full of joy.
+broadcast,ganesh chaturthi,en,formal,Ganesh Chaturthi wishes to everyone! 🐘 Ganpati Bappa Morya — may the Lord of new beginnings bless all.
+broadcast,ganesh chaturthi,en,formal,Happy Ganesh Chaturthi! 🐘 May Lord Ganesha's wisdom and blessings guide everyone to success.
+broadcast,ganesh chaturthi,hi,formal,सभी को गणेश चतुर्थी की हार्दिक शुभकामनाएं! 🐘 गणपति बप्पा मोरया! भगवान गणेश सभी की मनोकामनाएं पूरी करें।
+broadcast,ganesh chaturthi,hi,formal,गणेश चतुर्थी मुबारक हो! 🐘 जय गणेश! बप्पा का आशीर्वाद सभी पर बना रहे।
+broadcast,ganesh chaturthi,hi,formal,सभी को गणेश चतुर्थी की बधाई! 🐘 भगवान गणेश सभी के जीवन से विघ्न दूर करें।
+broadcast,ganesh chaturthi,hi,formal,गणेश चतुर्थी की हार्दिक शुभकामनाएं! 🐘 गणपति बप्पा मोरया! इस पावन अवसर पर गणेश की कृपा हो।
+broadcast,ganesh chaturthi,hi,formal,सभी को गणेश चतुर्थी मुबारक! 🐘 भगवान गणेश सभी को सुख और समृद्धि दें।
+broadcast,ganesh chaturthi,hi,formal,गणेश चतुर्थी की ढेरों शुभकामनाएं! 🐘 जय गणेश! बप्पा का आशीर्वाद सदा मिले।
+broadcast,ganesh chaturthi,hi,formal,सभी को गणेश चतुर्थी की बधाई हो! 🐘 गणपति बप्पा मोरया! शुभकामनाएं।
+broadcast,ganesh chaturthi,hi,formal,गणेश चतुर्थी मुबारक! 🐘 भगवान गणेश सभी पर अपनी कृपा बनाए रखें।
+broadcast,ganesh chaturthi,hi,formal,सभी को हार्दिक गणेश चतुर्थी बधाई! 🐘 बप्पा का आशीर्वाद हमेशा बना रहे।
+broadcast,ganesh chaturthi,hi,formal,गणेश चतुर्थी की शुभकामनाएं! 🐘 गणपति बप्पा मोरया! गणेश कृपा सभी पर हो।
+broadcast,ganesh chaturthi,hinglish,formal,Sabko Happy Ganesh Chaturthi! 🐘 Ganpati Bappa Morya! Bhagwan Ganesh ki kripa aap sab par ho.
+broadcast,ganesh chaturthi,hinglish,formal,Ganesh Chaturthi mubarak ho sabko! 🐘 Jai Ganesh! Bappa ka ashirwad sab par bana rahe.
+broadcast,ganesh chaturthi,hinglish,formal,Sabko Ganesh Chaturthi ki haardik shubhkamnayen! 🐘 Bappa sab ke vighna door karein.
+broadcast,ganesh chaturthi,hinglish,formal,Happy Ganesh Chaturthi to all! 🐘 Ganpati Bappa Morya! Is pavan avsar par Ganesh ji ki kripa ho.
+broadcast,ganesh chaturthi,hinglish,formal,Ganesh Chaturthi ki dher saari badhai! 🐘 Jai Ganesh! Bappa ashirwad sadaa mile.
+broadcast,ganesh chaturthi,hinglish,formal,Sabko Ganesh Chaturthi mubarak! 🐘 Ganpati Bappa Morya! Sabko sukh aur samriddhi mile.
+broadcast,ganesh chaturthi,hinglish,formal,Happy Ganesh Chaturthi sabko! 🐘 Is pavan parv par aap sab ko haardik shubhkamnayen.
+broadcast,ganesh chaturthi,hinglish,formal,Ganesh Chaturthi ki shubhkamnayen! 🐘 Jai Ganesh! Sabke vighna door hon.
+broadcast,ganesh chaturthi,hinglish,formal,Sabko Ganesh Chaturthi ki bahut badhai! 🐘 Bappa ka ashirwad hamesha bana rahe.
+broadcast,ganesh chaturthi,hinglish,formal,Happy Ganesh Chaturthi! 🐘 Ganpati Bappa Morya! Ganesh kripa sab par ho.
+broadcast,navratri,en,formal,Happy Navratri to all! 🌸 Jai Mata Di — may Maa Durga's blessings fill everyone with strength and joy.
+broadcast,navratri,en,formal,Warm Navratri greetings! 🌸 May the divine blessings of Maa Durga bring peace and prosperity to all.
+broadcast,navratri,en,formal,Wishing everyone a blessed Navratri! 🌸 May the Goddess shower her grace and protect everyone.
+broadcast,navratri,en,formal,Happy Navratri! 🌸 May the nine days of Navratri fill everyone's life with devotion and divine joy.
+broadcast,navratri,en,formal,Navratri greetings to all! 🌸 Jai Mata Di — may Maa Durga guide everyone with her divine strength.
+broadcast,navratri,en,formal,Happy Navratri everyone! 🌸 May the blessings of the Divine Mother be with all of you.
+broadcast,navratri,en,formal,Warmest Navratri wishes! 🌸 May this sacred festival bring divine blessings and inner peace to all.
+broadcast,navratri,en,formal,"Happy Navratri to all! 🌸 May Maa Durga bless everyone with courage, wisdom, and prosperity."
+broadcast,navratri,en,formal,Navratri wishes to everyone! 🌸 Jai Mata Di — may this auspicious festival bring divine grace to all.
+broadcast,navratri,en,formal,Happy Navratri! 🌸 May the divine power of Maa Durga protect and bless all of you.
+broadcast,navratri,hi,formal,सभी को नवरात्रि की हार्दिक शुभकामनाएं! 🌸 जय माता दी! माँ दुर्गा की कृपा आप सभी पर बनी रहे।
+broadcast,navratri,hi,formal,नवरात्रि मुबारक हो! 🌸 माँ दुर्गा के आशीर्वाद से सभी का जीवन सुखमय हो।
+broadcast,navratri,hi,formal,सभी को नवरात्रि की बधाई! 🌸 माँ की शक्ति सभी को शक्ति और साहस दे।
+broadcast,navratri,hi,formal,नवरात्रि की हार्दिक शुभकामनाएं! 🌸 जय माता दी! इस पावन पर्व पर माँ की कृपा हो।
+broadcast,navratri,hi,formal,सभी को नवरात्रि मुबारक! 🌸 माँ दुर्गा सभी के कष्ट दूर करें और खुशियां दें।
+broadcast,navratri,hi,formal,नवरात्रि की ढेरों शुभकामनाएं! 🌸 जय माता दी! माँ का आशीर्वाद सदा मिले।
+broadcast,navratri,hi,formal,सभी को नवरात्रि की बधाई हो! 🌸 माँ दुर्गा की कृपा से सभी का कल्याण हो।
+broadcast,navratri,hi,formal,नवरात्रि मुबारक! 🌸 माँ जगदम्बे सभी पर अपना आशीर्वाद बनाए रखें।
+broadcast,navratri,hi,formal,सभी को हार्दिक नवरात्रि बधाई! 🌸 जय माता दी! माँ की शरण में सभी सुरक्षित रहें।
+broadcast,navratri,hi,formal,नवरात्रि की शुभकामनाएं! 🌸 माँ दुर्गा की कृपा सभी पर हो।
+broadcast,navratri,hinglish,formal,Sabko Happy Navratri! 🌸 Jai Mata Di! Maa Durga ki kripa aap sab par ho.
+broadcast,navratri,hinglish,formal,Navratri mubarak ho sabko! 🌸 Maa ki shakti aap sab ko shakti aur sahas de.
+broadcast,navratri,hinglish,formal,Sabko Navratri ki haardik shubhkamnayen! 🌸 Jai Mata Di! Maa ka ashirwad sab par bana rahe.
+broadcast,navratri,hinglish,formal,Happy Navratri to all! 🌸 Jai Mata Di! Is pavan avsar par Maa ki kripa ho.
+broadcast,navratri,hinglish,formal,Navratri ki dher saari badhai! 🌸 Maa Durga sab ke kasht door karein.
+broadcast,navratri,hinglish,formal,Sabko Navratri mubarak! 🌸 Jai Mata Di! Maa ashirwad sadaa mile.
+broadcast,navratri,hinglish,formal,Happy Navratri sabko! 🌸 Is pavan parv par aap sab ko haardik shubhkamnayen.
+broadcast,navratri,hinglish,formal,Navratri ki shubhkamnayen! 🌸 Maa jagdambe sab par apna ashirwad banaye rakhen.
+broadcast,navratri,hinglish,formal,Sabko Navratri ki bahut badhai! 🌸 Jai Mata Di! Maa ka ashirwad hamesha bana rahe.
+broadcast,navratri,hinglish,formal,Happy Navratri! 🌸 Maa Durga ki kripa sab par ho. Jai Mata Di!
+broadcast,dussehra,en,formal,Happy Dussehra to all! 🏹 Jai Shri Ram — may the victory of good over evil inspire us always.
+broadcast,dussehra,en,formal,"Warm Dussehra greetings! 🏹 May this Vijayadashami bring triumph, joy, and blessings to everyone."
+broadcast,dussehra,en,formal,Wishing everyone a Happy Dussehra! 🏹 May the spirit of righteousness and truth prevail always.
+broadcast,dussehra,en,formal,Happy Dussehra! 🏹 May Lord Ram's victory over Ravana inspire us to overcome our own challenges.
+broadcast,dussehra,en,formal,Dussehra greetings to all! 🏹 Jai Shri Ram — may good always triumph over evil in our lives.
+broadcast,dussehra,en,formal,Happy Dussehra everyone! 🏹 May this Vijayadashami bring great success and happiness to all.
+broadcast,dussehra,en,formal,Warmest Dussehra wishes! 🏹 May the victory of truth and righteousness guide everyone always.
+broadcast,dussehra,en,formal,Happy Dussehra to all! 🏹 May Lord Ram's blessings be upon everyone on this auspicious day.
+broadcast,dussehra,en,formal,Dussehra wishes to everyone! 🏹 Jai Shri Ram — may we all emerge victorious over adversity.
+broadcast,dussehra,en,formal,Happy Dussehra! 🏹 May the light of righteousness illuminate all our paths. Jai Shri Ram!
+broadcast,dussehra,hi,formal,सभी को दशहरे की हार्दिक शुभकामनाएं! 🏹 जय श्री राम! बुराई पर अच्छाई की जीत का यह पर्व सभी को प्रेरणा दे।
+broadcast,dussehra,hi,formal,विजयदशमी मुबारक हो! 🏹 जय श्री राम! इस पावन पर्व पर भगवान राम की कृपा सभी पर हो।
+broadcast,dussehra,hi,formal,सभी को दशहरे की बधाई! 🏹 सत्य और धर्म की सदा जीत होती है — जय श्री राम!
+broadcast,dussehra,hi,formal,दशहरे की हार्दिक शुभकामनाएं! 🏹 जय श्री राम! यह पर्व सभी के जीवन में विजय लाए।
+broadcast,dussehra,hi,formal,सभी को दशहरा मुबारक! 🏹 भगवान राम का आशीर्वाद सभी पर बना रहे।
+broadcast,dussehra,hi,formal,दशहरे की ढेरों शुभकामनाएं! 🏹 जय श्री राम! बुराई पर अच्छाई की जय हो।
+broadcast,dussehra,hi,formal,सभी को दशहरे की बधाई हो! 🏹 विजयदशमी के इस पावन पर्व पर शुभकामनाएं।
+broadcast,dussehra,hi,formal,दशहरा मुबारक हो! 🏹 जय श्री राम! यह पर्व सभी के जीवन में विजय और सफलता लाए।
+broadcast,dussehra,hi,formal,सभी को हार्दिक दशहरे की बधाई! 🏹 जय श्री राम! सत्य की विजय हो।
+broadcast,dussehra,hi,formal,दशहरे की शुभकामनाएं! 🏹 जय श्री राम! बुराई पर अच्छाई की जीत का यह पर्व मंगलकारी हो।
+broadcast,dussehra,hinglish,formal,Sabko Happy Dussehra! 🏹 Jai Shri Ram! Burai par acchai ki jeet ka ye parv sab ko prerna de.
+broadcast,dussehra,hinglish,formal,Dussehra mubarak ho sabko! 🏹 Jai Shri Ram! Is pavan avsar par Ram ji ki kripa ho.
+broadcast,dussehra,hinglish,formal,Sabko Dussehra ki haardik shubhkamnayen! 🏹 Satya aur dharm ki hamesha jeet hoti hai.
+broadcast,dussehra,hinglish,formal,Happy Dussehra to all! 🏹 Jai Shri Ram! Ye parv aapke jeevan mein vijay laaye.
+broadcast,dussehra,hinglish,formal,Dussehra ki dher saari badhai! 🏹 Jai Shri Ram! Burai par acchai ki jai ho.
+broadcast,dussehra,hinglish,formal,Sabko Dussehra mubarak! 🏹 Bhagwan Ram ka ashirwad sab par bana rahe.
+broadcast,dussehra,hinglish,formal,Happy Dussehra sabko! 🏹 Is pavan parv par aap sab ko haardik shubhkamnayen.
+broadcast,dussehra,hinglish,formal,Dussehra ki shubhkamnayen! 🏹 Jai Shri Ram! Vijay aur safalta sabko mile.
+broadcast,dussehra,hinglish,formal,Sabko Dussehra ki bahut badhai! 🏹 Jai Shri Ram! Satya ki vijay ho.
+broadcast,dussehra,hinglish,formal,Happy Dussehra! 🏹 Jai Shri Ram! Is mahaan parv par sab ko badhai.
+broadcast,diwali,en,formal,Happy Diwali to all! 🪔 Shubh Deepawali — may the festival of lights fill every home with joy and prosperity.
+broadcast,diwali,en,formal,Warm Diwali greetings to everyone! 🪔 May the diyas of Diwali illuminate your lives with happiness.
+broadcast,diwali,en,formal,"Wishing everyone a very Happy Diwali! 🪔 May this festival bring light, love, and abundance to all."
+broadcast,diwali,en,formal,Happy Diwali! 🪔 May the radiance of a thousand diyas fill your lives with warmth and blessings.
+broadcast,diwali,en,formal,Diwali greetings to all! 🪔 Shubh Deepawali — may Maa Lakshmi bless everyone with prosperity.
+broadcast,diwali,en,formal,Happy Diwali everyone! 🪔 May the light of this beautiful festival dispel all darkness from your lives.
+broadcast,diwali,en,formal,"Warmest Diwali wishes! 🪔 May the festival of lights bring peace, joy, and great fortune to all."
+broadcast,diwali,en,formal,"Happy Diwali to all! 🪔 May this Deepawali be a time of celebration, togetherness, and blessings."
+broadcast,diwali,en,formal,Diwali wishes to everyone! 🪔 Shubh Deepawali — may the new year bring health and happiness.
+broadcast,diwali,en,formal,Happy Diwali! 🪔 May the glow of the diyas light up your hearts and homes this Deepawali.
+broadcast,diwali,hi,formal,सभी को दिवाली की हार्दिक शुभकामनाएं! 🪔 शुभ दीपावली! माँ लक्ष्मी की कृपा सभी पर बनी रहे।
+broadcast,diwali,hi,formal,दीपावली मुबारक हो! 🪔 इस प्रकाश पर्व पर सभी के घर में खुशियों का उजाला हो।
+broadcast,diwali,hi,formal,सभी को दिवाली की बधाई! 🪔 शुभ दीपावली! यह त्योहार सभी के जीवन में समृद्धि लाए।
+broadcast,diwali,hi,formal,दीपावली की हार्दिक शुभकामनाएं! 🪔 माँ लक्ष्मी सभी पर अपनी कृपा बनाए रखें।
+broadcast,diwali,hi,formal,सभी को दिवाली मुबारक! 🪔 शुभ दीपावली! दीपों का यह त्योहार सभी के जीवन में रोशनी लाए।
+broadcast,diwali,hi,formal,दीपावली की ढेरों शुभकामनाएं! 🪔 यह पर्व सभी के जीवन में सुख और समृद्धि लाए।
+broadcast,diwali,hi,formal,सभी को दीपावली की बधाई हो! 🪔 शुभ दीपावली! इस पावन पर्व पर शुभकामनाएं।
+broadcast,diwali,hi,formal,दिवाली मुबारक! 🪔 माँ लक्ष्मी सभी के घर में समृद्धि और खुशियां लाएं।
+broadcast,diwali,hi,formal,सभी को हार्दिक दीपावली बधाई! 🪔 शुभ दीपावली! दीपों की रोशनी सभी के जीवन में उजाला लाए।
+broadcast,diwali,hi,formal,दिवाली की शुभकामनाएं! 🪔 शुभ दीपावली! माँ लक्ष्मी की कृपा सभी पर हो।
+broadcast,diwali,hinglish,formal,Sabko Happy Diwali! 🪔 Shubh Deepawali! Maa Lakshmi ki kripa aap sab par ho.
+broadcast,diwali,hinglish,formal,Diwali mubarak ho sabko! 🪔 Is prakash parv par sabke ghar mein roshan ho.
+broadcast,diwali,hinglish,formal,Sabko Diwali ki haardik shubhkamnayen! 🪔 Shubh Deepawali! Ye parv khushiyan laaye.
+broadcast,diwali,hinglish,formal,Happy Diwali to all! 🪔 Shubh Deepawali! Maa Lakshmi sab par samriddhi barsayein.
+broadcast,diwali,hinglish,formal,Diwali ki dher saari badhai! 🪔 Is tyohar ki roshni aapke ghar mein prakash laaye.
+broadcast,diwali,hinglish,formal,Sabko Diwali mubarak! 🪔 Shubh Deepawali! Ye parv aapke jeevan mein sukh laaye.
+broadcast,diwali,hinglish,formal,Happy Diwali sabko! 🪔 Diyon ki roshni aapke ghar ko roshan kare. Shubh Deepawali!
+broadcast,diwali,hinglish,formal,Diwali ki shubhkamnayen! 🪔 Maa Lakshmi sab ke ghar mein samriddhi aur khushi laayein.
+broadcast,diwali,hinglish,formal,Sabko Diwali ki bahut badhai! 🪔 Shubh Deepawali! Ye saal sabke liye bahut khaas ho.
+broadcast,diwali,hinglish,formal,Happy Diwali! 🪔 Shubh Deepawali! Is prakash parv par sab ko dher saari khushiyan.
