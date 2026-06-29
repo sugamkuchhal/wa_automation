@@ -167,28 +167,34 @@ function prepareDailyQueue() {
 
     const eventType2 = String(row.event_type || '').toLowerCase().trim();
 
+    const hasPhone = !!String(row.phone || '').replace(/\D/g, '');
+    const hasLink  = !!String(row.group_invite_link || '').trim();
+
     if (eventType2 === 'cascade_birthday') {
-      // cascade_birthday: goes to parent phone, uses cascade_name + name
-      // No group card generated regardless of group_invite_link
-      output.push(_buildRecord(row, templates, today));
+      // cascade_birthday: always goes to parent phone, sheet tone
+      output.push(_buildRecord(Object.assign({}, row, { _dest: 'phone' }), templates, today));
+
     } else if (chatType === 'personalized') {
-      // Card 1: personal wish
-      output.push(_buildRecord(row, templates, today));
-      // Card 2: broadcast card if group_invite_link also present
-      if (String(row.group_invite_link || '').trim()) {
-        const rowGroup = Object.assign({}, row, { original_chat_type: 'personalized' });
-        output.push(_buildRecord(rowGroup, templates, today, '-broadcast', 'broadcast'));
+      if (hasPhone) {
+        // Card 1: personal → phone, sheet tone
+        output.push(_buildRecord(Object.assign({}, row, { _dest: 'phone' }), templates, today));
       }
+      if (hasLink) {
+        // Card 2 (or only card): → group link, forced formal, name kept
+        const rowGroup = Object.assign({}, row, { _dest: 'group', original_chat_type: 'personalized' });
+        output.push(_buildRecord(rowGroup, templates, today, hasPhone ? '-group' : '', 'broadcast'));
+      }
+
     } else if (chatType === 'broadcast') {
-      const bPhone = String(row.phone || '').replace(/\D/g, '');
-      const bLink  = String(row.group_invite_link || '').trim();
-      if (bPhone && bLink) {
-        // Both phone and group link — generate 2 broadcast cards
-        output.push(_buildRecord(row, templates, today, '-phone', 'broadcast'));
-        output.push(_buildRecord(row, templates, today, '-group', 'broadcast'));
+      if (hasPhone && hasLink) {
+        output.push(_buildRecord(Object.assign({}, row, { _dest: 'phone' }), templates, today, '-phone', 'broadcast'));
+        output.push(_buildRecord(Object.assign({}, row, { _dest: 'group' }), templates, today, '-group', 'broadcast'));
+      } else if (hasPhone) {
+        output.push(_buildRecord(Object.assign({}, row, { _dest: 'phone' }), templates, today));
       } else {
-        output.push(_buildRecord(row, templates, today));
+        output.push(_buildRecord(Object.assign({}, row, { _dest: 'group' }), templates, today));
       }
+
     } else {
       output.push(_buildRecord(row, templates, today));
     }
@@ -304,9 +310,13 @@ function _renderTemplate(row, templates) {
   const eventType = String(row.event_type || '').trim();
   const language  = String(row.language   || '').trim();
   const chatType  = String(row.chat_type  || '').toLowerCase();
-  // Groups always forced formal — hard override
-  const tone = (chatType === 'broadcast') ? 'formal' : String(row.tone || '').trim();
-  // individual-sourced group card uses group tone too
+  // Tone override rules:
+  // 1. broadcast chat_type → always formal
+  // 2. destination is group link → always formal
+  // 3. personalized going to phone → use sheet tone
+  const destIsGroup = String(row._dest || '').toLowerCase() === 'group'
+    || (chatType !== 'personalized' && !!String(row.group_invite_link || '').trim() && !String(row.phone || '').trim());
+  const tone = (chatType === 'broadcast' || destIsGroup) ? 'formal' : String(row.tone || '').trim();
   
 
   // ── cascade_birthday: message to parent — detected via event_type, not chat_type ──
