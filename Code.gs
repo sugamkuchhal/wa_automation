@@ -16,7 +16,7 @@ const QUEUE_HEADERS = [
 
 // ── Script Properties (set via Apps Script editor → Project Settings → Script Properties)
 // ANTHROPIC_API_KEY, TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID
-// GIPHY_API_KEY (optional), UNSPLASH_ACCESS_KEY (optional)
+// UNSPLASH_ACCESS_KEY (optional)
 function _prop(key) {
   return PropertiesService.getScriptProperties().getProperty(key) || '';
 }
@@ -365,17 +365,6 @@ function _buildMedia(row) {
   const mode = String(row.media_mode || '').toLowerCase();
   if (mode === 'text' || mode === 'manual_photo') return '';
   const eventType = String(row.event_type || 'celebration');
-
-  if (mode === 'gif') {
-    const key = _prop('GIPHY_API_KEY') || 'dc6zaTOxFJmzC';
-    try {
-      const url = 'https://api.giphy.com/v1/gifs/search?api_key=' + key +
-        '&q=' + encodeURIComponent(eventType + ' celebration') + '&limit=1&rating=g';
-      const res = UrlFetchApp.fetch(url, { muteHttpExceptions: true });
-      const data = JSON.parse(res.getContentText());
-      return data.data[0].images.original.url || '';
-    } catch(e) { return ''; }
-  }
 
   if (mode === 'image') {
     const unsplashKey = _prop('UNSPLASH_ACCESS_KEY');
@@ -870,14 +859,6 @@ function _rowToObj(headers, row) {
 // ============================================================================
 
 function testMedia() {
-  // Test Giphy
-  try {
-    const gifUrl = _buildMedia({ media_mode: 'gif', event_type: 'birthday' });
-    Logger.log('Giphy: ' + (gifUrl ? '✅ ' + gifUrl : '❌ no URL returned'));
-  } catch(e) {
-    Logger.log('Giphy error: ' + e.message);
-  }
-
   // Test Unsplash
   try {
     const imgUrl = _buildMedia({ media_mode: 'image', event_type: 'birthday' });
