@@ -156,7 +156,7 @@
 
 <script>
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbzGcZiIqLzhrX2PjylcH7Aw8CB08fN_cA5OwHe9GqwvjpA4JaMYHKxgPx37Webb3qGR/exec';
-const EMOJI = { birthday:'🎂', anniversary:'💍', diwali:'🪔', holi:'🎨', christmas:'🎄', 'new year':'🎉' };
+const EMOJI = { birthday:'🎂', cascade_birthday:'🎂', anniversary:'💍', diwali:'🪔', holi:'🎨', christmas:'🎄', 'new year':'🎉' };
 const AI_COOLDOWN = 10000;
 
 let allRows = [], selected = new Set(), sessQueue = [], sessIdx = 0, histRows = [];
@@ -193,18 +193,29 @@ async function _fetchWithTimeout(url, opts = {}) {
   }
 }
 
-async function gasGet(params) {
+async function gasGet(params, retries = 3) {
   const url = GAS_URL + '?' + new URLSearchParams(params);
-  const res = await _fetchWithTimeout(url);
-  return res.json();
+  for (let i = 0; i < retries; i++) {
+    try {
+      const res = await _fetchWithTimeout(url);
+      return res.json();
+    } catch(e) {
+      if (i === retries - 1) throw e;
+      await new Promise(r => setTimeout(r, 1000 * (i + 1)));
+    }
+  }
 }
 
-async function gasPost(data) {
-  const res = await _fetchWithTimeout(GAS_URL, {
-    method: 'POST',
-    body: JSON.stringify(data)
-  });
-  return res.json();
+async function gasPost(data, retries = 3) {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const res = await _fetchWithTimeout(GAS_URL, { method: 'POST', body: JSON.stringify(data) });
+      return res.json();
+    } catch(e) {
+      if (i === retries - 1) throw e;
+      await new Promise(r => setTimeout(r, 1000 * (i + 1)));
+    }
+  }
 }
 
 // ── Tabs ─────────────────────────────────────────────────────────────────────
@@ -263,7 +274,14 @@ function render(rows) {
   const root = document.getElementById('root');
   if (!rows.length) { root.innerHTML = '<p style="color:#777;font-size:13px;padding:10px 0">No pending messages.</p>'; return; }
   const todayStr = today();
-  const sorted = [...rows].sort((a,b) => String(a.queue_date).localeCompare(String(b.queue_date)));
+  const typeOrder = { birthday: 0, cascade_birthday: 1, anniversary: 2 };
+  const sorted = [...rows].sort((a, b) => {
+    const dateA = String(a.queue_date), dateB = String(b.queue_date);
+    if (dateA !== dateB) return dateA.localeCompare(dateB);
+    const tA = typeOrder[String(a.event_type).toLowerCase()] ?? 9;
+    const tB = typeOrder[String(b.event_type).toLowerCase()] ?? 9;
+    return tA - tB;
+  });
   root.innerHTML = sorted.map(r => {
     const icon = EMOJI[String(r.event_type||'').toLowerCase()] || '✨';
     const status = r.action_status || 'ready';
@@ -271,6 +289,7 @@ function render(rows) {
     const isSent = status === 'sent';
     const isMissed = r.queue_date !== todayStr;
     const hasMedia = !!r.media_url;
+    const isCascade = String(r.event_type||'').toLowerCase() === 'cascade_birthday';
 
     // Auto-prepend Belated for missed messages not yet edited
     // Track saved ids so auto-save fires only once per session, not on every render
@@ -300,10 +319,11 @@ function render(rows) {
         ${hasMedia?`<button class="btn cp" onclick="shareMsg('${esc(r.id)}','${esc(r.media_url)}')">Share</button>`:''}
         <button class="btn sk" onclick="mark('${esc(r.id)}','skipped')">Skip</button>`;
 
-    return `<div class="card${isSent?' done':isSkipped?' skipped':''}" id="card-${esc(r.id)}">
+    return `<div class="card${isSent?' done':isSkipped?' skipped':''}" id="card-${esc(r.id)}"${isCascade?' style="border-left:3px solid #f0a500"':''}>
       <input type="checkbox" class="cb" ${isSkipped||isSent?'disabled':''} onchange="toggleSel('${esc(r.id)}',this.checked)">
       <div class="ctitle">${icon} ${esc(r.name)} — ${esc(r.event_type)}
         <span class="badge b-${esc(status)}">${esc(status)}</span>
+        ${isCascade ? `<span class="badge" style="background:#fff0e0;color:#b35c00">👶→parent</span>` : ''}
         ${isMissed ? `<span class="badge" style="background:#fce8e8;color:#c0392b">⚠ belated · ${esc(r.queue_date)}</span>` : ''}
       </div>
       <div class="cmeta">${esc(r.chat_type)} · ${esc(r.media_mode)} · ${esc(r.queue_date)}</div>
