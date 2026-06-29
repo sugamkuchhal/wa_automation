@@ -37,6 +37,7 @@
     .card.skipped { opacity: .7; }
     .card.skipped .btn-unskip { opacity: 1 !important; pointer-events: auto !important; font-weight: 700; }
     .card.sel { outline: 2px solid #25D366; }
+    .card.cascade { border-left: 4px solid #f0a500; }
     .ctitle { font-weight: 700; font-size: 14px; margin-bottom: 3px; color: #111; }
     .cmeta { font-size: 12px; color: #777; margin-bottom: 7px; }
     .badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 99px; margin-left: 6px; vertical-align: middle; }
@@ -178,7 +179,8 @@ function today() {
   return new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
 }
 
-const GAS_TIMEOUT_MS = 10000;
+const GAS_TIMEOUT_MS = 12000;
+const GAS_MAX_RETRIES = 3;
 
 async function _fetchWithTimeout(url, opts = {}) {
   const ctrl = new AbortController();
@@ -193,14 +195,30 @@ async function _fetchWithTimeout(url, opts = {}) {
   }
 }
 
+async function _fetchWithRetry(url, opts = {}, retries = GAS_MAX_RETRIES) {
+  for (let attempt = 0; attempt < retries; attempt++) {
+    try {
+      const res = await _fetchWithTimeout(url, opts);
+      return res;
+    } catch(e) {
+      if (attempt < retries - 1) {
+        // Exponential backoff: 1s, 2s, 4s
+        await new Promise(r => setTimeout(r, Math.pow(2, attempt) * 1000));
+      } else {
+        throw e;
+      }
+    }
+  }
+}
+
 async function gasGet(params) {
   const url = GAS_URL + '?' + new URLSearchParams(params);
-  const res = await _fetchWithTimeout(url);
+  const res = await _fetchWithRetry(url);
   return res.json();
 }
 
 async function gasPost(data) {
-  const res = await _fetchWithTimeout(GAS_URL, {
+  const res = await _fetchWithRetry(GAS_URL, {
     method: 'POST',
     body: JSON.stringify(data)
   });
@@ -263,7 +281,13 @@ function render(rows) {
   const root = document.getElementById('root');
   if (!rows.length) { root.innerHTML = '<p style="color:#777;font-size:13px;padding:10px 0">No pending messages.</p>'; return; }
   const todayStr = today();
-  const sorted = [...rows].sort((a,b) => String(a.queue_date).localeCompare(String(b.queue_date)));
+  const EVENT_ORDER = {'birthday':0,'cascade_birthday':1,'anniversary':2};
+  const sorted = [...rows].sort((a,b) => {
+    const ao = EVENT_ORDER[String(a.event_type||'').toLowerCase()] ?? 99;
+    const bo = EVENT_ORDER[String(b.event_type||'').toLowerCase()] ?? 99;
+    if (ao !== bo) return ao - bo;
+    return String(a.queue_date).localeCompare(String(b.queue_date));
+  });
   root.innerHTML = sorted.map(r => {
     const icon = EMOJI[String(r.event_type||'').toLowerCase()] || '✨';
     const status = r.action_status || 'ready';
@@ -300,10 +324,13 @@ function render(rows) {
         ${hasMedia?`<button class="btn cp" onclick="shareMsg('${esc(r.id)}','${esc(r.media_url)}')">Share</button>`:''}
         <button class="btn sk" onclick="mark('${esc(r.id)}','skipped')">Skip</button>`;
 
-    return `<div class="card${isSent?' done':isSkipped?' skipped':''}" id="card-${esc(r.id)}">
+    const isCascade = String(r.event_type||'').toLowerCase() === 'cascade_birthday';
+    const cascadeBadge = isCascade ? `<span class="badge" style="background:#fff3cd;color:#856404">👶→parent</span>` : '';
+    return `<div class="card${isSent?' done':isSkipped?' skipped':''}${isCascade?' cascade':''}" id="card-${esc(r.id)}">
       <input type="checkbox" class="cb" ${isSkipped||isSent?'disabled':''} onchange="toggleSel('${esc(r.id)}',this.checked)">
       <div class="ctitle">${icon} ${esc(r.name)} — ${esc(r.event_type)}
         <span class="badge b-${esc(status)}">${esc(status)}</span>
+        ${cascadeBadge}
         ${isMissed ? `<span class="badge" style="background:#fce8e8;color:#c0392b">⚠ belated · ${esc(r.queue_date)}</span>` : ''}
       </div>
       <div class="cmeta">${esc(r.chat_type)} · ${esc(r.media_mode)} · ${esc(r.queue_date)}</div>
