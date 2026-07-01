@@ -160,7 +160,7 @@ const GAS_URL = 'https://script.google.com/macros/s/AKfycbzGcZiIqLzhrX2PjylcH7Aw
 const EMOJI = { birthday:'🎂', anniversary:'💍', diwali:'🪔', holi:'🎨', christmas:'🎄', 'new year':'🎉' };
 const AI_COOLDOWN = 10000;
 
-let allRows = [], selected = new Set(), sessQueue = [], sessIdx = 0, histRows = [];
+let allRows = [], selected = new Set(), sessQueue = [], sessIdx = 0, histRows = [], histPage = 0, histTotal = 0, histHasMore = false, histDays = 30;
 const _belateSaved = new Set(); // tracks ids that have had belated text auto-saved this session
 
 // ── Utilities ────────────────────────────────────────────────────────────────
@@ -572,26 +572,41 @@ async function endSession() {
 // ── History ───────────────────────────────────────────────────────────────────
 
 async function loadHistory() {
-  const days = document.getElementById('hist-days').value;
+  histDays = parseInt(document.getElementById('hist-days').value) || 30;
+  histPage = 0;
+  histRows = [];
   document.getElementById('hist-body').innerHTML = 'Loading…';
   try {
-    // Load history archive + today's ready_queue together
     const [histData, queueData] = await Promise.all([
-      gasGet({ action: 'history', days }),
+      gasGet({ action: 'history', days: histDays, page: 0 }),
       gasGet({ action: 'queue_all' })
     ]);
     if (histData && histData.error) {
       document.getElementById('hist-body').innerHTML = '❌ ' + histData.error;
       return;
     }
-    const hist  = Array.isArray(histData)  ? histData  : [];
-    const queue = Array.isArray(queueData) ? queueData : [];
-    // Merge today's queue rows not already in history (dedup by id)
+    const hist  = Array.isArray(histData) ? histData : (histData && Array.isArray(histData.rows) ? histData.rows : []);
+    histHasMore = !Array.isArray(histData) && !!histData.hasMore;
+    histTotal   = !Array.isArray(histData) && histData.total || hist.length;
+    const queue = Array.isArray(queueData) ? queueData : (queueData && Array.isArray(queueData.rows) ? queueData.rows : []);
     const histIds = new Set(hist.map(r => r.id));
     const todayRows = queue.filter(r => !histIds.has(r.id));
     histRows = [...hist, ...todayRows];
     renderHistory();
   } catch(e) { document.getElementById('hist-body').innerHTML = '❌ Could not load history.'; }
+}
+
+async function loadMoreHistory() {
+  histPage++;
+  try {
+    const histData = await gasGet({ action: 'history', days: histDays, page: histPage });
+    const rows = Array.isArray(histData) ? histData : (histData && Array.isArray(histData.rows) ? histData.rows : []);
+    histHasMore = !Array.isArray(histData) && !!histData.hasMore;
+    histTotal   = !Array.isArray(histData) && histData.total || histTotal;
+    const existingIds = new Set(histRows.map(r => r.id));
+    rows.forEach(r => { if (!existingIds.has(r.id)) histRows.push(r); });
+    renderHistory();
+  } catch(e) { /* silently keep current rows */ }
 }
 
 function renderHistory() {
@@ -600,7 +615,7 @@ function renderHistory() {
   const sent = rows.filter(r => r.action_status === 'sent').length;
   const skipped = rows.filter(r => r.action_status === 'skipped').length;
   const edited = rows.filter(r => r.action_status === 'edited').length;
-  const days = new Set(rows.map(r => r.queue_date)).size;
+  const days = new Set(rows.map(r => dateOnly(r.queue_date))).size;
   document.getElementById('hist-stats').innerHTML = `
     <div class="stat"><div class="stat-n">${rows.length}</div><div class="stat-l">Total</div></div>
     <div class="stat"><div class="stat-n" style="color:#1a7a42">${sent}</div><div class="stat-l">Sent</div></div>
@@ -608,21 +623,21 @@ function renderHistory() {
     <div class="stat"><div class="stat-n" style="color:#666">${skipped}</div><div class="stat-l">Skipped</div></div>
     <div class="stat"><div class="stat-n">${days}</div><div class="stat-l">Days</div></div>`;
   if (!rows.length) { document.getElementById('hist-body').innerHTML = '<p style="color:#777;font-size:13px">No records found.</p>'; return; }
-  const sorted = [...rows].sort((a,b) => String(b.queue_date).localeCompare(String(a.queue_date)));
+  const sorted = [...rows].sort((a,b) => dateOnly(b.queue_date).localeCompare(dateOnly(a.queue_date)));
   const colors = { sent:'#1a7a42', skipped:'#666', edited:'#856404', ready:'#1a56db' };
   const tbl = `
     <table class="htbl">
       <thead><tr><th>Date</th><th>Name</th><th>Event</th><th>Status</th><th>Time</th></tr></thead>
       <tbody>${sorted.map(r => `<tr>
-        <td>${esc(r.queue_date)}</td>
+        <td>${esc(dateOnly(r.queue_date))}</td>
         <td>${esc(r.name)}</td>
         <td>${esc(r.event_type)}</td>
         <td style="color:${colors[r.action_status]||'#333'};font-weight:600">${esc(r.action_status)}</td>
         <td style="color:#999;font-size:11px">${r.action_ts ? String(r.action_ts).replace('T',' ').substring(0,16) : '—'}</td>
       </tr>`).join('')}</tbody>
     </table>`;
-  const footer = (hasMore && !q)
-    ? `<div style="text-align:center;margin-top:12px"><button onclick="loadMoreHistory()" style="padding:8px 20px;border-radius:8px;border:0;background:#222;color:#fff;font-size:13px;font-weight:600;cursor:pointer">Load more (${(total||0) - histRows.length} remaining)</button></div>`
+  const footer = (histHasMore && !q)
+    ? `<div style="text-align:center;margin-top:12px"><button onclick="loadMoreHistory()" style="padding:8px 20px;border-radius:8px;border:0;background:#222;color:#fff;font-size:13px;font-weight:600;cursor:pointer">Load more (${(histTotal||0) - histRows.length} remaining)</button></div>`
     : '';
   document.getElementById('hist-body').innerHTML = tbl + footer;
 }
