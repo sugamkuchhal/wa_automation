@@ -850,7 +850,17 @@ function runChecks() {
 
 function _rowToObj(headers, row) {
   const obj = {};
-  headers.forEach((h, i) => { obj[h] = row[i]; });
+  headers.forEach((h, i) => {
+    let value = row[i];
+    if (value instanceof Date && !isNaN(value)) {
+      if (h === 'queue_date') {
+        value = Utilities.formatDate(value, TZ, 'yyyy-MM-dd');
+      } else if (h === 'action_ts') {
+        value = Utilities.formatDate(value, TZ, "yyyy-MM-dd'T'HH:mm:ss");
+      }
+    }
+    obj[h] = value;
+  });
   return obj;
 }
 
