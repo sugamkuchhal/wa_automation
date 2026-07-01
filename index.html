@@ -179,6 +179,16 @@ function today() {
   return new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
 }
 
+function dateOnly(v) {
+  if (!v) return '';
+  const s = String(v).trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  const d = new Date(s);
+  if (!isNaN(d)) return d.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
+  const m = s.match(/^(\d{4}-\d{2}-\d{2})/);
+  return m ? m[1] : s;
+}
+
 const GAS_TIMEOUT_MS = 12000;
 const GAS_MAX_RETRIES = 3;
 
@@ -268,7 +278,7 @@ async function loadQueue() {
     allRows = Array.isArray(rows) ? rows : [];
     const todayStr2 = today();
     const pending = allRows.length;
-    const missed = allRows.filter(r => r.queue_date !== todayStr2).length;
+    const missed = allRows.filter(r => dateOnly(r.queue_date) !== todayStr2).length;
     document.getElementById('q-date').textContent = pending + ' pending' + (missed > 0 ? ' · ' + missed + ' from previous days' : '') + ' · ' + todayStr2;
     render(allRows);
   } catch(e) {
@@ -286,14 +296,15 @@ function render(rows) {
     const ao = EVENT_ORDER[String(a.event_type||'').toLowerCase()] ?? 99;
     const bo = EVENT_ORDER[String(b.event_type||'').toLowerCase()] ?? 99;
     if (ao !== bo) return ao - bo;
-    return String(a.queue_date).localeCompare(String(b.queue_date));
+    return dateOnly(a.queue_date).localeCompare(dateOnly(b.queue_date));
   });
   root.innerHTML = sorted.map(r => {
     const icon = EMOJI[String(r.event_type||'').toLowerCase()] || '✨';
     const status = r.action_status || 'ready';
     const isSkipped = status === 'skipped';
     const isSent = status === 'sent';
-    const isMissed = r.queue_date !== todayStr;
+    const queueDate = dateOnly(r.queue_date);
+    const isMissed = queueDate !== todayStr;
     const hasMedia = !!r.media_url;
 
     // Auto-prepend Belated for missed messages not yet edited
@@ -306,7 +317,7 @@ function render(rows) {
       msgText = 'Belated ' + msgText;
       if (!_belateSaved.has(r.id)) {
         _belateSaved.add(r.id);
-        gasPost({ action: 'edit', id: r.id, text: msgText }).then(d => {
+        gasPost({ action: 'edit', id: r.id, text: msgText, skipStatus: true }).then(d => {
           if (d.ok && d.wa_link) {
             const wa = document.getElementById('wa-' + r.id);
             if (wa) wa.href = d.wa_link;
@@ -331,9 +342,9 @@ function render(rows) {
       <div class="ctitle">${icon} ${esc(r.name)} — ${esc(r.event_type)}
         <span class="badge b-${esc(status)}">${esc(status)}</span>
         ${cascadeBadge}
-        ${isMissed ? `<span class="badge" style="background:#fce8e8;color:#c0392b">⚠ belated · ${esc(r.queue_date)}</span>` : ''}
+        ${isMissed ? `<span class="badge" style="background:#fce8e8;color:#c0392b">⚠ belated · ${esc(queueDate)}</span>` : ''}
       </div>
-      <div class="cmeta">${esc(r.chat_type)} · ${esc(r.media_mode)} · ${esc(r.queue_date)}</div>
+      <div class="cmeta">${esc(r.chat_type)} · ${esc(r.media_mode)} · ${esc(queueDate)}</div>
       <textarea class="msg" id="msg-${esc(r.id)}" rows="4" ${isSkipped?'disabled':''} oninput="onEdit('${esc(r.id)}')">${esc(msgText)}</textarea>
       ${hasMedia?`<div style="font-size:11px;color:#888;margin-top:4px">Media: ${esc(r.media_url)}</div>`:''}
       <div class="btns" id="btns-${esc(r.id)}">${actionBtns}</div>
