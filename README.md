@@ -115,7 +115,7 @@ Run `morningRun()` once to test the full flow.
 | cascade_name | `Priya` | Parent's name for `cascade_birthday` rows; replaces `{{cascade_name}}`. Unused otherwise. |
 | relation | `mother`, `cousin` | Used in AI Generate prompt. ` via Parent` suffix stripped automatically. |
 | language | `en` / `hi` / `hinglish` | Template matching. |
-| tone | `warm` / `casual` / `fun` / `formal` | `broadcast` rows always forced to `formal`. |
+| tone | `warm` / `casual` / `fun` / `formal` | Group-link destination cards are forced to `formal`; phone destination cards retain this sheet tone. |
 | media_mode | `text` / `image` / `gif` / `manual_photo` | |
 | is_active | `TRUE` / `FALSE` | `FALSE` rows skipped entirely. |
 
@@ -138,7 +138,7 @@ Run `morningRun()` once to test the full flow.
 
 ### message_templates
 
-Templates support `{{name}}` placeholder.
+Templates support `{{name}}` and `{{cascade_name}}` placeholders. If source values are present, placeholders are replaced for every `chat_type`, including `broadcast`.
 
 Match priority (best tier wins, random pick across all matches at that tier):
 1. `chat_type` + event + language + tone
@@ -153,13 +153,15 @@ Match priority (best tier wins, random pick across all matches at that tier):
 
 ## Message routing
 
-| chat_type | Has phone | Has group link | Destination | Tone | `{{name}}` |
-|---|---|---|---|---|---|
-| `personalized` | ✅ | ❌ | `wa.me/{phone}` | from sheet | replaced |
-| `personalized` | ✅ | ✅ | Card 1: `wa.me/{phone}` | from sheet | replaced |
-| `personalized` | ✅ | ✅ | Card 2: group invite link | forced formal | replaced |
-| `broadcast` | ❌ | ✅ | group invite link | forced formal | stripped |
-| `cascade_birthday` | ✅ (parent) | — | `wa.me/{parent phone}` | from sheet | child name |
+| chat_type | event_type | Has phone | Has group link | Destination | Tone | Placeholders |
+|---|---|---:|---:|---|---|---|
+| `personalized` | any non-cascade event | ✅ | ❌ | `wa.me/{phone}` | from sheet | replaced |
+| `personalized` | any non-cascade event | ✅ | ✅ | Card 1: `wa.me/{phone}` | from sheet | replaced |
+| `personalized` | any non-cascade event | ✅ | ✅ | Card 2: group invite link, with `chat_type` preserved | forced formal | replaced |
+| `broadcast` | any non-cascade event | ✅ | ❌ | `wa.me/{phone}` | from sheet | replaced |
+| `broadcast` | any non-cascade event | ❌ | ✅ | group invite link | forced formal | replaced |
+| `broadcast` | any non-cascade event | ✅ | ✅ | Card 1: `wa.me/{phone}`; Card 2: group invite link | phone from sheet; group forced formal | replaced |
+| any valid `chat_type` | `cascade_birthday` | ✅ (parent) | — | `wa.me/{parent phone}` | from sheet | `{{name}}` = child, `{{cascade_name}}` = parent |
 
 ---
 

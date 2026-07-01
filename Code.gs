@@ -186,20 +186,20 @@ function prepareDailyQueue() {
         const suffix = phones.length > 1 ? '-p' + (i+1) : '';
         output.push(_buildRecord(Object.assign({}, row, { phone, _dest: 'phone' }), templates, today, suffix));
       });
-      // One card per group link (forced formal, name kept, original_chat_type=personalized)
+      // One card per group link (forced formal tone, name kept, chat_type preserved)
       links.forEach((link, i) => {
         const base = phones.length > 0 ? '-g' + (i+1) : (links.length > 1 ? '-g' + (i+1) : '');
-        const rowGroup = Object.assign({}, row, { group_invite_link: link, _dest: 'group', original_chat_type: 'personalized' });
-        output.push(_buildRecord(rowGroup, templates, today, base, 'broadcast'));
+        const rowGroup = Object.assign({}, row, { phone: '', group_invite_link: link, _dest: 'group' });
+        output.push(_buildRecord(rowGroup, templates, today, base));
       });
 
     } else if (chatType === 'broadcast') {
-      // One card per phone (forced formal, name stripped)
+      // One card per phone (sheet tone, names kept)
       phones.forEach((phone, i) => {
         const suffix = (phones.length > 1 || links.length > 0) ? '-p' + (i+1) : '';
         output.push(_buildRecord(Object.assign({}, row, { phone, group_invite_link: '', _dest: 'phone' }), templates, today, suffix));
       });
-      // One card per group link (forced formal, name stripped)
+      // One card per group link (forced formal tone, names kept)
       links.forEach((link, i) => {
         const suffix = (links.length > 1 || phones.length > 0) ? '-g' + (i+1) : '';
         output.push(_buildRecord(Object.assign({}, row, { group_invite_link: link, phone: '', _dest: 'group' }), templates, today, suffix));
@@ -321,12 +321,11 @@ function _renderTemplate(row, templates) {
   const language  = String(row.language   || '').trim();
   const chatType  = String(row.chat_type  || '').toLowerCase();
   // Tone override rules:
-  // 1. broadcast chat_type → always formal
-  // 2. destination is group link → always formal
-  // 3. personalized going to phone → use sheet tone
+  // 1. destination is group link → always formal
+  // 2. every non-group destination keeps the sheet tone, including broadcast phones
   const destIsGroup = String(row._dest || '').toLowerCase() === 'group'
-    || (chatType !== 'personalized' && !!String(row.group_invite_link || '').trim() && !String(row.phone || '').trim());
-  const tone = (chatType === 'broadcast' || destIsGroup) ? 'formal' : String(row.tone || '').trim();
+    || (!!String(row.group_invite_link || '').trim() && !String(row.phone || '').trim());
+  const tone = destIsGroup ? 'formal' : String(row.tone || '').trim();
 
   // ── cascade_birthday: message to parent — detected via event_type, not chat_type ──
   if (eventType.toLowerCase() === 'cascade_birthday') {
@@ -347,14 +346,11 @@ function _renderTemplate(row, templates) {
       : 'Hi {{name}}, wishing you a wonderful day!' };
   const text = String(tmpl.template_text || '');
 
-  // Personalisation
-  const originalChatType = String(row.original_chat_type || '').toLowerCase();
-  if (chatType === 'broadcast' && originalChatType !== 'personalized') {
-    // Pure group row — strip name
-    return text.replace(/\{\{name\}\}/g, '').replace(/  +/g, ' ').trim();
-  }
-  // Individual or individual-sourced group card — keep name
-  return text.replace(/\{\{name\}\}/g, String(row.name || 'there'));
+  // Replace placeholders whenever source values are available. Do not strip names
+  // for broadcast rows; templates without placeholders remain naturally unchanged.
+  return text
+    .replace(/\{\{cascade_name\}\}/g, String(row.cascade_name || 'there'))
+    .replace(/\{\{name\}\}/g, String(row.name || 'there'));
 }
 
 // ============================================================================
@@ -393,12 +389,16 @@ function _buildWaLink(row, text, mediaUrl) {
   const chatType = String(row.chat_type || '').toLowerCase();
   const phone    = String(row.phone || '').replace(/\D/g, '');
 
+  const link = String(row.group_invite_link || '').trim();
+  const destIsGroup = String(row._dest || '').toLowerCase() === 'group';
+
+  if (destIsGroup && link) return link;
+
   if (chatType === 'personalized' && phone) {
     return 'https://wa.me/' + phone + '?text=' + encoded;
   }
   if (chatType === 'broadcast') {
     // Prefer group invite link; fall back to phone wa.me if no link
-    const link = String(row.group_invite_link || '').trim();
     if (link) return link;
     if (phone) return 'https://wa.me/' + phone + '?text=' + encoded;
     return '';
@@ -410,9 +410,9 @@ function _buildWaLink(row, text, mediaUrl) {
 // Build single queue record
 // ============================================================================
 
-function _buildRecord(row, templates, dateStr, idSuffix, chatTypeOverride) {
+function _buildRecord(row, templates, dateStr, idSuffix) {
   idSuffix = idSuffix || '';
-  const chatType   = chatTypeOverride || String(row.chat_type || '').toLowerCase();
+  const chatType   = String(row.chat_type || '').toLowerCase();
   const resolved   = Object.assign({}, row, { chat_type: chatType });
   const text       = _renderTemplate(resolved, templates);
   const mediaUrl   = _buildMedia(resolved);
